@@ -14,16 +14,16 @@ class FirstLoadingScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Welcome to the app!'),
+              const Text('Welcome to the app!'),
               ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                      builder: (context) => HomeScreen(),
+                      builder: (context) => const HomeScreen(),
                     ),
                   );
                 },
-                child: Text('Get Started'),
+                child: const Text('Get Started'),
               ),
             ],
           ),

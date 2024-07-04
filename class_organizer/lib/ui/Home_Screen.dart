@@ -13,7 +13,7 @@ class HomeScreen extends StatelessWidget {
       ),
       body: Center(
         child: Container(
-          child:  Text("Your App Starts Here",
+          child:  const Text("Your App Starts Here",
           style: TextStyle(
             fontSize: 30,
             fontWeight: FontWeight.bold,
