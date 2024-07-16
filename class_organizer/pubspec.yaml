@@ -42,6 +42,12 @@ dependencies:
   avatar_glow: ^3.0.1
   flutter_svg: ^2.0.10+1
   shared_preferences: ^2.2.3
+  smooth_page_indicator: 
+  lottie: ^3.1.2
+  intl: ^0.17.0
+  uuid: ^3.0.6
+  # shared_preferences: ^2.0.13
+  json_annotation: ^4.6.0
   # added shared_preferences  to handle persistent storage.
   # cached_network_image: ^3.3.1
   # A flutter library to show images from the internet and keep them in the cache directory.
@@ -70,7 +76,16 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/images/
+    - assets/
+    - animation/
+    # - assets/images/
+    - assets/edu.jpg
+    - animation/9.json
+    - animation/hello.json
+    - animation/hello1.json
+    - animation/edubox.json
+    - animation/education.json
+    - animation/edumain.json
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

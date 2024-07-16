@@ -2,12 +2,10 @@ import 'dart:async';
 
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:class_organizer/ui/screens/controller/app_controller.dart';
-import 'package:class_organizer/ui/screens/on_loading_screens/first_loading_screen.dart';
 import 'package:class_organizer/utility/assets_path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../Home_Screen.dart';
 import '../widgets/background_widget.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -24,12 +22,17 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   Future<void> moveToNextScreen() async {
     await Future.delayed(const Duration(seconds: 4));
     bool isFirstTimeInstall = await AppController.isFirstTimeInstall();
+
+
     if (mounted) {
       Navigator.pushReplacementNamed(
         context,
         isFirstTimeInstall ? '/firstLoadingScreen' : '/home',
       );
     }
+
+
+
   }
 
   @override
