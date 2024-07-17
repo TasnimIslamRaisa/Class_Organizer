@@ -78,7 +78,8 @@ flutter:
   assets:
     - assets/
     - animation/
-    # - assets/images/
+    - assets/images/
+    - assets/images/mainLogo.svg
     - assets/edu.jpg
     - animation/9.json
     - animation/hello.json
