@@ -2,7 +2,7 @@ import 'dart:async';
 
 
 import 'package:avatar_glow/avatar_glow.dart';
-import 'package:class_organizer/login/login_page.dart';
+import 'package:class_organizer/pages/login/admin_login.dart';
 import 'package:class_organizer/ui/screens/controller/app_controller.dart';
 import 'package:class_organizer/utility/assets_path.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +11,7 @@ import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../onboarding/on_screen.dart';
+import '../pages/login/login_page.dart';
 
 class SplashScreenV1 extends StatefulWidget {
   const SplashScreenV1({super.key});
@@ -110,10 +111,11 @@ class SplashScreenV1State extends State<SplashScreenV1> {
   void goToScreen() async {
     WidgetsFlutterBinding.ensureInitialized();
     final prefs = await SharedPreferences.getInstance();
-    final onboarding = prefs.getBool("onboarding")??false; 
+    final onboarding = prefs.getBool("onboarding")??false;
+    final userType = prefs.getString("user_type")??"user";
     Timer(
         const Duration(seconds: 4),
         () => Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => onboarding ? LoginPage() : OnScreen())));
+            MaterialPageRoute(builder: (context) => onboarding ? (userType=="user"? const LoginPage() : const AdminLogin()) : OnScreen())));
   }
 }

@@ -63,7 +63,7 @@ class OnScreenState extends State<OnScreen> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(builder: (context)=> GetStart()));
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=> GetStart()));
                     },
                     child: Text(buttonText)),
                   SmoothPageIndicator(
