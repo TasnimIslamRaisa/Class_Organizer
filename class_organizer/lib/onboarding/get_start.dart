@@ -82,11 +82,13 @@ class GetStartState extends State<GetStart>{
                     height: 15,
                   ),
                   const Padding(padding: EdgeInsets.symmetric(horizontal: 40),
-                    child: Text("Learning with Class Organizer"),
+                    child: Text("Let's Explore as...",style: TextStyle(fontSize: 23, fontWeight: FontWeight.w400),),
                   ),
                   const SizedBox(height: 8,),
-                  Expanded(
+                  Padding(
+                    padding: const EdgeInsets.all(2),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         ElevatedButton(onPressed: ()async{
                           final press = await SharedPreferences.getInstance();
