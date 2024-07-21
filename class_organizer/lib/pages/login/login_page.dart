@@ -1,10 +1,12 @@
+import 'package:class_organizer/pages/forgot_password.dart';
+import 'package:class_organizer/pages/signup/student_sign_up.dart';
 import 'package:class_organizer/preference/preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
 late bool _passwordVisible = false;
 
-class LoginPage extends StatefulWidget{
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
@@ -12,23 +14,21 @@ class LoginPage extends StatefulWidget{
     // TODO: implement build
     throw UnimplementedError();
   }
-  
+
   @override
   State<StatefulWidget> createState() {
     return LoginPageState();
   }
-  
 }
 
 class LoginPageState extends State<LoginPage> {
-
   final _formKey = GlobalKey<FormState>();
 
   @override
   initState() {
     super.initState();
     preference();
-        _passwordVisible = true;
+    _passwordVisible = true;
   }
 
   @override
@@ -109,197 +109,238 @@ class LoginPageState extends State<LoginPage> {
                       child: Column(
                         children: [
                           Form(
-                            key: _formKey,
+                              key: _formKey,
                               child: Column(
-                            children: [
-                              const SizedBox(
-                                height: 45,
-                              ),
-                              TextFormField(
-                                textAlign: TextAlign.start,
-                                keyboardType: TextInputType.phone,
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                                decoration: const InputDecoration(
-                                  labelText: "Mobile Number / Email",
-                                  floatingLabelBehavior:
-                                      FloatingLabelBehavior.always,
-                                  isDense: true,
-                                  labelStyle: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    height: 0.5,
+                                children: [
+                                  const SizedBox(
+                                    height: 45,
                                   ),
-                                  hintStyle: TextStyle(
-                                    fontSize: 17,
-                                    color: Colors.yellow,
-                                    height: 0.7,
-                                  ),
-                                  enabledBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                    color: Colors.black,
-                                    width: 0.7,
-                                  )),
-                                  border: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                    color: Colors.black,
-                                  )),
-                                  disabledBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                    color: Colors.black,
-                                  )),
-                                  focusedBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                    color: Colors.black,
-                                    width: 0.7,
-                                  )),
-                                  errorBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                    color: Color.fromARGB(255, 146, 24, 24),
-                                    width: 1.2,
-                                  )),
-                                  focusedErrorBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                    color: Color.fromARGB(255, 146, 24, 24),
-                                    width: 1.2,
-                                  )),
-                                ),
-                                validator: (value) {
-                                  RegExp regExp = new RegExp(
-                                      r'^\+?(\d{1,3})?[-. \(\)]?(\d{1,4})?[-. \(\)]?\d{1,4}[-. ]?\d{1,4}[-. ]?\d{1,9}$');
-                                  if(value==null|| value.isEmpty){
-                                    return "Please enter your mobile number...";
-                                  }else if(!regExp.hasMatch(value)){
-                                    return "Pleasel enter a valid phone number..";
-                                  }
-                                },
-                              ),
-                              const SizedBox(
-                                height: 12,
-                              ),
-                              TextFormField(
-                                obscureText: _passwordVisible,
-                                textAlign: TextAlign.start,
-                                keyboardType: TextInputType.visiblePassword,
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                                decoration: InputDecoration(
-                                  labelText: "Password",
-                                  floatingLabelBehavior:
-                                      FloatingLabelBehavior.always,
-                                  isDense: true,
-                                  suffixIcon: IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        _passwordVisible = !_passwordVisible;
-                                      });
-                                    },
-                                    icon: Icon(_passwordVisible
-                                        ? Icons.visibility_off_outlined
-                                        : Icons.visibility_off_outlined),
-                                    iconSize: 20,
-                                  ),
-                                  labelStyle: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    height: 0.5,
-                                  ),
-                                  hintStyle: const TextStyle(
-                                    fontSize: 17,
-                                    color: Colors.yellow,
-                                    height: 0.7,
-                                  ),
-                                  enabledBorder: const UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                    color: Colors.black,
-                                    width: 0.7,
-                                  )),
-                                  border: const UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                    color: Colors.black,
-                                  )),
-                                  disabledBorder: const UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                    color: Colors.black,
-                                  )),
-                                  focusedBorder: const UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                    color: Colors.black,
-                                    width: 0.7,
-                                  )),
-                                  errorBorder: const UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                    color: Color.fromARGB(255, 146, 24, 24),
-                                    width: 1.2,
-                                  )),
-                                  focusedErrorBorder:
-                                      const UnderlineInputBorder(
-                                          borderSide: BorderSide(
-                                    color: Color.fromARGB(255, 146, 24, 24),
-                                    width: 1.2,
-                                  )),
-                                ),
-                                validator: (value) {
-                                  
-                                },
-                              ),
-                              const SizedBox(height: 18,),
-                              Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: InkWell(
-                                  onTap: (){
-                                    if(_formKey.currentState!.validate()){
-                                      
-                                    }
-                                  },
-                                  child: Container(
-                                    margin: const EdgeInsets.only(left: 10,right: 10),
-                                    padding: EdgeInsets.only(right: 18),
-                                    width: double.infinity,
-                                    height: 50.0,
-                                    decoration:  BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        colors: [Colors.blue,Colors.amber],
-                                        begin: FractionalOffset(0.4, 0.3),
-                                        end: FractionalOffset(0.7, 0.0),
-                                        stops: [0.0,1.8],
-                                        tileMode: TileMode.clamp,
-                                  
-                                      ),
-                                      borderRadius: BorderRadius.circular(30)
+                                  TextFormField(
+                                    textAlign: TextAlign.start,
+                                    keyboardType: TextInputType.phone,
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w400,
                                     ),
-                                    child: const Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                      Spacer(),
-                                      Text("Sign In",style: TextStyle(
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.w500,
-                                        
-                                      ),),
-                                      Spacer(),
-                                      Icon(Icons.arrow_forward_outlined,size: 30,color: Colors.white,),
-                                    ],),
+                                    decoration: const InputDecoration(
+                                      labelText: "Mobile Number / Email",
+                                      floatingLabelBehavior:
+                                          FloatingLabelBehavior.always,
+                                      isDense: true,
+                                      labelStyle: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        height: 0.5,
+                                      ),
+                                      hintStyle: TextStyle(
+                                        fontSize: 17,
+                                        color: Colors.yellow,
+                                        height: 0.7,
+                                      ),
+                                      enabledBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(
+                                        color: Colors.black,
+                                        width: 0.7,
+                                      )),
+                                      border: UnderlineInputBorder(
+                                          borderSide: BorderSide(
+                                        color: Colors.black,
+                                      )),
+                                      disabledBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(
+                                        color: Colors.black,
+                                      )),
+                                      focusedBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(
+                                        color: Colors.black,
+                                        width: 0.7,
+                                      )),
+                                      errorBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(
+                                        color: Color.fromARGB(255, 146, 24, 24),
+                                        width: 1.2,
+                                      )),
+                                      focusedErrorBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(
+                                        color: Color.fromARGB(255, 146, 24, 24),
+                                        width: 1.2,
+                                      )),
+                                    ),
+                                    validator: (value) {
+                                      RegExp regExp = new RegExp(
+                                          r'^\+?(\d{1,3})?[-. \(\)]?(\d{1,4})?[-. \(\)]?\d{1,4}[-. ]?\d{1,4}[-. ]?\d{1,9}$');
+                                      if (value == null || value.isEmpty) {
+                                        return "Please enter your mobile number...";
+                                      } else if (!regExp.hasMatch(value)) {
+                                        return "Pleasel enter a valid phone number..";
+                                      }
+                                    },
                                   ),
-                                ),
-                              ),
-                              const SizedBox(height: 10,),
-                              const Align(
-                                alignment: Alignment.bottomRight,
-                                child: Text("Forgot Password",style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w300,
-                                ),textAlign: TextAlign.end,),
-                              )
-                            ],
-                          ))
+                                  const SizedBox(
+                                    height: 12,
+                                  ),
+                                  TextFormField(
+                                    obscureText: _passwordVisible,
+                                    textAlign: TextAlign.start,
+                                    keyboardType: TextInputType.visiblePassword,
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    decoration: InputDecoration(
+                                      labelText: "Password",
+                                      floatingLabelBehavior:
+                                          FloatingLabelBehavior.always,
+                                      isDense: true,
+                                      suffixIcon: IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            _passwordVisible =
+                                                !_passwordVisible;
+                                          });
+                                        },
+                                        icon: Icon(_passwordVisible
+                                            ? Icons.visibility_off_outlined
+                                            : Icons.visibility_off_outlined),
+                                        iconSize: 20,
+                                      ),
+                                      labelStyle: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        height: 0.5,
+                                      ),
+                                      hintStyle: const TextStyle(
+                                        fontSize: 17,
+                                        color: Colors.yellow,
+                                        height: 0.7,
+                                      ),
+                                      enabledBorder: const UnderlineInputBorder(
+                                          borderSide: BorderSide(
+                                        color: Colors.black,
+                                        width: 0.7,
+                                      )),
+                                      border: const UnderlineInputBorder(
+                                          borderSide: BorderSide(
+                                        color: Colors.black,
+                                      )),
+                                      disabledBorder:
+                                          const UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                        color: Colors.black,
+                                      )),
+                                      focusedBorder: const UnderlineInputBorder(
+                                          borderSide: BorderSide(
+                                        color: Colors.black,
+                                        width: 0.7,
+                                      )),
+                                      errorBorder: const UnderlineInputBorder(
+                                          borderSide: BorderSide(
+                                        color: Color.fromARGB(255, 146, 24, 24),
+                                        width: 1.2,
+                                      )),
+                                      focusedErrorBorder:
+                                          const UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                        color: Color.fromARGB(255, 146, 24, 24),
+                                        width: 1.2,
+                                      )),
+                                    ),
+                                    validator: (value) {},
+                                  ),
+                                  const SizedBox(
+                                    height: 18,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: InkWell(
+                                      onTap: () {
+                                        if (_formKey.currentState!
+                                            .validate()) {}
+                                      },
+                                      child: Container(
+                                        margin: const EdgeInsets.only(
+                                            left: 10, right: 10),
+                                        padding: EdgeInsets.only(right: 18),
+                                        width: double.infinity,
+                                        height: 50.0,
+                                        decoration: BoxDecoration(
+                                            gradient: const LinearGradient(
+                                              colors: [
+                                                Colors.blue,
+                                                Colors.amber
+                                              ],
+                                              begin: FractionalOffset(0.4, 0.3),
+                                              end: FractionalOffset(0.7, 0.0),
+                                              stops: [0.0, 1.8],
+                                              tileMode: TileMode.clamp,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(30)),
+                                        child: const Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Spacer(),
+                                            Text(
+                                              "Sign In",
+                                              style: TextStyle(
+                                                fontSize: 25,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            Spacer(),
+                                            Icon(
+                                              Icons.arrow_forward_outlined,
+                                              size: 30,
+                                              color: Colors.white,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  InkWell(
+                                    onTap: (){
+                                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => ForgotPassword()));
+                                    },
+                                    child: const Align(
+                                      alignment: Alignment.bottomRight,
+                                      child: Text(
+                                        "Forgot Password",
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        textAlign: TextAlign.end,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 8,),
+                                  InkWell(
+                                    onTap: (){
+                                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => StudentSignUp()));
+                                    },
+                                    child: const Align(
+                                      alignment: Alignment.bottomCenter,
+                                      child: Text(
+                                        "Not yet registered? Sign Up ->",
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        textAlign: TextAlign.end,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ))
                         ],
                       ),
                     ),
@@ -312,12 +353,12 @@ class LoginPageState extends State<LoginPage> {
       )),
     );
   }
-  
+
   preference() async {
-      if(await Preferences.checkInstalled()){
-        print("Installed");
-      }else{
-        print("Not Installed");
-      }
+    if (await Preferences.checkInstalled()) {
+      print("Installed");
+    } else {
+      print("Not Installed");
+    }
   }
 }
