@@ -11,6 +11,7 @@ import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../onboarding/on_screen.dart';
+import '../ui/Home_Screen.dart';
 
 class SplashScreenV1 extends StatefulWidget {
   const SplashScreenV1({super.key});
@@ -114,6 +115,6 @@ class SplashScreenV1State extends State<SplashScreenV1> {
     Timer(
         const Duration(seconds: 4),
         () => Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => onboarding ? LoginPage() : OnScreen())));
+            MaterialPageRoute(builder: (context) => onboarding ? const HomeScreen() : OnScreen())));
   }
 }
