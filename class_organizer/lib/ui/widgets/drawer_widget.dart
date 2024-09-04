@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 
 import '../../style/app_color.dart';
-import '../screens/students_screen/edit_profile.dart';
+import '../screens/students_screen/edit_profile_screen.dart';
 
 class DrawerWidget extends StatelessWidget {
   const DrawerWidget({

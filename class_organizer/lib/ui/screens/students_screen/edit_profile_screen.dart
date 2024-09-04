@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../widgets/drawer_widget.dart';
+
 class EditProfileScreen extends StatelessWidget {
   const EditProfileScreen({super.key});
 
@@ -11,6 +13,7 @@ class EditProfileScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
       ),
+      drawer: const DrawerWidget(),
       body: SingleChildScrollView(
         child: SafeArea(
           child: Padding(
