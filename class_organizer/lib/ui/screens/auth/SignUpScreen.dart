@@ -1,3 +1,4 @@
+import 'package:class_organizer/ui/screens/auth/SignInScreen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 // import '../../../data/network_caller.dart';
@@ -156,11 +157,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         child: CircularProgressIndicator(),
                       ),
                       child: ElevatedButton(
-                        onPressed: () async {
-                          if (_formkey.currentState!.validate()) {
-                            await registerUser();
-                          }
-                        },
+                        onPressed: () {
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                            MaterialPageRoute(
+                                builder: (contex)=>const SignInScreen()
+                            ),
+                              (route)=>false,
+                          );
+                          },
                         child: const Icon(Icons.arrow_right),
                       ),
                     ),

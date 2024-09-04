@@ -71,8 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
       )
           : null,
       drawer: const DrawerWidget(),
-      body: BackgroundWidget(
-        child: PageView(
+      body: PageView(
           controller: _pageController,
           onPageChanged: (value) {
             setState(() {
@@ -82,12 +81,12 @@ class _HomeScreenState extends State<HomeScreen> {
           children: const [
             StudentCompanionScreen(),
             ClassManagerScreen(),
-            RoutineScreen(),
+            //RoutineScreen(),
             Notes(),
             EditProfileScreen(),
           ],
         ),
-      ),
+
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: index,
         onTap: (value) {
@@ -110,10 +109,6 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.class_outlined),
             label: 'Calendar',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.grid_on),
-            label: 'Grid',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.notifications),

@@ -10,7 +10,7 @@ class EditProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: ProfileAppBar(
-        title: 'Notes',
+        title: 'Edit Profile',
         actionIcon: Icons.more_vert,
         onActionPressed: () {  },
         appBarbgColor: Colors.cyan,

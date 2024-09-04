@@ -15,7 +15,7 @@ class SetPasswordScreen extends StatefulWidget {
 class _SetPasswordScreenState extends State<SetPasswordScreen> {
   final TextEditingController passController = TextEditingController();
   final TextEditingController confirmPassController = TextEditingController();
-
+  bool showPassWord = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,22 +44,65 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
                   const SizedBox(
                     height: 30,
                   ),
+                  // TextFormField(
+                  //   controller: passController,
+                  //   decoration: const InputDecoration(
+                  //     hintText: "Password",
+                  //   ),
+                  //   obscureText: true, // It's a good practice to obscure password fields
+                  // ),
                   TextFormField(
                     controller: passController,
-                    decoration: const InputDecoration(
+                    obscureText: showPassWord == false,
+                    decoration: InputDecoration(
                       hintText: "Password",
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          showPassWord = !showPassWord;
+                          if (mounted) {
+                            setState(() {});
+                          }
+                        },
+                        icon: Icon(showPassWord
+                            ? Icons.visibility
+                            : Icons.visibility_off),
+                      ),
                     ),
-                    obscureText: true, // It's a good practice to obscure password fields
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (String? value) {
+                      if (value?.trim().isEmpty ?? true) {
+                        return "Enter Your Password ";
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(
                     height: 16,
                   ),
                   TextFormField(
                     controller: confirmPassController,
-                    decoration: const InputDecoration(
+                    obscureText: showPassWord == false,
+                    decoration: InputDecoration(
                       hintText: "Confirm Password",
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          showPassWord = !showPassWord;
+                          if (mounted) {
+                            setState(() {});
+                          }
+                        },
+                        icon: Icon(showPassWord
+                            ? Icons.visibility
+                            : Icons.visibility_off),
+                      ),
                     ),
-                    obscureText: true,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (String? value) {
+                      if (value?.trim().isEmpty ?? true) {
+                        return "Enter Your Password ";
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(
                     height: 16,

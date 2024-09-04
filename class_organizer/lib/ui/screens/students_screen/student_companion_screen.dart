@@ -39,7 +39,7 @@ class StudentCompanionScreen extends StatelessWidget {
                   height: 65,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.grey[400],
+                    color: Colors.blueGrey[100],
                   ),
                   child: const Icon(
                     Icons.person,
@@ -111,7 +111,7 @@ class StudentCompanionScreen extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.grey[300],
+                          color: Colors.blueGrey[50],
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: ListTile(
