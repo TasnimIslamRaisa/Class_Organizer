@@ -13,7 +13,7 @@ class RoutineScreen extends StatelessWidget {
           title: 'Routine',
           actionIcon: Icons.more_vert,
           onActionPressed: () {  },
-          appBarbgColor: Colors.pink,
+          appBarbgColor: Color(0xFF40C4FF),
         ),
       drawer: const DrawerWidget(),
       );

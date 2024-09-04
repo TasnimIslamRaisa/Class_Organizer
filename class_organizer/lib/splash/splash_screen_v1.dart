@@ -1,9 +1,6 @@
 import 'dart:async';
-
-
 import 'package:avatar_glow/avatar_glow.dart';
-import 'package:class_organizer/login/login_page.dart';
-import 'package:class_organizer/ui/screens/controller/app_controller.dart';
+import 'package:class_organizer/ui/screens/auth/SignInScreen.dart';
 import 'package:class_organizer/utility/assets_path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -11,7 +8,6 @@ import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../onboarding/on_screen.dart';
-import '../ui/Home_Screen.dart';
 
 class SplashScreenV1 extends StatefulWidget {
   const SplashScreenV1({super.key});
@@ -64,7 +60,7 @@ class SplashScreenV1State extends State<SplashScreenV1> {
         fit: StackFit.expand,
         children: [
           Image.asset(
-            "assets/edu.jpg",
+            "assets/images/blueBG.jpg",
             fit: BoxFit.cover,
           ),
           Center(
@@ -115,6 +111,6 @@ class SplashScreenV1State extends State<SplashScreenV1> {
     Timer(
         const Duration(seconds: 4),
         () => Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => onboarding ? const HomeScreen() : OnScreen())));
+            MaterialPageRoute(builder: (context) => onboarding ? const SignInScreen() : OnScreen())));
   }
 }

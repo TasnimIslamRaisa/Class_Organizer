@@ -13,7 +13,7 @@ class ClassManagerScreen extends StatelessWidget {
         title: 'Class Manager',
         actionIcon: Icons.more_vert,
         onActionPressed: () {  },
-        appBarbgColor: Colors.lightBlueAccent,
+        appBarbgColor: const Color(0xFF00B0FF),
       ),
       drawer: const DrawerWidget(),
     );

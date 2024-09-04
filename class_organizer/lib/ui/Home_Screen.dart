@@ -1,8 +1,10 @@
+import 'package:class_organizer/ui/screens/auth/SignInScreen.dart';
 import 'package:class_organizer/ui/screens/students_screen/class_manager_screen.dart';
 import 'package:class_organizer/ui/screens/students_screen/edit_profile_screen.dart';
 import 'package:class_organizer/ui/screens/students_screen/notes_screen.dart';
 import 'package:class_organizer/ui/screens/students_screen/routine_screen.dart';
 import 'package:class_organizer/ui/screens/students_screen/student_companion_screen.dart';
+import 'package:class_organizer/ui/widgets/background_widget.dart';
 import 'package:class_organizer/ui/widgets/drawer_widget.dart';
 import 'package:flutter/material.dart';
 class HomeScreen extends StatefulWidget {
@@ -23,6 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ? AppBar(
         title: const Text("Student Companion"),
         backgroundColor: Colors.lightBlueAccent[700],
+        foregroundColor: Colors.white,
         actions: [
           PopupMenuButton<String>(
             onSelected: (value) {
@@ -39,7 +42,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 // Navigate to the Settings screen or perform settings action
                   break;
                 case 'logout':
-                // Perform logout action
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SignInScreen(),
+                    ),
+                  );
                   break;
               }
             },
@@ -63,20 +71,22 @@ class _HomeScreenState extends State<HomeScreen> {
       )
           : null,
       drawer: const DrawerWidget(),
-      body: PageView(
-        controller: _pageController,
-        onPageChanged: (value) {
-          setState(() {
-            index = value;
-          });
-        },
-        children: const [
-          StudentCompanionScreen(),
-          ClassManagerScreen(),
-          RoutineScreen(),
-          Notes(),
-          EditProfileScreen(),
-        ],
+      body: BackgroundWidget(
+        child: PageView(
+          controller: _pageController,
+          onPageChanged: (value) {
+            setState(() {
+              index = value;
+            });
+          },
+          children: const [
+            StudentCompanionScreen(),
+            ClassManagerScreen(),
+            RoutineScreen(),
+            Notes(),
+            EditProfileScreen(),
+          ],
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: index,

@@ -19,6 +19,7 @@ class ProfileAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       title: Text(title),
       backgroundColor: appBarbgColor,
+      foregroundColor: Colors.white,
       actions: [
         IconButton(
           icon: Icon(actionIcon),

@@ -13,7 +13,7 @@ class Notes extends StatelessWidget {
         title: 'Notes',
         actionIcon: Icons.more_vert,
         onActionPressed: () {  },
-        appBarbgColor: Colors.pinkAccent,
+        appBarbgColor: Color(0xFF80D8FF),
       ),
       drawer: const DrawerWidget(),
     );
