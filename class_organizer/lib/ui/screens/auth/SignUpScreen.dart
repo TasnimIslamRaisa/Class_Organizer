@@ -30,9 +30,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
+      body: BackgroundWidget(
         //BackgroundWidget
-        child: BackgroundWidget(
+        child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(30.0),
             child:  Form(
