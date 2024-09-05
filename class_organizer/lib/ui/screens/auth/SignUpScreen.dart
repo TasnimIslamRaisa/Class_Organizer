@@ -279,7 +279,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void onTabSignInButton() {
-    Navigator.pop(context);
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context)=>const SignInScreen()),
+        (route)=>false,
+    );
   }
 
   Future<void> registerUser() async {

@@ -1,6 +1,7 @@
 import 'package:class_organizer/ui/screens/seven_days_content/tuesday_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart'; // Import SpeedDial package
+import '../../../utility/profile_app_bar.dart';
 import '../../widgets/drawer_widget.dart';
 import '../seven_days_content/friday_content.dart';
 import '../seven_days_content/monday_content.dart';
@@ -17,20 +18,16 @@ class ClassManagerScreen extends StatelessWidget {
     return DefaultTabController(
       length: 7, // Number of days in the week
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Class Manager'),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.more_vert),
-              onPressed: () {
-                // Handle action pressed
-              },
-            ),
-          ],
-          backgroundColor: const Color(0xFF00B0FF),
-          foregroundColor: Colors.white,
-          bottom: const TabBar(
+        appBar: ProfileAppBar(
+          title:  'Student Companions',
+          actionIcon: Icons.more_vert,
+          onActionPressed: (){},
+          appBarbgColor: const Color(0xFF00B0FF),
+          //foregroundColor: Colors.white,
+          bottom:const TabBar(
             isScrollable: true,
+            labelColor: Colors.black,
+            unselectedLabelColor: Colors.white,
             tabs: [
               Tab(text: 'Mon'),
               Tab(text: 'Tue'),
@@ -40,6 +37,7 @@ class ClassManagerScreen extends StatelessWidget {
               Tab(text: 'Sat'),
               Tab(text: 'Sun'),
             ],
+
           ),
         ),
         drawer: const DrawerWidget(),

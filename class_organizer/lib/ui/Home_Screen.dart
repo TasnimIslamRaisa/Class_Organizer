@@ -2,11 +2,12 @@ import 'package:class_organizer/ui/screens/auth/SignInScreen.dart';
 import 'package:class_organizer/ui/screens/students_screen/class_manager_screen.dart';
 import 'package:class_organizer/ui/screens/students_screen/edit_profile_screen.dart';
 import 'package:class_organizer/ui/screens/students_screen/notes_screen.dart';
+import 'package:class_organizer/ui/screens/students_screen/settings_screen.dart';
 import 'package:class_organizer/ui/screens/students_screen/student_companion_screen.dart';
 import 'package:class_organizer/ui/widgets/drawer_widget.dart';
+import 'package:class_organizer/utility/profile_app_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart'; // Import SpeedDial package
-
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -22,54 +23,13 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: index == 0
-          ? AppBar(
-        title: const Text("Student Companion"),
-        backgroundColor: Colors.lightBlueAccent[700],
-        foregroundColor: Colors.white,
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              switch (value) {
-                case 'edit':
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const EditProfileScreen(),
-                    ),
-                  );
-                  break;
-                case 'settings':
-                // Navigate to the Settings screen or perform settings action
-                  break;
-                case 'logout':
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SignInScreen(),
-                    ),
-                  );
-                  break;
-              }
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'edit',
-                child: Text('Edit'),
-              ),
-              const PopupMenuItem(
-                value: 'settings',
-                child: Text('Settings'),
-              ),
-              const PopupMenuItem(
-                value: 'logout',
-                child: Text('Logout'),
-              ),
-            ],
-            icon: const Icon(Icons.more_vert), // Options icon
-          ),
-        ],
+          ? ProfileAppBar(
+          title:  'Student Companions',
+          actionIcon: Icons.more_vert,
+          onActionPressed: (){},
+          appBarbgColor: const Color(0xFF01579B),
       )
-          : null,
+      : null,
       drawer: const DrawerWidget(),
       body: PageView(
         controller: _pageController,

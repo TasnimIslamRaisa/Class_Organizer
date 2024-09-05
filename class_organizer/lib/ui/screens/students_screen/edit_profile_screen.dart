@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:class_organizer/ui/screens/students_screen/settings_screen.dart';
 import 'package:flutter/material.dart';
 import '../../Home_Screen.dart';
 import '../../widgets/drawer_widget.dart';
@@ -196,7 +197,9 @@ class EditProfileScreen extends StatelessWidget {
               foregroundColor: Colors.white,
               shape: const CircleBorder(),
               onPressed: () {
-                // Handle settings action
+                Navigator.push(context, 
+                    MaterialPageRoute(builder: (contex)=>const SettingScreen())
+                );
               },
               heroTag: 'settings', // Unique heroTag for each button
               child: const Icon(Icons.settings),

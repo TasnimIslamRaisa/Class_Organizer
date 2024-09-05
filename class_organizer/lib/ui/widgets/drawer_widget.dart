@@ -1,3 +1,5 @@
+import 'package:class_organizer/ui/screens/auth/SignInScreen.dart';
+import 'package:class_organizer/ui/screens/students_screen/settings_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../style/app_color.dart';
@@ -126,10 +128,27 @@ class DrawerWidget extends StatelessWidget {
             },
           ),
           ListTile(
+            leading: const Icon(Icons.settings),
+            title: const Text('S E T T I N G S'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context)=>const SettingScreen()),
+
+              );
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('L O G O U T'),
             onTap: () {
               Navigator.pop(context);
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context)=>const SignInScreen()),
+                  (route)=>false
+              );
             },
           ),
         ],
