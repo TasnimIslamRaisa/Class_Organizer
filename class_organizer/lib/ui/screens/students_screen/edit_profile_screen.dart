@@ -1,7 +1,9 @@
-import 'package:class_organizer/ui/widgets/background_widget.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
-import '../../../utility/profile_app_bar.dart';
+import '../../Home_Screen.dart';
 import '../../widgets/drawer_widget.dart';
+import '../../../utility/profile_app_bar.dart';
+import '../../widgets/background_widget.dart';
 
 class EditProfileScreen extends StatelessWidget {
   const EditProfileScreen({super.key});
@@ -12,7 +14,7 @@ class EditProfileScreen extends StatelessWidget {
       appBar: ProfileAppBar(
         title: 'Edit Profile',
         actionIcon: Icons.more_vert,
-        onActionPressed: () {  },
+        onActionPressed: () {},
         appBarbgColor: Colors.cyan,
       ),
       drawer: const DrawerWidget(),
@@ -67,7 +69,7 @@ class EditProfileScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-        
+
                   // Name TextField
                   TextField(
                     decoration: InputDecoration(
@@ -79,7 +81,7 @@ class EditProfileScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-        
+
                   // University TextField
                   TextField(
                     decoration: InputDecoration(
@@ -91,7 +93,7 @@ class EditProfileScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-        
+
                   // Department Dropdown
                   DropdownButtonFormField<String>(
                     decoration: InputDecoration(
@@ -104,14 +106,13 @@ class EditProfileScreen extends StatelessWidget {
                       DropdownMenuItem(value: 'CSE', child: Text('CSE')),
                       DropdownMenuItem(value: 'EEE', child: Text('EEE')),
                       DropdownMenuItem(value: 'BBA', child: Text('BBA')),
-                      // Add more departments as needed
                     ],
                     onChanged: (value) {
                       // Handle department selection
                     },
                   ),
                   const SizedBox(height: 16),
-        
+
                   // Semester Dropdown
                   DropdownButtonFormField<String>(
                     decoration: InputDecoration(
@@ -133,14 +134,13 @@ class EditProfileScreen extends StatelessWidget {
                       DropdownMenuItem(value: '10th', child: Text('10th')),
                       DropdownMenuItem(value: '11th', child: Text('11th')),
                       DropdownMenuItem(value: '12th', child: Text('12th')),
-                      // Add more semesters as needed
                     ],
                     onChanged: (value) {
                       // Handle semester selection
                     },
                   ),
                   const SizedBox(height: 16),
-        
+
                   // CGPA TextField
                   TextField(
                     decoration: InputDecoration(
@@ -152,7 +152,7 @@ class EditProfileScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-        
+
                   // Credits TextField
                   TextField(
                     decoration: InputDecoration(
@@ -164,7 +164,7 @@ class EditProfileScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-        
+
                   // Notes with Dots
                   const Padding(
                     padding: EdgeInsets.only(left: 8.0),
@@ -185,7 +185,7 @@ class EditProfileScreen extends StatelessWidget {
           ),
         ),
       ),
-      // Stack to position Floating Action Buttons
+      // Floating Action Buttons for both Settings and Save
       floatingActionButton: Stack(
         children: [
           Positioned(
@@ -196,10 +196,10 @@ class EditProfileScreen extends StatelessWidget {
               foregroundColor: Colors.white,
               shape: const CircleBorder(),
               onPressed: () {
-                // Handle save action
+                // Handle settings action
               },
-              heroTag: null,
-              child: const Icon(Icons.settings), // Prevents hero tag conflicts
+              heroTag: 'settings', // Unique heroTag for each button
+              child: const Icon(Icons.settings),
             ),
           ),
           Positioned(
@@ -210,10 +210,28 @@ class EditProfileScreen extends StatelessWidget {
               foregroundColor: Colors.white,
               shape: const CircleBorder(),
               onPressed: () {
-                // Handle other action
+                // Show alert dialog with "Profile updated"
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return const AlertDialog(
+                      title: Center(child: Text("Successfully Updated",style: TextStyle(
+                        fontSize: 18
+                      ),)),
+                      //content: Text("Profile updated!"),
+                    );
+                  },
+                );
+
+                // Delay for 3 seconds before navigating to HomeScreen
+                Future.delayed(const Duration(seconds: 1), () {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  );
+                });
               },
-              heroTag: null,
-              child: const Icon(Icons.check), // Prevents hero tag conflicts
+              heroTag: 'save', // Unique heroTag for each button
+              child: const Icon(Icons.check),
             ),
           ),
         ],
