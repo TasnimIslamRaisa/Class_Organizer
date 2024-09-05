@@ -7,6 +7,7 @@ class BackgroundWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Stack(
       children: [
         // Image.asset(
@@ -21,8 +22,8 @@ class BackgroundWidget extends StatelessWidget {
           child: Image.asset(
             "assets/images/blueBG.jpg",
             fit: BoxFit.cover,
-            height: double.maxFinite,
-            width: double.maxFinite,
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
           ),
         ),
         child,
