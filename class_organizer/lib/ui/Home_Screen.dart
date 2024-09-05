@@ -2,11 +2,11 @@ import 'package:class_organizer/ui/screens/auth/SignInScreen.dart';
 import 'package:class_organizer/ui/screens/students_screen/class_manager_screen.dart';
 import 'package:class_organizer/ui/screens/students_screen/edit_profile_screen.dart';
 import 'package:class_organizer/ui/screens/students_screen/notes_screen.dart';
-import 'package:class_organizer/ui/screens/students_screen/routine_screen.dart';
 import 'package:class_organizer/ui/screens/students_screen/student_companion_screen.dart';
-import 'package:class_organizer/ui/widgets/background_widget.dart';
 import 'package:class_organizer/ui/widgets/drawer_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart'; // Import SpeedDial package
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -52,9 +52,9 @@ class _HomeScreenState extends State<HomeScreen> {
               }
             },
             itemBuilder: (context) => [
-              PopupMenuItem(
+              const PopupMenuItem(
                 value: 'edit',
-                child: const Text('Edit'),
+                child: Text('Edit'),
               ),
               const PopupMenuItem(
                 value: 'settings',
@@ -72,21 +72,19 @@ class _HomeScreenState extends State<HomeScreen> {
           : null,
       drawer: const DrawerWidget(),
       body: PageView(
-          controller: _pageController,
-          onPageChanged: (value) {
-            setState(() {
-              index = value;
-            });
-          },
-          children: const [
-            StudentCompanionScreen(),
-            ClassManagerScreen(),
-            //RoutineScreen(),
-            Notes(),
-            EditProfileScreen(),
-          ],
-        ),
-
+        controller: _pageController,
+        onPageChanged: (value) {
+          setState(() {
+            index = value;
+          });
+        },
+        children: const [
+          StudentCompanionScreen(),
+          ClassManagerScreen(),
+          Notes(),
+          EditProfileScreen(),
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: index,
         onTap: (value) {
@@ -120,6 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+
     );
   }
 }

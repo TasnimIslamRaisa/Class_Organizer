@@ -16,8 +16,8 @@ class EditProfileScreen extends StatelessWidget {
         appBarbgColor: Colors.cyan,
       ),
       drawer: const DrawerWidget(),
-      body: BackgroundWidget(
-        child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        child: BackgroundWidget(
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(16.0),

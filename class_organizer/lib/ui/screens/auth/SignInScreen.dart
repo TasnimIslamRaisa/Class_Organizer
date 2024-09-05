@@ -96,6 +96,27 @@ class _SignInScreenState extends State<SignInScreen> {
                     const SizedBox(
                       height: 16,
                     ),
+                    DropdownButtonFormField<String>(
+                      decoration: InputDecoration(
+                        labelText: 'Sign In As',
+                        suffixStyle: TextStyle(
+                          color: AppColors.subtitleColor,
+                        ),
+                        border: InputBorder.none,
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                      ),
+                      items: const [
+                        DropdownMenuItem(value: 'Student', child: Text('Student',)),
+                        DropdownMenuItem(value: 'Teacher', child: Text('Teacher')),
+                        DropdownMenuItem(value: 'Admin', child: Text('Admin')),
+                        // Add more departments as needed
+                      ],
+                      onChanged: (value) {
+                        // Handle department selection
+                      },
+                    ),
+                    const SizedBox(height: 16,),
                     Visibility(
                       visible: signInApiInProgress==false,
                       replacement: const Center(child: CircularProgressIndicator()),
@@ -207,11 +228,12 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   void onTabSignUpButton() {
-    Navigator.push(
+    Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
         builder: (context) => const SignUpScreen(),
       ),
+        (route)=>false,
     );
   }
 
