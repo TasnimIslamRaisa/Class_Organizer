@@ -1,5 +1,7 @@
-import 'package:class_organizer/style/themes/theme_provider.dart';
+import 'package:class_organizer/ui/screens/controller/theme_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:provider/provider.dart';
 
 import 'class_organizer_app.dart';
@@ -9,9 +11,6 @@ Future<void> main() async {
 
   // // Open the database
   // final db = await dbManager.database;
-  runApp(ChangeNotifierProvider(
-    create: (_) => ThemeProvider(),
-    child:const ClassOrganizerApp(),
-  ),
-  );
+  Get.put(ThemeController());
+  runApp(const ClassOrganizerApp(),);
 }

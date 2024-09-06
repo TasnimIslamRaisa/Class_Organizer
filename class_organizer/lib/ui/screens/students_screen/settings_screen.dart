@@ -1,15 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import '../../../style/themes/theme_provider.dart';
+import 'package:get/get.dart';
 import '../../../utility/profile_app_bar.dart';
+import '../controller/theme_controller.dart';
 
 class SettingScreen extends StatelessWidget {
   const SettingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Access the ThemeController
+    final ThemeController themeController = Get.find<ThemeController>();
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.secondary,
       appBar:  ProfileAppBar(
@@ -33,14 +34,15 @@ class SettingScreen extends StatelessWidget {
               style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold
-              ),),
-            //switch
-            CupertinoSwitch(
-                value: Provider.of<ThemeProvider>(context,listen: false).isDarkMode,
-                onChanged: (value){
-                  Provider.of<ThemeProvider>(context,listen: false).toggleTheme();
-                }),
-
+              ),
+            ),
+            // Dark Mode Switch using GetX
+            Obx(() => CupertinoSwitch(
+              value: themeController.isDarkMode,  // Get the dark mode status
+              onChanged: (value) {
+                themeController.toggleTheme();  // Toggle theme on switch change
+              },
+            )),
           ],
         ),
       ),

@@ -1,18 +1,21 @@
 import 'package:class_organizer/splash/splash_screen_v1.dart';
+import 'package:class_organizer/ui/screens/controller/theme_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_navigation/src/root/get_material_app.dart';
-import 'package:provider/provider.dart';
+import 'package:get/get.dart';
+
 class ClassOrganizerApp extends StatelessWidget {
   const ClassOrganizerApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
+    // Initialize the ThemeController
+    final ThemeController themeController = Get.put(ThemeController());
+    return Obx(()=>GetMaterialApp(
       title: 'Class Organizer',
       debugShowCheckedModeBanner:false ,
-      theme: Provider.of(context).ThemeData,
+      theme: themeController.themeData.value, // Observe theme changes
       home: const SplashScreenV1(),
 
-    );
+    ),);
   }
 }
