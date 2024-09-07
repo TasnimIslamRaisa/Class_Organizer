@@ -6,7 +6,7 @@ class SaturdayContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Center(
-      child: Text("NO Class On Tuesday",
+      child: Text("NO Class On Saturday",
         style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w500

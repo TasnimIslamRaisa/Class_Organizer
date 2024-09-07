@@ -16,6 +16,7 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
   final TextEditingController passController = TextEditingController();
   final TextEditingController confirmPassController = TextEditingController();
   bool showPassWord = false;
+  bool showConfirmedPassWord = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,13 +45,6 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
                   const SizedBox(
                     height: 30,
                   ),
-                  // TextFormField(
-                  //   controller: passController,
-                  //   decoration: const InputDecoration(
-                  //     hintText: "Password",
-                  //   ),
-                  //   obscureText: true, // It's a good practice to obscure password fields
-                  // ),
                   TextFormField(
                     controller: passController,
                     obscureText: showPassWord == false,
@@ -86,12 +80,12 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
                       hintText: "Confirm Password",
                       suffixIcon: IconButton(
                         onPressed: () {
-                          showPassWord = !showPassWord;
+                          showConfirmedPassWord = !showConfirmedPassWord;
                           if (mounted) {
                             setState(() {});
                           }
                         },
-                        icon: Icon(showPassWord
+                        icon: Icon(showConfirmedPassWord
                             ? Icons.visibility
                             : Icons.visibility_off),
                       ),
@@ -147,7 +141,6 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
       ),
     );
   }
-
   void onTabSignInButton() {
     Navigator.push(
       context,
@@ -185,7 +178,6 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
       ),
     );
   }
-
   @override
   void dispose() {
     passController.dispose();
