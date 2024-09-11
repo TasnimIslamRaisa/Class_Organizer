@@ -272,12 +272,12 @@ void showSnackBarMsg(BuildContext context, String message) {
 
     if (_formkey.currentState!.validate()) {
       signUp();
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const HomeScreen(),
-        ),
-      );
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => const HomeScreen(),
+      //   ),
+      // );
     }
   }
 
