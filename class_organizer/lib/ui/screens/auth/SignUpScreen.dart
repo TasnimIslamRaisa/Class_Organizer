@@ -1,9 +1,16 @@
+import 'package:class_organizer/models/user.dart';
+import 'package:class_organizer/ui/Home_Screen.dart';
 import 'package:class_organizer/ui/screens/auth/SignInScreen.dart';
+import 'package:class_organizer/utility/unique.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import '../../../db/database_helper.dart';
+import '../../../models/u_data.dart';
+import '../../../preference/logout.dart';
 import '../../../style/app_color.dart';
 import '../../../utility/app_constant.dart';
 import '../../widgets/background_widget.dart';
+import 'package:uuid/uuid.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -25,6 +32,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool registrationInProgress = false;
   String? selectedRole;
 
+
+@override
+  void initState() {
+    super.initState();
+    checkLoginStatus();
+  }
 
 
   @override
@@ -211,9 +224,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       if (value?.trim().isEmpty ?? true) {
                         return "Select Any Option ";
                       }
-                      if (value != passWordController.text) {
-                        return "Passwords do not match";
-                      }
+                      // if (value != passWordController.text) {
+                      //   return "Passwords do not match";
+                      // }
                       return null;
                     },
                   ),
@@ -286,11 +299,55 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
+void showSnackBarMsg(BuildContext context, String message) {
+  final snackBar = SnackBar(
+    content: Text(message),
+    duration: const Duration(seconds: 2),
+  );
+
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+}
+
   Future<void> registerUser() async {
     registrationInProgress = true;
     if (mounted) {
       setState(() {});
     }
+
+    // sqlite
+
+    User? existingUser = await DatabaseHelper().getUserByPhone(mobileController.text.trim());
+
+  if (existingUser != null) {
+
+    if (mounted) {
+      showSnackBarMsg(context, 'User already registered');
+    }
+    registrationInProgress = false;
+    if (mounted) {
+      setState(() {});
+    }
+    return;
+  }
+
+
+var uuid = Uuid();
+
+String uniqueId = Unique().generateUniqueID();
+
+User newUser = User(
+  uniqueid: uniqueId,
+  uname: "${firstNameController.text.trim()} ${lastNameController.text.trim()}",
+  phone: mobileController.text.trim(),
+  pass: passWordController.text.trim(),
+  email: emailController.text.trim(),
+  userid: uuid.v4(),
+  utype: 3,
+  status: 1,
+);
+
+int result = await DatabaseHelper().insertUser(newUser);
+
     // Map<String, dynamic> requestInput = {
     //   "email": emailController.text.trim(),
     //   "firstName": firstNameController.text.trim(),
@@ -305,6 +362,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
     if (mounted) {
       setState(() {});
     }
+
+  if (result > 0) {
+    if (mounted) {
+      showSnackBarMsg(context, 'Registration Successful');
+    }
+    clearfield();
+  } else {
+    if (mounted) {
+      showSnackBarMsg(context, 'Registration Failed');
+    }
+  }
+
+
     // if (response.isSuccess) {
     //   if (mounted) {
     //     showSnackBarMsg(context, 'Registration Successful');
@@ -324,6 +394,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
     mobileController.clear();
     passWordController.clear();
   }
+
+void checkLoginStatus() async {
+
+  bool isLoggedIn = await Logout().isLoggedIn();
+
+  if (isLoggedIn) {
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HomeScreen(),
+      ),
+    );
+  } else {
+    // User is not logged in, stay on the sign-in screen
+  }
+}
 
   @override
   void dispose() {

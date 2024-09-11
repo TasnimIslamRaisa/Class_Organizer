@@ -85,9 +85,9 @@ class GetStartState extends State<GetStart>{
                   const Padding(padding: EdgeInsets.symmetric(horizontal: 40),
                     child: Text("Let's Explore as...",style: TextStyle(fontSize: 23, fontWeight: FontWeight.w400),),
                   ),
-                  const SizedBox(height: 8,),
+                  const SizedBox(height: 10,),
                   Padding(
-                    padding: const EdgeInsets.all(2),
+                    padding: const EdgeInsets.all(1),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -101,6 +101,7 @@ class GetStartState extends State<GetStart>{
                           
 
                         ), child: const Text("USER")),
+                        SizedBox(height: 2),
                         ElevatedButton(onPressed: ()async{
                           final press = await SharedPreferences.getInstance();
                           press.setBool("onboarding", true);

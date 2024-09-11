@@ -1,4 +1,5 @@
 import 'package:class_organizer/ui/screens/auth/SignInScreen.dart';
+import 'package:class_organizer/ui/screens/students_screen/campus_routine.dart';
 import 'package:class_organizer/ui/screens/students_screen/class_manager_screen.dart';
 import 'package:class_organizer/ui/screens/students_screen/edit_profile_screen.dart';
 import 'package:class_organizer/ui/screens/students_screen/notes_screen.dart';
@@ -41,6 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: const [
           StudentCompanionScreen(),
           ClassManagerScreen(),
+          CampusRoutine(),
           Notes(),
           EditProfileScreen(),
         ],
@@ -66,11 +68,15 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.class_outlined),
-            label: 'Calendar',
+            label: 'Schedules',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.event_outlined),
+            label: 'Routines',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.notifications),
-            label: 'Notifications',
+            label: 'Notes',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle),

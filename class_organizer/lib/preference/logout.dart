@@ -30,6 +30,11 @@ class Logout {
     }
   }
 
+  Future<void> clearUser({String key = USER_KEY}) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove(key);
+  }
+
   Future<void> getOut(BuildContext context) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.clear();
@@ -47,6 +52,11 @@ class Logout {
   Future<void> setLoggedIn(bool isLoggedIn) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool(KEY_IS_LOGGED_IN, isLoggedIn);
+  }
+
+    Future<void> logoutUser() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool(KEY_IS_LOGGED_IN, false);
   }
 
   Future<void> setInstaller(bool isInstalled) async {

@@ -19,7 +19,7 @@ class ClassManagerScreen extends StatelessWidget {
       length: 7, // Number of days in the week
       child: Scaffold(
         appBar: ProfileAppBar(
-          title:  'Student Companions',
+          title:  'Daily Schedules',
           actionIcon: Icons.more_vert,
           onActionPressed: (){},
           appBarbgColor: const Color(0xFF00B0FF),

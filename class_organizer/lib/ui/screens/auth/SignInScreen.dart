@@ -1,9 +1,12 @@
+import 'package:class_organizer/preference/logout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 // import '../../../data/logInModel.dart';
 // import '../../../data/network_caller.dart';
 // import '../../../data/network_response.dart';
 // import '../../../data/urls.dart';
+import '../../../db/database_helper.dart';
+import '../../../models/user.dart';
 import '../../../style/app_color.dart';
 import '../../../utility/app_constant.dart';
 import '../../Home_Screen.dart';
@@ -57,11 +60,25 @@ class _SignInScreenState extends State<SignInScreen> {
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (String? value) {
                         if (value?.trim().isEmpty ?? true) {
-                          return "Enter Your Email ";
+                          return "Enter Your Email or Phone Number ";
                         }
-                        if (AppConstant.emailRegExp.hasMatch(value!) == false) {
+                        // if (AppConstant.emailRegExp.hasMatch(value!) == false) {
+                        //   return "Enter a valid email address";
+                        // }
+
+                        if (RegExp(r'^[0-9]+$').hasMatch(value!.trim())) {
+                          // (assuming phone numbers should be at least 10 digits)
+                          if (value.length < 10) {
+                            return "Enter a valid phone number";
+                          }
+                          return null;
+                        }
+
+                        if (AppConstant.emailRegExp.hasMatch(value.trim()) == false) {
                           return "Enter a valid email address";
                         }
+
+
                         return null;
                       },
                     ),
@@ -179,11 +196,28 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
+void showSnackBarMsg(BuildContext context, String message) {
+  final snackBar = SnackBar(
+    content: Text(message),
+    duration: const Duration(seconds: 2),
+  );
+
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+}
+
   Future<void> signUp() async {
     signInApiInProgress = true;
     if (mounted) {
       setState(() {});
     }
+
+
+  String email = emailController.text.trim();
+  String password = passWordController.text.trim();
+
+    User? user = await DatabaseHelper().checkUserByPhone(email, password);
+
+
     // Map<String, dynamic> requestdata = {
     //   "email": emailController.text.trim(),
     //   "password": passWordController.text,
@@ -194,6 +228,26 @@ class _SignInScreenState extends State<SignInScreen> {
     if (mounted) {
       setState(() {});
     }
+
+  if (user != null) {
+    await Logout().setLoggedIn(true);
+    await Logout().saveUser(user.toMap(), key: "user_logged_in");
+
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomeScreen(),
+        ),
+      );
+    }
+  } else {
+
+    if (mounted) {
+      showSnackBarMsg(context, 'Email or password is not correct!');
+    }
+  }
+
     // if (response.isSuccess) {
     //   LogInModel  loginModel=LogInModel.fromJson(response.responseData);
     //   await AuthController.saveUserAccessToken(loginModel.token!);
@@ -245,6 +299,32 @@ class _SignInScreenState extends State<SignInScreen> {
       ),
     );
   }
+
+
+
+
+  void checkLoginStatus() async {
+
+  bool isLoggedIn = await Logout().isLoggedIn();
+
+  if (isLoggedIn) {
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HomeScreen(),
+      ),
+    );
+  } else {
+    // User is not logged in, stay on the sign-in screen
+  }
+}
+
+@override
+void initState() {
+  super.initState();
+  checkLoginStatus();
+}
 
   @override
   void dispose() {

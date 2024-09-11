@@ -48,7 +48,7 @@ class DatabaseTable {
   static const USER = '''
     CREATE TABLE IF NOT EXISTS User (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      u_id TEXT,
+      userid TEXT,
       uniqueId TEXT,
       uname TEXT,
       email TEXT,

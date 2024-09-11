@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../preference/logout.dart';
 import '../ui/screens/auth/SignInScreen.dart';
 import '../ui/screens/students_screen/edit_profile_screen.dart';
 import '../ui/screens/students_screen/settings_screen.dart';
@@ -27,7 +28,7 @@ class ProfileAppBar extends StatelessWidget implements PreferredSizeWidget {
       foregroundColor: Colors.white,
       actions: [
         PopupMenuButton<String>(
-          onSelected: (value) {
+          onSelected: (value) async {
             switch (value) {
               case 'edit':
                 Navigator.push(
@@ -44,6 +45,10 @@ class ProfileAppBar extends StatelessWidget implements PreferredSizeWidget {
                         builder: (context) => const SettingScreen()));
                 break;
               case 'logout':
+
+              await Logout().logoutUser();
+              await Logout().clearUser(key: "user_logged_in");
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(

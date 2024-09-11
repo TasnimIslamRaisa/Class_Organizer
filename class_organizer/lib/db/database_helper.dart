@@ -8,22 +8,22 @@ import '../models/admin.dart';
 class DatabaseHelper {
   Future<int> insertUser(User user) async {
     Database db = await DatabaseManager().database;
-    return await db.insert('user', user.toMap());
+    return await db.insert('User', user.toMap());
   }
 
   Future<int> updateUser(User user) async {
     Database db = await DatabaseManager().database;
-    return await db.update('user', user.toMap(), where: 'id = ?', whereArgs: [user.id]);
+    return await db.update('User', user.toMap(), where: 'id = ?', whereArgs: [user.id]);
   }
 
   Future<int> deleteUser(int id) async {
     Database db = await DatabaseManager().database;
-    return await db.delete('user', where: 'id = ?', whereArgs: [id]);
+    return await db.delete('User', where: 'id = ?', whereArgs: [id]);
   }
 
   Future<List<User>> getUsers() async {
     Database db = await DatabaseManager().database;
-    List<Map<String, dynamic>> maps = await db.query('user');
+    List<Map<String, dynamic>> maps = await db.query('User');
     return List.generate(maps.length, (i) {
       return User.fromMap(maps[i]);
     });
@@ -31,7 +31,25 @@ class DatabaseHelper {
 
   Future<User?> getUserById(int id) async {
     Database db = await DatabaseManager().database;
-    List<Map<String, dynamic>> maps = await db.query('user', where: 'id = ?', whereArgs: [id]);
+    List<Map<String, dynamic>> maps = await db.query('User', where: 'id = ?', whereArgs: [id]);
+    if (maps.isNotEmpty) {
+      return User.fromMap(maps.first);
+    }
+    return null;
+  }
+
+    Future<User?> getUserByPhone(String id) async {
+    Database db = await DatabaseManager().database;
+    List<Map<String, dynamic>> maps = await db.query('User', where: 'phone = ?', whereArgs: [id]);
+    if (maps.isNotEmpty) {
+      return User.fromMap(maps.first);
+    }
+    return null;
+  }
+
+  Future<User?> checkUserByPhone(String phone, String pass) async {
+    Database db = await DatabaseManager().database;
+    List<Map<String, dynamic>> maps = await db.query('User', where: 'phone = ? OR email = ? AND pass = ?', whereArgs: [phone,phone,pass]);
     if (maps.isNotEmpty) {
       return User.fromMap(maps.first);
     }
@@ -40,22 +58,22 @@ class DatabaseHelper {
 
   Future<int> insertUData(UData uData) async {
     Database db = await DatabaseManager().database;
-    return await db.insert('u_data', uData.toMap());
+    return await db.insert('Udata', uData.toMap());
   }
 
   Future<int> updateUData(UData uData) async {
     Database db = await DatabaseManager().database;
-    return await db.update('u_data', uData.toMap(), where: 'id = ?', whereArgs: [uData.id]);
+    return await db.update('Udata', uData.toMap(), where: 'id = ?', whereArgs: [uData.id]);
   }
 
   Future<int> deleteUData(int id) async {
     Database db = await DatabaseManager().database;
-    return await db.delete('u_data', where: 'id = ?', whereArgs: [id]);
+    return await db.delete('Udata', where: 'id = ?', whereArgs: [id]);
   }
 
   Future<List<UData>> getUData() async {
     Database db = await DatabaseManager().database;
-    List<Map<String, dynamic>> maps = await db.query('u_data');
+    List<Map<String, dynamic>> maps = await db.query('Udata');
     return List.generate(maps.length, (i) {
       return UData.fromMap(maps[i]);
     });
@@ -63,7 +81,16 @@ class DatabaseHelper {
 
   Future<UData?> getUDataById(int id) async {
     Database db = await DatabaseManager().database;
-    List<Map<String, dynamic>> maps = await db.query('u_data', where: 'id = ?', whereArgs: [id]);
+    List<Map<String, dynamic>> maps = await db.query('Udata', where: 'id = ?', whereArgs: [id]);
+    if (maps.isNotEmpty) {
+      return UData.fromMap(maps.first);
+    }
+    return null;
+  }
+
+    Future<UData?> getUDataByPhone(String phone) async {
+    Database db = await DatabaseManager().database;
+    List<Map<String, dynamic>> maps = await db.query('Udata', where: 'phone = ?', whereArgs: [phone]);
     if (maps.isNotEmpty) {
       return UData.fromMap(maps.first);
     }
