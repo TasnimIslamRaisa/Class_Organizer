@@ -3,8 +3,13 @@ import 'package:flutter/material.dart';
 
 import '../../style/app_color.dart';
 
-ThemeData lightTheme(){
-  return ThemeData(
+ThemeData lightMode= ThemeData(
+    colorScheme: ColorScheme.light(
+      surface: Colors.grey.shade100,
+      primary: Colors.grey.shade500,
+      secondary: Colors.grey.shade50,
+      inversePrimary: Colors.grey.shade900,
+    ),
     textTheme: const TextTheme(
       titleLarge: TextStyle(
           fontSize: 25,
@@ -44,4 +49,4 @@ ThemeData lightTheme(){
       ),
     ),
   );
-}
+

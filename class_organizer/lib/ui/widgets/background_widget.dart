@@ -1,6 +1,5 @@
-import 'package:class_organizer/utility/assets_path.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter/material.dart';
 
 class BackgroundWidget extends StatelessWidget {
   const BackgroundWidget({super.key, required this.child});
@@ -8,13 +7,24 @@ class BackgroundWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Stack(
       children: [
-        SvgPicture.asset(
-          AssetsPath.bgSvgPath,
-          height: double.maxFinite,
-          width: double.maxFinite,
-          fit: BoxFit.cover,
+        // Image.asset(
+        //   'assets/images/blueBG',
+        //   //AssetsPath.bgSvgPath,
+        //   height: double.maxFinite,
+        //   width: double.maxFinite,
+        //   fit: BoxFit.cover,
+        // ),
+        Opacity(
+          opacity: 0.4,
+          child: Image.asset(
+            "assets/images/blueBG.jpg",
+            fit: BoxFit.cover,
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+          ),
         ),
         child,
       ],

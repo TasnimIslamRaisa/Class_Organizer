@@ -1,13 +1,10 @@
 import 'dart:async';
-
-
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../onboarding/on_screen.dart';
-import '../pages/login/admin_login.dart';
-import '../pages/login/login_page.dart';
+import '../ui/screens/auth/SignInScreen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -84,6 +81,6 @@ class SplashScreenState extends State<SplashScreen> {
     Timer(
         const Duration(seconds: 4),
         () => Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => onboarding ? (userType=="user"? const LoginPage() : const AdminLogin()) : OnScreen())));
+            MaterialPageRoute(builder: (context) => onboarding ? const SignInScreen() : OnScreen())));
   }
 }

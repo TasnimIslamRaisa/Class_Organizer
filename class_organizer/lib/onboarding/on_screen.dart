@@ -1,7 +1,6 @@
+import 'package:class_organizer/ui/screens/auth/SignInScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-
-import 'get_start.dart';
 import 'screen/intro_four.dart';
 import 'screen/intro_one.dart';
 import 'screen/intro_three.dart';
@@ -63,7 +62,7 @@ class OnScreenState extends State<OnScreen> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=> GetStart()));
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context)=> const SignInScreen()));
                     },
                     child: Text(buttonText)),
                   SmoothPageIndicator(

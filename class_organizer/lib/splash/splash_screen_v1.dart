@@ -1,9 +1,6 @@
 import 'dart:async';
-
-
 import 'package:avatar_glow/avatar_glow.dart';
-import 'package:class_organizer/pages/login/admin_login.dart';
-import 'package:class_organizer/ui/screens/controller/app_controller.dart';
+import 'package:class_organizer/ui/screens/auth/SignInScreen.dart';
 import 'package:class_organizer/utility/assets_path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -64,7 +61,7 @@ class SplashScreenV1State extends State<SplashScreenV1> {
         fit: StackFit.expand,
         children: [
           Image.asset(
-            "assets/edu.jpg",
+            "assets/images/blueBG.jpg",
             fit: BoxFit.cover,
           ),
           Center(
@@ -116,6 +113,6 @@ class SplashScreenV1State extends State<SplashScreenV1> {
     Timer(
         const Duration(seconds: 4),
         () => Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => onboarding ? (userType=="user"? const LoginPage() : const AdminLogin()) : OnScreen())));
+            MaterialPageRoute(builder: (context) => onboarding ? const SignInScreen() : OnScreen())));
   }
 }
