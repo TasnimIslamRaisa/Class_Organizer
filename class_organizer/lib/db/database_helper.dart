@@ -49,7 +49,16 @@ class DatabaseHelper {
 
   Future<User?> checkUserByPhone(String phone, String pass) async {
     Database db = await DatabaseManager().database;
-    List<Map<String, dynamic>> maps = await db.query('User', where: 'phone = ? OR email = ? AND pass = ?', whereArgs: [phone,phone,pass]);
+    List<Map<String, dynamic>> maps = await db.query('User', where: '(phone = ? OR email) = ? AND pass = ?', whereArgs: [phone,phone,pass]);
+    if (maps.isNotEmpty) {
+      return User.fromMap(maps.first);
+    }
+    return null;
+  }
+
+    Future<User?> checkUserLogin(String phone, String pass, int type) async {
+    Database db = await DatabaseManager().database;
+    List<Map<String, dynamic>> maps = await db.query('User', where: '(phone = ? OR email = ?) AND pass = ? AND utype = ?', whereArgs: [phone,phone,pass,type]);
     if (maps.isNotEmpty) {
       return User.fromMap(maps.first);
     }
@@ -127,6 +136,77 @@ class DatabaseHelper {
       return School.fromMap(maps.first);
     }
     return null;
+  }
+
+
+Future<School?> getSchoolBySid(String sid) async {
+  Database db = await DatabaseManager().database;
+  List<Map<String, dynamic>> maps = await db.query('school', where: 'sid = ?', whereArgs: [sid]);
+
+  if (maps.isNotEmpty) {
+    return School.fromMap(maps.first);
+  } else {
+    return null;
+  }
+}
+
+Future<School?> getSchoolByPhone(String phone) async {
+  Database db = await DatabaseManager().database;
+  List<Map<String, dynamic>> maps = await db.query('school', where: 'phone = ?', whereArgs: [phone]);
+
+  if (maps.isNotEmpty) {
+    return School.fromMap(maps.first);
+  } else {
+    return null;
+  }
+}
+
+Future<int> updateSchoolBySid(School school) async {
+  Database db = await DatabaseManager().database;
+  return await db.update('school', school.toMap(), where: 'sid = ?', whereArgs: [school.sId]);
+}
+
+Future<int> deleteSchoolBySid(String sid) async {
+  Database db = await DatabaseManager().database;
+  return await db.delete('school', where: 'sid = ?', whereArgs: [sid]);
+}
+
+
+   // Insert a new school into the database
+  Future<int> insertSchooll(School school) async {
+    final db = await DatabaseManager().database;
+    return await db!.insert('school', school.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  // Get all schools from the database
+  Future<List<School>> getSchoolls() async {
+    final db = await DatabaseManager().database;
+    final List<Map<String, dynamic>> maps = await db!.query('school');
+    return List.generate(maps.length, (i) {
+      return School.fromMap(maps[i]);
+    });
+  }
+
+  // Update a school
+  Future<int> updateSchooll(School school) async {
+    final db = await DatabaseManager().database;
+    return await db!.update(
+      'school',
+      school.toMap(),
+      where: "id = ?",
+      whereArgs: [school.id],
+    );
+  }
+
+  // Delete a school
+  Future<void> deleteSchooll(int id) async {
+    final db = await DatabaseManager().database;
+    await db!.delete(
+      'school',
+      where: "id = ?",
+      whereArgs: [id],
+    );
   }
 
   Future<int> insertAdmin(Admin admin) async {

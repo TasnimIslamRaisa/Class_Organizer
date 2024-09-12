@@ -1,6 +1,6 @@
 import 'package:class_organizer/pages/forgot_password.dart';
-import 'package:class_organizer/pages/signup/student_sign_up.dart';
 import 'package:class_organizer/preference/preferences.dart';
+import 'package:class_organizer/ui/screens/auth/SignUpScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
@@ -324,7 +324,7 @@ class LoginPageState extends State<LoginPage> {
                                   SizedBox(height: 8,),
                                   InkWell(
                                     onTap: (){
-                                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => StudentSignUp()));
+                                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => SignUpScreen()));
                                     },
                                     child: const Align(
                                       alignment: Alignment.bottomCenter,

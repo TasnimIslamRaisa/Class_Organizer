@@ -157,6 +157,7 @@ class DatabaseTable {
       sLogo TEXT,
       sId TEXT,
       sAdrs TEXT,
+      sAYear TEXT,
       sEiin TEXT,
       sStudent INTEGER,
       sTeacher INTEGER,
@@ -176,7 +177,8 @@ class DatabaseTable {
       sEmpl INTEGER,
       proPic BLOB,
       sync_status INTEGER,
-      sync_key TEXT
+      sync_key TEXT,
+      key TEXT,
     );
   ''';
 

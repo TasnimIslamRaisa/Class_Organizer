@@ -220,8 +220,8 @@ class School {
       'sUser': _sUser,
       'sTeacher': _sTeacher,
       'sStudent': _sStudent,
-      'syncKey': _syncKey,
-      'syncStatus': _syncStatus,
+      'sync_key': _syncKey,
+      'sync_status': _syncStatus,
       'uniqueId': _uniqueId,
       'key': _key,
     };
@@ -263,6 +263,77 @@ class School {
       key: map['key'],
     );
   }
+
+
+  //   Map<String, dynamic> toMap() {
+  //   return {
+  //     'id': _id,
+  //     'sId': _sId,
+  //     'sName': _sName,
+  //     'sPhone': _sPhone,
+  //     'sEmail': _sEmail,
+  //     'sPass': _sPass,
+  //     'sAdrs': _sAdrs,
+  //     'sEiin': _sEiin,
+  //     'sFundsBal': _sFundsBal,
+  //     'sAYear': _sAYear,
+  //     'sVerification': _sVerification,
+  //     'currSessId': _currSessId,
+  //     'sItp1': _sItp1,
+  //     'sItp2': _sItp2,
+  //     'sItEmail': _sItEmail,
+  //     'sWeb': _sWeb,
+  //     'sFundsBank': _sFundsBank,
+  //     'sFundsAN': _sFundsAN,
+  //     'sLogo': _sLogo,
+  //     'sActivate': _sActivate,
+  //     'sEmpl': _sEmpl,
+  //     'sCourse': _sCourse,
+  //     'sClass': _sClass,
+  //     'sSec': _sSec,
+  //     'sUser': _sUser,
+  //     'sTeacher': _sTeacher,
+  //     'sStudent': _sStudent,
+  //     'syncKey': _syncKey,
+  //     'syncStatus': _syncStatus,
+  //     'uniqueId': _uniqueId,
+  //     'key': _key,
+  //   };
+  // }
+
+  // Convert a Map object into a School object
+  // School.fromMap(Map<String, dynamic> map)
+  //     : _id = map['id'],
+  //       _sId = map['sId'],
+  //       _sName = map['sName'],
+  //       _sPhone = map['sPhone'],
+  //       _sEmail = map['sEmail'],
+  //       _sPass = map['sPass'],
+  //       _sAdrs = map['sAdrs'],
+  //       _sEiin = map['sEiin'],
+  //       _sFundsBal = map['sFundsBal'],
+  //       _sAYear = map['sAYear'],
+  //       _sVerification = map['sVerification'],
+  //       _currSessId = map['currSessId'],
+  //       _sItp1 = map['sItp1'],
+  //       _sItp2 = map['sItp2'],
+  //       _sItEmail = map['sItEmail'],
+  //       _sWeb = map['sWeb'],
+  //       _sFundsBank = map['sFundsBank'],
+  //       _sFundsAN = map['sFundsAN'],
+  //       _sLogo = map['sLogo'],
+  //       _sActivate = map['sActivate'],
+  //       _sEmpl = map['sEmpl'],
+  //       _sCourse = map['sCourse'],
+  //       _sClass = map['sClass'],
+  //       _sSec = map['sSec'],
+  //       _sUser = map['sUser'],
+  //       _sTeacher = map['sTeacher'],
+  //       _sStudent = map['sStudent'],
+  //       _syncKey = map['syncKey'],
+  //       _syncStatus = map['syncStatus'],
+  //       _uniqueId = map['uniqueId'],
+  //       _key = map['key'];
 
   @override
   String toString() {

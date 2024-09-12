@@ -1,22 +1,23 @@
+import 'package:class_organizer/admin/panel/admin_panel.dart';
+import 'package:class_organizer/pages/school/create_school.dart';
 import 'package:class_organizer/preference/preferences.dart';
+import 'package:class_organizer/ui/screens/auth/SignUpScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lottie/lottie.dart';
 
+import '../../db/database_helper.dart';
+import '../../models/user.dart';
+import '../../preference/logout.dart';
+import '../../ui/screens/auth/email_verification_screen.dart';
 import '../forgot_password.dart';
-import '../signup/student_sign_up.dart';
 
 late bool _passwordVisible = false;
 
 class AdminLogin extends StatefulWidget {
   const AdminLogin({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
-  }
 
   @override
   State<StatefulWidget> createState() {
@@ -27,11 +28,21 @@ class AdminLogin extends StatefulWidget {
 class AdminLoginState extends State<AdminLogin> {
   final _formKey = GlobalKey<FormState>();
 
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
   @override
   initState() {
     super.initState();
     preference();
     _passwordVisible = true;
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -119,6 +130,7 @@ class AdminLoginState extends State<AdminLogin> {
                                     height: 45,
                                   ),
                                   TextFormField(
+                                    controller: _usernameController,
                                     textAlign: TextAlign.start,
                                     keyboardType: TextInputType.phone,
                                     style: const TextStyle(
@@ -184,6 +196,7 @@ class AdminLoginState extends State<AdminLogin> {
                                     height: 12,
                                   ),
                                   TextFormField(
+                                    controller: _passwordController,
                                     obscureText: _passwordVisible,
                                     textAlign: TextAlign.start,
                                     keyboardType: TextInputType.visiblePassword,
@@ -260,7 +273,15 @@ class AdminLoginState extends State<AdminLogin> {
                                     child: InkWell(
                                       onTap: () {
                                         if (_formKey.currentState!
-                                            .validate()) {}
+                                            .validate()) {
+
+                                              String username =
+                                                  _usernameController.text;
+                                              String password =
+                                                  _passwordController.text;
+
+                                              adminSignIn(username, password);
+                                            }
                                       },
                                       child: Container(
                                         margin: const EdgeInsets.only(
@@ -309,10 +330,10 @@ class AdminLoginState extends State<AdminLogin> {
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      Navigator.of(context).push(
+                                      Navigator.of(context).pushReplacement(
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  ForgotPassword()));
+                                                  EmailVerificationScreen()));
                                     },
                                     child: const Align(
                                       alignment: Alignment.bottomRight,
@@ -335,7 +356,7 @@ class AdminLoginState extends State<AdminLogin> {
                                       Navigator.of(context).push(
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  StudentSignUp()));
+                                                  SignUpScreen()));
                                     },
                                     child: const Align(
                                       alignment: Alignment.bottomCenter,
@@ -365,11 +386,72 @@ class AdminLoginState extends State<AdminLogin> {
     );
   }
 
+  Future<void> adminSignIn(String username, String password) async {
+
+      if (mounted) {
+      setState(() {});
+    }
+
+    // User? user = await DatabaseHelper().checkUserByPhone(email, password);
+
+    User? user = await DatabaseHelper().checkUserLogin(username, password,1);
+
+
+    if (mounted) {
+      setState(() {});
+    }
+
+  if (user != null) {
+    await Logout().setLoggedIn(true);
+    await Logout().saveUser(user.toMap(), key: "user_logged_in");
+
+    if (mounted) {
+
+
+      checkSchool(user);
+
+    }
+
+  } else {
+
+    if (mounted) {
+      showSnackBarMsg(context, 'Email or password is not correct!');
+    }
+  }
+
+}
+void showSnackBarMsg(BuildContext context, String message) {
+  final snackBar = SnackBar(
+    content: Text(message),
+    duration: const Duration(seconds: 2),
+  );
+
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+}
+
   preference() async {
     if (await Preferences.checkUserType() == "admin") {
       print("Installed");
     } else {
       print("Not Installed");
+    }
+  }
+  
+  void checkSchool(User user) {
+    if(user.sid == null){
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CreateSchool(),
+        ),
+      );
+    }else{
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const AdminPanel(),
+        ),
+      );
     }
   }
 }

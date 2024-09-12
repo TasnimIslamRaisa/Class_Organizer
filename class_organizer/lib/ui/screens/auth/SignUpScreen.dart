@@ -1,4 +1,5 @@
 import 'package:class_organizer/models/user.dart';
+import 'package:class_organizer/onboarding/get_start.dart';
 import 'package:class_organizer/ui/Home_Screen.dart';
 import 'package:class_organizer/ui/screens/auth/SignInScreen.dart';
 import 'package:class_organizer/utility/unique.dart';
@@ -31,6 +32,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool showPassWord = false;
   bool registrationInProgress = false;
   String? selectedRole;
+  int uType = 0;
 
 
 @override
@@ -209,9 +211,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       fillColor: Colors.grey[200],
                     ),
                     items: const [
-                      DropdownMenuItem(value: 'Student', child: Text('Student',)),
-                      DropdownMenuItem(value: 'Teacher', child: Text('Teacher')),
-                      DropdownMenuItem(value: 'Admin', child: Text('Admin')),
+                      DropdownMenuItem(value: '3', child: Text('Student',)),
+                      DropdownMenuItem(value: '2', child: Text('Teacher')),
+                      DropdownMenuItem(value: '1', child: Text('Admin')),
                       // Add more departments as needed
                     ],
                     onChanged: (value) {
@@ -335,6 +337,14 @@ var uuid = Uuid();
 
 String uniqueId = Unique().generateUniqueID();
 
+if(selectedRole=="3"){
+  uType = 3;
+}else if(selectedRole=="2"){
+  uType = 2;
+}else{
+  uType = 1;
+}
+
 User newUser = User(
   uniqueid: uniqueId,
   uname: "${firstNameController.text.trim()} ${lastNameController.text.trim()}",
@@ -342,7 +352,7 @@ User newUser = User(
   pass: passWordController.text.trim(),
   email: emailController.text.trim(),
   userid: uuid.v4(),
-  utype: 3,
+  utype: uType,
   status: 1,
 );
 
@@ -366,6 +376,16 @@ int result = await DatabaseHelper().insertUser(newUser);
   if (result > 0) {
     if (mounted) {
       showSnackBarMsg(context, 'Registration Successful');
+
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => GetStart()),
+        );
+      }
+    });
+
     }
     clearfield();
   } else {

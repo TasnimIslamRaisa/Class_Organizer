@@ -1,3 +1,4 @@
+import 'package:class_organizer/onboarding/get_start.dart';
 import 'package:flutter/material.dart';
 
 import '../preference/logout.dart';
@@ -44,6 +45,18 @@ class ProfileAppBar extends StatelessWidget implements PreferredSizeWidget {
                     MaterialPageRoute(
                         builder: (context) => const SettingScreen()));
                 break;
+              case 'restart':
+
+              await Logout().logoutUser();
+              await Logout().clearUser(key: "user_logged_in");
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GetStart(),
+                  ),
+                );
+                break;  
               case 'logout':
 
               await Logout().logoutUser();
@@ -66,6 +79,10 @@ class ProfileAppBar extends StatelessWidget implements PreferredSizeWidget {
             const PopupMenuItem(
               value: 'settings',
               child: Text('Settings'),
+            ),
+            const PopupMenuItem(
+              value: 'restart',
+              child: Text('Restart'),
             ),
             const PopupMenuItem(
               value: 'logout',

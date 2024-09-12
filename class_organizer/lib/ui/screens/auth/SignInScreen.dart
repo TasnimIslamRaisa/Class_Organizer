@@ -1,4 +1,5 @@
 import 'package:class_organizer/preference/logout.dart';
+import 'package:class_organizer/teacher/panel/teacher_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 // import '../../../data/logInModel.dart';
@@ -28,6 +29,8 @@ class _SignInScreenState extends State<SignInScreen> {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   bool signInApiInProgress = false;
   bool showPassWord = false;
+  String? selectedRole;
+  int uType = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -124,13 +127,25 @@ class _SignInScreenState extends State<SignInScreen> {
                         fillColor: Colors.grey[200],
                       ),
                       items: const [
-                        DropdownMenuItem(value: 'Student', child: Text('Student',)),
-                        DropdownMenuItem(value: 'Teacher', child: Text('Teacher')),
-                        DropdownMenuItem(value: 'Admin', child: Text('Admin')),
+                        DropdownMenuItem(value: '3', child: Text('Student',)),
+                        DropdownMenuItem(value: '2', child: Text('Teacher')),
+                        // DropdownMenuItem(value: 'Admin', child: Text('Admin')),
                         // Add more departments as needed
                       ],
                       onChanged: (value) {
-                        // Handle department selection
+                        setState(() {
+                          selectedRole = value;
+                        });
+                      },
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (String? value) {
+                        if (value?.trim().isEmpty ?? true) {
+                          return "Select Any Option ";
+                        }
+                        // if (value != passWordController.text) {
+                        //   return "Passwords do not match";
+                        // }
+                        return null;
                       },
                     ),
                     const SizedBox(height: 16,),
@@ -215,7 +230,14 @@ void showSnackBarMsg(BuildContext context, String message) {
   String email = emailController.text.trim();
   String password = passWordController.text.trim();
 
-    User? user = await DatabaseHelper().checkUserByPhone(email, password);
+  if(selectedRole=="3"){
+    uType = 3;
+  }else{
+    uType = 2;
+  }
+    // User? user = await DatabaseHelper().checkUserByPhone(email, password);
+
+    User? user = await DatabaseHelper().checkUserLogin(email, password,uType);
 
 
     // Map<String, dynamic> requestdata = {
@@ -234,12 +256,26 @@ void showSnackBarMsg(BuildContext context, String message) {
     await Logout().saveUser(user.toMap(), key: "user_logged_in");
 
     if (mounted) {
-      Navigator.pushReplacement(
+
+      if(selectedRole=="3"){
+        uType = 3;
+        Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => const HomeScreen(),
         ),
       );
+      }else{
+        uType = 2;
+        Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const TeacherPanel(),
+        ),
+      );
+      }
+
+
     }
   } else {
 
