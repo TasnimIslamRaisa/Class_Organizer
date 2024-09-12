@@ -178,7 +178,7 @@ class DatabaseTable {
       proPic BLOB,
       sync_status INTEGER,
       sync_key TEXT,
-      key TEXT,
+      key TEXT
     );
   ''';
 
