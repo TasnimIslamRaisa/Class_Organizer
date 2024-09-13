@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "168100674425",
+    "firebase_url": "https://classorganizer-b6c6f-default-rtdb.firebaseio.com",
+    "project_id": "classorganizer-b6c6f",
+    "storage_bucket": "classorganizer-b6c6f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:168100674425:android:09e9f744892909b39b0da8",
+        "android_client_info": {
+          "package_name": "com.example.class_organizer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBkKHRN_VCgd4iwmkJmJ_qs_wVU9m4HLpE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
