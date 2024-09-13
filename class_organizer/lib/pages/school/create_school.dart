@@ -1,6 +1,7 @@
 import 'package:class_organizer/admin/panel/admin_panel.dart';
 import 'package:class_organizer/db/database_helper.dart';
 import 'package:class_organizer/pages/login/admin_login.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -534,6 +535,7 @@ class CustomAutoCompleteDropdownField extends StatefulWidget {
   final String hintText;
   final List<String> suggestions;
   final TextEditingController controller; // Add controller as a parameter
+  
 
   const CustomAutoCompleteDropdownField({
     Key? key,
@@ -673,3 +675,4 @@ class _CustomFileChooserFieldState extends State<CustomFileChooserField> {
     );
   }
 }
+
