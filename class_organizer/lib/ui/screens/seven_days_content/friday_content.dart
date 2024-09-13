@@ -1,42 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import '../../../models/class_model.dart';
+import '../../../utility/confirmationDialog.dart';
 
 class FridayContent extends StatelessWidget {
   final List<Class> classes;
   final void Function(Class) onDeleteClass;
 
   const FridayContent({super.key, required this.classes, required this.onDeleteClass});
-
-  Future<void> _showConfirmationDialog(BuildContext context, Class classItem) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirm Deletion'),
-          content: Text('Are you sure you want to delete the class "${classItem.courseName}"?'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Delete'),
-              onPressed: () {
-                onDeleteClass(classItem);
-
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -53,7 +24,7 @@ class FridayContent extends StatelessWidget {
                 children: [
                   SlidableAction(
                     onPressed: (context) {
-                      _showConfirmationDialog(context, classItem);
+                      showConfirmationDialog(context, classItem,onDeleteClass);
                     },
                     backgroundColor: Colors.red,
                     foregroundColor: Colors.white,

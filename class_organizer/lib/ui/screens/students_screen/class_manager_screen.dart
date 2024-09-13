@@ -41,6 +41,7 @@ class ClassManagerScreen extends StatelessWidget {
             isScrollable: true,
             labelColor: Colors.black,
             unselectedLabelColor: Colors.white,
+            dividerColor: Colors.blue,
             tabs: [
               Tab(text: 'Mon'),
               Tab(text: 'Tue'),
@@ -58,15 +59,13 @@ class ClassManagerScreen extends StatelessWidget {
           print('Current classes: $classes');
           return TabBarView(
             children: [
-              MondayContent(classes: classes['Monday'] ?? [], onDeleteClass: (Class ) {  },),
-              TuesdayContent(classes: classes['Tuesday'] ?? []),
-              WednesdayContent(classes: classes['Wednesday'] ?? []),
-              ThursdayContent(classes: classes['Thursday'] ?? []),
-              FridayContent(classes: classes['Friday'] ?? [],
-                  onDeleteClass: _deleteClass),
-
-              SaturdayContent(classes: classes['Saturday'] ?? []),
-              SundayContent(classes: classes['Sunday'] ?? []),
+              MondayContent(classes: classes['Monday'] ?? [], onDeleteClass:_deleteClass,),
+              TuesdayContent(classes: classes['Tuesday'] ?? [], onDeleteClass: _deleteClass,),
+              WednesdayContent(classes: classes['Wednesday'] ?? [], onDeleteClass: _deleteClass,),
+              ThursdayContent(classes: classes['Thursday'] ?? [], onDeleteClass: _deleteClass,),
+              FridayContent(classes: classes['Friday'] ?? [],onDeleteClass: _deleteClass),
+              SaturdayContent(classes: classes['Saturday'] ?? [], onDeleteClass:_deleteClass,),
+              SundayContent(classes: classes['Sunday'] ?? [], onDeleteClass:_deleteClass,),
             ],
           );
         }),

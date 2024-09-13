@@ -11,7 +11,6 @@ class AddClassBottomSheet extends StatefulWidget {
 }
 
 class _AddClassBottomSheetState extends State<AddClassBottomSheet> {
-
   final _courseNameController = TextEditingController();
 
   final _courseCodeController = TextEditingController();
@@ -26,7 +25,7 @@ class _AddClassBottomSheetState extends State<AddClassBottomSheet> {
 
   final _classroomController = TextEditingController();
 
-  String selectedDay = 'Monday';  // Default selected day
+  String selectedDay = 'Monday'; // Default selected day
 
   void _submitForm(BuildContext context) {
     if (_courseNameController.text.isEmpty ||
@@ -52,46 +51,49 @@ class _AddClassBottomSheetState extends State<AddClassBottomSheet> {
       startTime: _starttimeController.text,
       endTime: _endingtimeController.text,
       roomNumber: _classroomController.text,
-      day: selectedDay,  // Use the selected day
+      day: selectedDay, // Use the selected day
     );
 
     widget.onAddClass(newClass);
     if (Navigator.canPop(context)) {
       Navigator.pop(context);
     }
-
   }
-
 
   @override
   Widget build(BuildContext context) {
-
-
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text("Add Your Class", style: Theme.of(context).textTheme.titleLarge),
+            Text("Add Your Class",
+                style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 8),
-
-
-      DropdownButton<String>(
-        value: selectedDay,
-        items: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-            .map((day) => DropdownMenuItem<String>(
-          value: day,
-          child: Text(day),
-        ))
-            .toList(),
-        onChanged: (value) {
-          setState(() {
-            selectedDay = value!;
-          });
-        },
-      ),
-        const SizedBox(height: 8),
+            DropdownButtonFormField(
+              value: selectedDay,
+              items: [
+                'Monday',
+                'Tuesday',
+                'Wednesday',
+                'Thursday',
+                'Friday',
+                'Saturday',
+                'Sunday'
+              ]
+                  .map((day) => DropdownMenuItem<String>(
+                        value: day,
+                        child: Text(day),
+                      ))
+                  .toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedDay = value!;
+                });
+              },
+            ),
+            const SizedBox(height: 8),
             TextField(
               controller: _courseNameController,
               decoration: const InputDecoration(labelText: 'Course Name'),
