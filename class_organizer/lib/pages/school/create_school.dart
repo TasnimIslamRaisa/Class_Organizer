@@ -251,12 +251,11 @@ void saveSchool() async {
 
   Future<void> setUserSid(User? user) async {
   if (user != null) {
-
+    user.sid = sid;
     int result = await DatabaseHelper().updateUser(user);
     
     if (result > 0){
       setState(() {
-        user.sid = sid;
         _user = user;
         _user_data = user;
       });
