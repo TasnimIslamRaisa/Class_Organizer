@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:class_organizer/models/user.dart';
 import 'package:class_organizer/onboarding/get_start.dart';
 import 'package:class_organizer/ui/Home_Screen.dart';
@@ -11,14 +10,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../db/database_helper.dart';
 import '../../../models/school.dart';
-import '../../../models/u_data.dart';
-import '../../../pages/school/create_school.dart';
 import '../../../preference/logout.dart';
 import '../../../style/app_color.dart';
 import '../../../utility/app_constant.dart';
 import '../../widgets/background_widget.dart';
 import 'package:uuid/uuid.dart';
-import 'package:searchable_paginated_dropdown/searchable_paginated_dropdown.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -28,15 +24,43 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-
-
-
-    List<School> _schoolList = [
-    School(sId: '001', sName: 'Harvard University'),
-    School(sId: '002', sName: 'Stanford University'),
-    School(sId: '003', sName: 'MIT'),
+  List<School> _schoolList = [
+    School(sName: 'University of Chittagong'),
+    School(sName: 'Chittagong Independent University'),
+    School(sName: 'East Delta University'),
+    School(sName: 'University of Creative Technology Chittagong'),
+    School(sName: 'University Of Science & Technology Chattogram (USTC)'),
+    School(sName: 'Asian University for Women'),
+    School(sName: 'Port City International University'),
+    School(sName: 'International Islamic University Chittagong'),
+    School(sName: 'Southern University Bangladesh'),
+    School(sName: 'Premier University, Chittagong'),
+    School(sName: 'Chittagong University of Engineering and Technology (CUET)'),
+    School(sName: 'Chattogram Veterinary and Animal Sciences University'),
+    School(sName: 'Chattogram Medical University BITID'),
+    School(sName: 'Institute of Education and Research (IER)'),
+    School(sName: 'Rangamati Science & Technology University'),
+    School(sName: 'Noakhali Science and Technology University'),
+    School(sName: 'Comilla University'),
+    School(sName: 'Chandpur Science and Technology University'),
+    School(sName: 'Chattogram Cantonment Public College'),
+    School(sName: 'Chittagong College'),
+    School(sName: 'Government College of Commerce, Chattogram'),
+    School(sName: 'Govt. Hazi Muhammad Mohsin College, Chattogram'),
+    School(sName: 'Hazera-Taju Degree College'),
+    School(sName: 'Agrabad Mohila College'),
+    School(sName: 'Government City College, Chattogram'),
+    School(sName: 'Chittagong Government Model School and College'),
+    School(sName: 'Ispahani Public School and College'),
+    School(sName: 'Islamia College, Chattogram'),
+    School(sName: 'Omargani M.E.S. University College'),
+    School(sName: 'National University, Bangladesh'),
+    School(sName: 'North South University'),
+    School(sName: 'BRAC University'),
   ];
-  School? _selectedSchool;
+
+  bool _isLoading = true;
+    School? _selectedSchool;
 
 
   final TextEditingController emailController = TextEditingController();
@@ -45,10 +69,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController mobileController = TextEditingController();
   final TextEditingController passWordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
-
   final TextEditingController autoCompleteController = TextEditingController();
 
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+
   bool showPassWord = false;
   bool registrationInProgress = false;
   String? selectedRole;
@@ -59,18 +83,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
   void initState() {
     super.initState();
     checkLoginStatus();
-    _loadSchoolData();
+   _loadSchoolData();
   }
 
-
-
-  Future<void> _loadSchoolData() async {
-    final String response = await rootBundle.loadString('assets/schools.json');
-    final data = json.decode(response) as List<dynamic>;
-    setState(() {
-      _schoolList = data.map((json) => School.fromJson(json)).toList();
-    });
-  }
+   Future<void> _loadSchoolData() async {
+     final String response = await rootBundle.loadString('assets/schools.json');
+     final data = json.decode(response) as List<dynamic>;
+     setState(() {
+       _schoolList = data.map((json) => School.fromJson(json)).toList();
+     });
+   }
 
   @override
   Widget build(BuildContext context) {
@@ -101,49 +123,41 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   //   suggestions: ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'],
                   //   controller: autoCompleteController,
                   // ),
-
-                
-              DropdownButtonFormField<School>(
-                decoration: InputDecoration(
-                  labelText: 'Select School/College',
-                  helperText: 'Required',
-                  helperStyle: TextStyle(color: Colors.purple), // Color for helper text
-                  prefixIcon: Icon(Icons.school), // Start icon
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide(
-                      color: Colors.grey,
+                  DropdownSearch<School>(
+                    items: _schoolList,
+                    dropdownDecoratorProps: DropDownDecoratorProps(
+                      dropdownSearchDecoration: InputDecoration(
+                        labelText: 'Select School/College',
+                        prefixIcon: Icon(Icons.school),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
                     ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide(
-                      color: Colors.grey,
+                    onChanged: (School? selected) {
+                      setState(() {
+                        _selectedSchool = selected;
+                      });
+                    },
+                    selectedItem: _selectedSchool,
+                    popupProps: PopupProps.menu(
+                      showSearchBox: true, // Enables the search box
+                      itemBuilder: (context, item, isSelected) => ListTile(
+                        title: Text(item.sName!),
+                        //subtitle: Text("sId: ${item.sId}"),
+                      ),
                     ),
+                    dropdownBuilder: (context, selectedItem) {
+                      return Text(selectedItem?.sName ?? "No School Selected");
+                    },
                   ),
-                ),
-                items: _schoolList.map((School school) {
-                  return DropdownMenuItem<School>(
-                    value: school,
-                    child: Text(school.sName!),
-                  );
-                }).toList(),
-                onChanged: (School? selected) {
-                  setState(() {
-                    _selectedSchool = selected;
-                  });
-                },
-                value: _selectedSchool,
-                isExpanded: true, // Make sure it fits the full width
-              ),
-              SizedBox(height: 20),
-              if (_selectedSchool != null)
+                  /*
+                   if (_selectedSchool != null)
                 Text(
                   "Selected School: ${_selectedSchool!.sName}, sId: ${_selectedSchool!.sId}",
                   style: TextStyle(fontSize: 16),
                 ),
-
-
+                  */
 
                   const SizedBox(
                     height: 8,
@@ -368,8 +382,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
             ),
             //),
-
-
           ),
         ),
       ),
@@ -544,6 +556,9 @@ void checkLoginStatus() async {
       ),
     );
   }
+
+
+
 
   @override
   void dispose() {

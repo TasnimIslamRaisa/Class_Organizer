@@ -30,6 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
   sqflite: ^2.0.0
   pin_code_fields: ^8.0.1
   # path_provider: ^2.0.2
@@ -102,6 +103,7 @@ flutter:
     - animation/edubox.json
     - animation/education.json
     - animation/edumain.json
+  #  - assets/schools.json
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
