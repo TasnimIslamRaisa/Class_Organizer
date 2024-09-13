@@ -254,6 +254,7 @@ void showSnackBarMsg(BuildContext context, String message) {
   if (user != null) {
     await Logout().setLoggedIn(true);
     await Logout().saveUser(user.toMap(), key: "user_logged_in");
+    await Logout().saveUserDetails(user,key: "user_data");
 
     if (mounted) {
 

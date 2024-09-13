@@ -1,11 +1,15 @@
 import 'package:class_organizer/admin/panel/admin_panel.dart';
 import 'package:class_organizer/db/database_helper.dart';
+import 'package:class_organizer/pages/login/admin_login.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
 import '../../models/school.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../models/user.dart';
+import '../../preference/logout.dart';
 import '../../utility/unique.dart';
 
 class CreateSchool extends StatefulWidget {
@@ -16,7 +20,10 @@ class CreateSchool extends StatefulWidget {
 }
 
 class CreateSchoolState extends State<CreateSchool> {
+  User? _user, _user_data;
   final _formKey = GlobalKey<FormState>();
+  String? sid;
+  School? school;
 
   final balanceController = TextEditingController();
   final urlController = TextEditingController();
@@ -28,6 +35,24 @@ class CreateSchoolState extends State<CreateSchool> {
   final schoolEiin = TextEditingController();
   final schoolItEmail = TextEditingController();
   final schoolTrx = TextEditingController();
+
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUser();
+  }
+
+  Future<void> _loadUser() async {
+    Logout logout = Logout();
+    User? user = await logout.getUserDetails(key: 'user_data');
+    Map<String, dynamic>? userMap = await logout.getUser(key: 'user_logged_in');
+    User user_data = User.fromMap(userMap!);
+    setState(() {
+      _user = user;
+      _user_data = user_data;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -190,12 +215,19 @@ void saveSchool() async {
     sFundsBal: balanceController.text,
     sVerification: schoolTrx.text,
   );
+  setState(() {
+    school = newSchool;
+    sid = newSchool.sId;
+  });
 
   final result = await DatabaseHelper().insertSchool(newSchool);
 
   if (result > 0) {
 
+    setUserSid(_user ??_user_data);
+
     ScaffoldMessenger.of(context).showSnackBar(
+
       SnackBar(content: Text('School saved successfully!')),
     );
 
@@ -206,7 +238,7 @@ void saveSchool() async {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const AdminPanel(),
+          builder: (context) => const AdminLogin(),
         ),
       );
 
@@ -217,6 +249,29 @@ void saveSchool() async {
     );
   }
 }
+
+  Future<void> setUserSid(User? user) async {
+  if (user != null) {
+    user.sid = sid;
+    int result = await DatabaseHelper().updateUser(user);
+    
+    if (result > 0){
+      setState(() {
+        _user = user;
+        _user_data = user;
+      });
+      await Logout().clearUser(key: "user_logged_in", key_key: "user_data");
+      await Logout().saveUser(user.toMap(), key: "user_logged_in");
+      await Logout().saveUserDetails(user,key: "user_data");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('User updated successfully')),
+      );
+    }
+
+  } else {
+    print("User is null.");
+  }
+  }
 
 }
 
@@ -480,6 +535,7 @@ class CustomAutoCompleteDropdownField extends StatefulWidget {
   final String hintText;
   final List<String> suggestions;
   final TextEditingController controller; // Add controller as a parameter
+  
 
   const CustomAutoCompleteDropdownField({
     Key? key,
@@ -619,3 +675,4 @@ class _CustomFileChooserFieldState extends State<CustomFileChooserField> {
     );
   }
 }
+
