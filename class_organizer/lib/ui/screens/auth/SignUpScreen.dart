@@ -377,7 +377,7 @@ int result = await DatabaseHelper().insertUser(newUser);
     if (mounted) {
       showSnackBarMsg(context, 'Registration Successful');
 
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
         Navigator.pushReplacement(
           context,
