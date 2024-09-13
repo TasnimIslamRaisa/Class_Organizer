@@ -335,6 +335,78 @@ class School {
   //       _uniqueId = map['uniqueId'],
   //       _key = map['key'];
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': _id,
+      'sId': _sId,
+      'sName': _sName,
+      'sPhone': _sPhone,
+      'sEmail': _sEmail,
+      'sPass': _sPass,
+      'sAdrs': _sAdrs,
+      'sEiin': _sEiin,
+      'sFundsBal': _sFundsBal,
+      'sAYear': _sAYear,
+      'sVerification': _sVerification,
+      'currSessId': _currSessId,
+      'sItp1': _sItp1,
+      'sItp2': _sItp2,
+      'sItEmail': _sItEmail,
+      'sWeb': _sWeb,
+      'sFundsBank': _sFundsBank,
+      'sFundsAN': _sFundsAN,
+      'sLogo': _sLogo,
+      'sActivate': _sActivate,
+      'sEmpl': _sEmpl,
+      'sCourse': _sCourse,
+      'sClass': _sClass,
+      'sSec': _sSec,
+      'sUser': _sUser,
+      'sTeacher': _sTeacher,
+      'sStudent': _sStudent,
+      'syncKey': _syncKey,
+      'syncStatus': _syncStatus,
+      'uniqueId': _uniqueId,
+      'key': _key,
+    };
+  }
+
+  static School fromJson(Map<String, dynamic> json) {
+    return School(
+      id: json['id'],
+      sId: json['sId'],
+      sName: json['sName'],
+      sPhone: json['sPhone'],
+      sEmail: json['sEmail'],
+      sPass: json['sPass'],
+      sAdrs: json['sAdrs'],
+      sEiin: json['sEiin'],
+      sFundsBal: json['sFundsBal'],
+      sAYear: json['sAYear'],
+      sVerification: json['sVerification'],
+      currSessId: json['currSessId'],
+      sItp1: json['sItp1'],
+      sItp2: json['sItp2'],
+      sItEmail: json['sItEmail'],
+      sWeb: json['sWeb'],
+      sFundsBank: json['sFundsBank'],
+      sFundsAN: json['sFundsAN'],
+      sLogo: json['sLogo'],
+      sActivate: json['sActivate'],
+      sEmpl: json['sEmpl'],
+      sCourse: json['sCourse'],
+      sClass: json['sClass'],
+      sSec: json['sSec'],
+      sUser: json['sUser'],
+      sTeacher: json['sTeacher'],
+      sStudent: json['sStudent'],
+      syncKey: json['syncKey'],
+      syncStatus: json['syncStatus'],
+      uniqueId: json['uniqueId'],
+      key: json['key'],
+    );
+  }
+
   @override
   String toString() {
     return _sName ?? '';

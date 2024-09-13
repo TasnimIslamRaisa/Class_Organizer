@@ -1,17 +1,24 @@
+import 'dart:convert';
+
 import 'package:class_organizer/models/user.dart';
 import 'package:class_organizer/onboarding/get_start.dart';
 import 'package:class_organizer/ui/Home_Screen.dart';
 import 'package:class_organizer/ui/screens/auth/SignInScreen.dart';
 import 'package:class_organizer/utility/unique.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../db/database_helper.dart';
+import '../../../models/school.dart';
 import '../../../models/u_data.dart';
+import '../../../pages/school/create_school.dart';
 import '../../../preference/logout.dart';
 import '../../../style/app_color.dart';
 import '../../../utility/app_constant.dart';
 import '../../widgets/background_widget.dart';
 import 'package:uuid/uuid.dart';
+import 'package:searchable_paginated_dropdown/searchable_paginated_dropdown.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -21,12 +28,25 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+
+
+
+    List<School> _schoolList = [
+    School(sId: '001', sName: 'Harvard University'),
+    School(sId: '002', sName: 'Stanford University'),
+    School(sId: '003', sName: 'MIT'),
+  ];
+  School? _selectedSchool;
+
+
   final TextEditingController emailController = TextEditingController();
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController mobileController = TextEditingController();
   final TextEditingController passWordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
+
+  final TextEditingController autoCompleteController = TextEditingController();
 
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   bool showPassWord = false;
@@ -39,8 +59,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
   void initState() {
     super.initState();
     checkLoginStatus();
+    _loadSchoolData();
   }
 
+
+
+  Future<void> _loadSchoolData() async {
+    final String response = await rootBundle.loadString('assets/schools.json');
+    final data = json.decode(response) as List<dynamic>;
+    setState(() {
+      _schoolList = data.map((json) => School.fromJson(json)).toList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +94,59 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   const SizedBox(
                     height: 30,
+                  ),
+
+                  // CustomAutoCompleteDropdownField(
+                  //   hintText: "Search School here...",
+                  //   suggestions: ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'],
+                  //   controller: autoCompleteController,
+                  // ),
+
+                
+              DropdownButtonFormField<School>(
+                decoration: InputDecoration(
+                  labelText: 'Select School/College',
+                  helperText: 'Required',
+                  helperStyle: TextStyle(color: Colors.purple), // Color for helper text
+                  prefixIcon: Icon(Icons.school), // Start icon
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide(
+                      color: Colors.grey,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide(
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+                items: _schoolList.map((School school) {
+                  return DropdownMenuItem<School>(
+                    value: school,
+                    child: Text(school.sName!),
+                  );
+                }).toList(),
+                onChanged: (School? selected) {
+                  setState(() {
+                    _selectedSchool = selected;
+                  });
+                },
+                value: _selectedSchool,
+                isExpanded: true, // Make sure it fits the full width
+              ),
+              SizedBox(height: 20),
+              if (_selectedSchool != null)
+                Text(
+                  "Selected School: ${_selectedSchool!.sName}, sId: ${_selectedSchool!.sId}",
+                  style: TextStyle(fontSize: 16),
+                ),
+
+
+
+                  const SizedBox(
+                    height: 8,
                   ),
                   TextFormField(
                     controller: emailController,
@@ -431,6 +514,36 @@ void checkLoginStatus() async {
     // User is not logged in, stay on the sign-in screen
   }
 }
+
+
+  // Custom Dropdown displayed when item is selected
+  Widget _customDropDown(BuildContext context, School? item) {
+    if (item == null) {
+      return Text("No School Selected", style: TextStyle(color: Colors.grey));
+    }
+    return ListTile(
+      leading: Icon(Icons.school, color: Colors.blue),
+      title: Text(item.sName!, style: TextStyle(fontWeight: FontWeight.bold)),
+      subtitle: Text("sId: ${item.sId}"),
+    );
+  }
+
+  // Custom Popup item in the dropdown list
+  Widget _customPopupItemBuilder(BuildContext context, School item, bool isSelected) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 8),
+      decoration: BoxDecoration(
+        border: Border.all(color: isSelected ? Colors.blue : Colors.transparent),
+        borderRadius: BorderRadius.circular(5),
+        color: isSelected ? Colors.blue.withOpacity(0.1) : Colors.transparent,
+      ),
+      child: ListTile(
+        leading: Icon(Icons.school),
+        title: Text(item.sName!),
+        subtitle: Text("sId: ${item.sId}"),
+      ),
+    );
+  }
 
   @override
   void dispose() {
