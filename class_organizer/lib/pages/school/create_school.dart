@@ -256,6 +256,7 @@ void saveSchool() async {
     
     if (result > 0){
       setState(() {
+        user.sid = sid;
         _user = user;
         _user_data = user;
       });
