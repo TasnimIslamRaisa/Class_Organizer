@@ -34,6 +34,7 @@ class AdminLoginState extends State<AdminLogin> {
   @override
   initState() {
     super.initState();
+    checkLoginStatus();
     preference();
     _passwordVisible = true;
   }
@@ -385,6 +386,23 @@ class AdminLoginState extends State<AdminLogin> {
       )),
     );
   }
+
+    void checkLoginStatus() async {
+
+  bool isLoggedIn = await Logout().isLoggedIn();
+
+  if (isLoggedIn) {
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AdminPanel(),
+      ),
+    );
+  } else {
+    // User is not logged in, stay on the sign-in screen
+  }
+}
 
   Future<void> adminSignIn(String username, String password) async {
 
