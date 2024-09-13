@@ -9,11 +9,8 @@ import '../pages/login/login_page.dart';
 class GetStart extends StatefulWidget{
   @override
   State<StatefulWidget> createState() {
-
     return GetStartState();
-
   }
-  
 }
 
 class GetStartState extends State<GetStart>{
@@ -31,7 +28,6 @@ class GetStartState extends State<GetStart>{
                 height: MediaQuery.of(context).size.height / 1.6,
                 decoration: const BoxDecoration(
                   color: Colors.white,
-
                 ),
 
               ),
