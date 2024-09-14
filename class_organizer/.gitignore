@@ -43,3 +43,17 @@ app.*.map.json
 /android/app/release
 windows/flutter/generated_plugin_registrant.cc
 windows/flutter/generated_plugins.cmake
+
+# macOS Flutter Plugin Registrant
+macos/Flutter/GeneratedPluginRegistrant.swift
+
+# Windows Flutter Plugin Registrant
+windows/flutter/generated_plugin_registrant.cc
+windows/flutter/generated_plugins.cmake
+
+# macOS Flutter Plugin Registrant
+macos/Flutter/GeneratedPluginRegistrant.swift
+
+# Windows Flutter Plugin Registrant
+windows/flutter/generated_plugin_registrant.cc
+windows/flutter/generated_plugins.cmake
