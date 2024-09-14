@@ -1,5 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
-import 'package:class_organizer/models/user.dart';
+import 'package:class_organizer/models/user.dart' as local;
 import 'package:class_organizer/onboarding/get_start.dart';
 import 'package:class_organizer/ui/Home_Screen.dart';
 import 'package:class_organizer/ui/screens/auth/SignInScreen.dart';
@@ -8,13 +9,19 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import '../../../db/database_helper.dart';
 import '../../../models/school.dart';
 import '../../../preference/logout.dart';
 import '../../../style/app_color.dart';
 import '../../../utility/app_constant.dart';
+import '../../../web/internet_connectivity.dart';
 import '../../widgets/background_widget.dart';
 import 'package:uuid/uuid.dart';
+
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -24,6 +31,11 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+
+final _auth = FirebaseAuth.instance;
+final _databaseRef = FirebaseDatabase.instance.ref();
+  
+
   List<School> _schoolList = [
     School(sName: 'University of Chittagong'),
     School(sName: 'Chittagong Independent University'),
@@ -79,12 +91,55 @@ class _SignUpScreenState extends State<SignUpScreen> {
   int uType = 0;
 
 
+  bool isConnected = false;
+  late StreamSubscription subscription;
+  final internetChecker = InternetConnectivity();
+  StreamSubscription<InternetConnectionStatus>? connectionSubscription;
+
 @override
   void initState() {
     super.initState();
     checkLoginStatus();
    _loadSchoolData();
+   
+    startListening();
+    checkConnection();
+
+    subscription = internetChecker.checkConnectionContinuously((status) {
+      setState(() {
+        isConnected = status;
+      });
+    });
+
   }
+
+  void checkConnection() async {
+    bool result = await internetChecker.hasInternetConnection();
+    setState(() {
+      isConnected = result;
+    });
+  }
+
+
+  StreamSubscription<InternetConnectionStatus> checkConnectionContinuously() {
+    return InternetConnectionChecker().onStatusChange.listen((InternetConnectionStatus status) {
+      if (status == InternetConnectionStatus.connected) {
+        // Handle connected state
+        print('Connected to the internet');
+      } else {
+        // Handle disconnected state
+        print('Disconnected from the internet');
+      }
+    });
+  }
+
+void startListening() {
+  connectionSubscription = checkConnectionContinuously();
+}
+
+void stopListening() {
+  connectionSubscription?.cancel();
+}
 
    Future<void> _loadSchoolData() async {
      final String response = await rootBundle.loadString('assets/schools.json');
@@ -413,7 +468,7 @@ void showSnackBarMsg(BuildContext context, String message) {
 
     // sqlite
 
-    User? existingUser = await DatabaseHelper().getUserByPhone(mobileController.text.trim());
+    local.User? existingUser = await DatabaseHelper().getUserByPhone(mobileController.text.trim());
 
   if (existingUser != null) {
 
@@ -440,7 +495,7 @@ if(selectedRole=="3"){
   uType = 1;
 }
 
-User newUser = User(
+local.User newUser = local.User(
   uniqueid: uniqueId,
   uname: "${firstNameController.text.trim()} ${lastNameController.text.trim()}",
   phone: mobileController.text.trim(),
@@ -568,6 +623,9 @@ void checkLoginStatus() async {
     mobileController.dispose();
     passWordController.dispose();
     confirmPasswordController.dispose();
+
+    stopListening();
+    subscription.cancel();
     super.dispose();
   }
 }
