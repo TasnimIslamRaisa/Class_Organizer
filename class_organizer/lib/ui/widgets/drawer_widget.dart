@@ -1,4 +1,5 @@
 import 'package:class_organizer/web/black_box.dart';
+import 'package:class_organizer/web/black_box_online.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -98,7 +99,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             title: const Text('B L A C K B O X'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => BlackBox()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => BlackBoxOnline()));
             },
           ),
           ListTile(
