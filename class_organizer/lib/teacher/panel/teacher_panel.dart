@@ -39,12 +39,12 @@ class _TeacherPanelState extends State<TeacherPanel> {
             index = value;
           });
         },
-        children: const [
-          StudentCompanionScreen(),
+        children: [
+          const StudentCompanionScreen(),
           ClassManagerScreen(),
-          CampusRoutine(),
-          Notes(),
-          EditProfileScreen(),
+          const CampusRoutine(),
+          const Notes(),
+          const EditProfileScreen(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(

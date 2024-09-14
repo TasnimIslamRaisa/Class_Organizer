@@ -39,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
             index = value;
           });
         },
-        children: const [
+        children:  [
           StudentCompanionScreen(),
           ClassManagerScreen(),
           CampusRoutine(),
