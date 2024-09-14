@@ -1,20 +1,27 @@
+import 'dart:async';
+
 import 'package:class_organizer/preference/logout.dart';
 import 'package:class_organizer/teacher/panel/teacher_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 // import '../../../data/logInModel.dart';
 // import '../../../data/network_caller.dart';
 // import '../../../data/network_response.dart';
 // import '../../../data/urls.dart';
 import '../../../db/database_helper.dart';
-import '../../../models/user.dart';
+import '../../../models/user.dart' as local;
 import '../../../style/app_color.dart';
 import '../../../utility/app_constant.dart';
+import '../../../web/internet_connectivity.dart';
 import '../../Home_Screen.dart';
 import '../../widgets/background_widget.dart';
 // import '../controller/auth_controller.dart';
 import 'SignUpScreen.dart';
 import 'email_verification_screen.dart';
+
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:firebase_database/firebase_database.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -24,6 +31,11 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
+
+final _auth = firebase_auth.FirebaseAuth.instance;
+final _databaseRef = FirebaseDatabase.instance.ref();
+  
+
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passWordController = TextEditingController();
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
@@ -31,6 +43,63 @@ class _SignInScreenState extends State<SignInScreen> {
   bool showPassWord = false;
   String? selectedRole;
   int uType = 0;
+
+  bool isConnected = false;
+  late StreamSubscription subscription;
+  final internetChecker = InternetConnectivity();
+  StreamSubscription<InternetConnectionStatus>? connectionSubscription;
+
+  @override
+void initState() {
+  super.initState();
+  checkLoginStatus();
+
+    startListening();
+    checkConnection();
+
+    subscription = internetChecker.checkConnectionContinuously((status) {
+      setState(() {
+        isConnected = status;
+      });
+    });
+
+}
+
+  void checkConnection() async {
+    bool result = await internetChecker.hasInternetConnection();
+    setState(() {
+      isConnected = result;
+    });
+  }
+
+
+  StreamSubscription<InternetConnectionStatus> checkConnectionContinuously() {
+    return InternetConnectionChecker().onStatusChange.listen((InternetConnectionStatus status) {
+      if (status == InternetConnectionStatus.connected) {
+        isConnected = true;
+        print('Connected to the internet');
+      } else {
+        isConnected = false;
+        print('Disconnected from the internet');
+      }
+    });
+  }
+
+void startListening() {
+  connectionSubscription = checkConnectionContinuously();
+}
+
+void stopListening() {
+  connectionSubscription?.cancel();
+}
+
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passWordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +137,6 @@ class _SignInScreenState extends State<SignInScreen> {
                         // if (AppConstant.emailRegExp.hasMatch(value!) == false) {
                         //   return "Enter a valid email address";
                         // }
-
                         if (RegExp(r'^[0-9]+$').hasMatch(value!.trim())) {
                           // (assuming phone numbers should be at least 10 digits)
                           if (value.length < 10) {
@@ -76,12 +144,9 @@ class _SignInScreenState extends State<SignInScreen> {
                           }
                           return null;
                         }
-
                         if (AppConstant.emailRegExp.hasMatch(value.trim()) == false) {
                           return "Enter a valid email address";
                         }
-
-
                         return null;
                       },
                     ),
@@ -235,9 +300,140 @@ void showSnackBarMsg(BuildContext context, String message) {
   }else{
     uType = 2;
   }
-    // User? user = await DatabaseHelper().checkUserByPhone(email, password);
 
-    User? user = await DatabaseHelper().checkUserLogin(email, password,uType);
+    if(await InternetConnectionChecker().hasConnection){
+
+      try {
+        firebase_auth.UserCredential userCredential = await firebase_auth.FirebaseAuth.instance
+            .signInWithEmailAndPassword(email: email, password: password);
+
+        firebase_auth.User? firebaseUser = userCredential.user;
+
+        if (firebaseUser != null) {
+          DatabaseReference userRef = FirebaseDatabase.instance
+              .ref()
+              .child('users')
+              .child(firebaseUser.uid);
+
+          final snapshot = await userRef.get();
+
+          if (snapshot.exists) {
+            Map<String, dynamic> userData = Map<String, dynamic>.from(snapshot.value as Map);
+            local.User user = local.User.fromMap(userData);
+
+            if (mounted) {
+              if(selectedRole=="3"){
+                uType = 3;
+                if(uType==user.utype){
+                  
+                  await Logout().setLoggedIn(true);
+                  await Logout().saveUser(user.toMap(), key: "user_logged_in");
+                  await Logout().saveUserDetails(user, key: "user_data");
+
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HomeScreen(),
+                      ),
+                    );
+                }else{
+                  showSnackBarMsg(context, 'You are the wrong guy!');
+                }
+              }else{
+                uType = 2;
+                if(uType==user.utype){
+                  await Logout().setLoggedIn(true);
+                  await Logout().saveUser(user.toMap(), key: "user_logged_in");
+                  await Logout().saveUserDetails(user, key: "user_data");
+
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const TeacherPanel(),
+                      ),
+                    );
+                }else{
+                  showSnackBarMsg(context, 'You are the wrong guy!');
+                }
+              }
+            }
+          } else {
+            showSnackBarMsg(context, 'User data not found!');
+          }
+        }
+      } on firebase_auth.FirebaseAuthException catch (e) {
+        if (e.code == 'user-not-found') {
+          showSnackBarMsg(context, 'No user found for that email.');
+        } else if (e.code == 'wrong-password') {
+          showSnackBarMsg(context, 'Wrong password provided.');
+        } else {
+          showSnackBarMsg(context, e.message ?? 'An error occurred.');
+        }
+      } finally {
+        setState(() {
+          signInApiInProgress = false;
+        });
+      }
+
+    }else{
+      // User? user = await DatabaseHelper().checkUserByPhone(email, password);
+
+      local.User? user = await DatabaseHelper().checkUserLogin(email, password,uType);
+
+          signInApiInProgress = true;
+          if (mounted) {
+            setState(() {});
+          }
+
+          if (user != null) {
+
+            if (mounted) {
+
+              if(selectedRole=="3"){
+                uType = 3;
+                if(uType==user.utype){
+                      await Logout().setLoggedIn(true);
+                      await Logout().saveUser(user.toMap(), key: "user_logged_in");
+                      await Logout().saveUserDetails(user,key: "user_data");
+
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HomeScreen(),
+                      ),
+                    );
+                }else{
+                  showSnackBarMsg(context, 'You are the wrong guy!!');
+                }
+              }else{
+                uType = 2;
+                if(uType==user.utype){
+                      await Logout().setLoggedIn(true);
+                      await Logout().saveUser(user.toMap(), key: "user_logged_in");
+                      await Logout().saveUserDetails(user,key: "user_data");
+
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const TeacherPanel(),
+                      ),
+                    );
+                }else{
+                  showSnackBarMsg(context, 'You are the wrong guy!');
+                }
+              }
+
+
+            }
+          } else {
+
+            if (mounted) {
+              showSnackBarMsg(context, 'Email or password is not correct!');
+            }
+          }
+
+    }
+
 
 
     // Map<String, dynamic> requestdata = {
@@ -246,45 +442,6 @@ void showSnackBarMsg(BuildContext context, String message) {
     // };
     // final NetworkResponse response =
     // await NetworkCaller.postRequest(Urls.login, body: requestdata);
-    signInApiInProgress = true;
-    if (mounted) {
-      setState(() {});
-    }
-
-  if (user != null) {
-    await Logout().setLoggedIn(true);
-    await Logout().saveUser(user.toMap(), key: "user_logged_in");
-    await Logout().saveUserDetails(user,key: "user_data");
-
-    if (mounted) {
-
-      if(selectedRole=="3"){
-        uType = 3;
-        Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const HomeScreen(),
-        ),
-      );
-      }else{
-        uType = 2;
-        Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const TeacherPanel(),
-        ),
-      );
-      }
-
-
-    }
-  } else {
-
-    if (mounted) {
-      showSnackBarMsg(context, 'Email or password is not correct!');
-    }
-  }
-
     // if (response.isSuccess) {
     //   LogInModel  loginModel=LogInModel.fromJson(response.responseData);
     //   await AuthController.saveUserAccessToken(loginModel.token!);
@@ -357,16 +514,9 @@ void showSnackBarMsg(BuildContext context, String message) {
   }
 }
 
-@override
-void initState() {
-  super.initState();
-  checkLoginStatus();
+Future<bool> checkInternetConnection() async {
+  bool isConnected = await internetChecker.hasInternetConnection();
+  return isConnected;
 }
 
-  @override
-  void dispose() {
-    emailController.dispose();
-    passWordController.dispose();
-    super.dispose();
-  }
 }
