@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:class_organizer/web/black_box_online.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../models/user.dart';
 import '../../../preference/logout.dart';
 import '../../../style/app_color.dart';
 import '../../../web/black_box.dart';
+import '../../../web/black_box_online_e.dart';
 
 class StudentCompanionScreen extends StatefulWidget {
   const StudentCompanionScreen({super.key});
@@ -138,7 +140,7 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => BlackBox()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => BlackBoxOnlineE()));
                       },
                       child: const Text("RDS"),
                     ),

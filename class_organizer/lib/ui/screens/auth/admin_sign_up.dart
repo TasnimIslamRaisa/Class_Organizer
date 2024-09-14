@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:class_organizer/models/user.dart' as local;
 import 'package:class_organizer/onboarding/get_start.dart';
+import 'package:class_organizer/pages/login/admin_login.dart';
 import 'package:class_organizer/ui/Home_Screen.dart';
 import 'package:class_organizer/ui/screens/auth/SignInScreen.dart';
 import 'package:class_organizer/utility/unique.dart';
@@ -23,14 +24,14 @@ import 'package:uuid/uuid.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 
-class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+class AdminSignUp extends StatefulWidget {
+  const AdminSignUp({super.key});
 
   @override
-  State<SignUpScreen> createState() => _SignUpScreenState();
+  State<AdminSignUp> createState() => _AdminSignUpState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
+class _AdminSignUpState extends State<AdminSignUp> {
 
 final _auth = FirebaseAuth.instance;
 final _databaseRef = FirebaseDatabase.instance.ref();
@@ -182,37 +183,37 @@ void stopListening() {
                   //   suggestions: ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'],
                   //   controller: autoCompleteController,
                   // ),
-                  DropdownSearch<School>(
-                    items: _schoolList,
-                    dropdownDecoratorProps: DropDownDecoratorProps(
-                      dropdownSearchDecoration: InputDecoration(
-                        labelText: 'Select School/College',
-                        prefixIcon: Icon(Icons.school),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
-                    ),
-                    onChanged: (School? selected) {
-                      setState(() {
-                        _selectedSchool = selected;
-                        sId = _selectedSchool!.sId;
-                      });
-                    },
-                    selectedItem: _selectedSchool,
-                    popupProps: PopupProps.menu(
-                      showSearchBox: true, // Enables the search box
-                      itemBuilder: (context, item, isSelected) => ListTile(
-                        title: Text(item.sName!),
-                        //subtitle: Text("sId: ${item.sId}"),
-                      ),
-                    ),
-                    dropdownBuilder: (context, selectedItem) {
-                      return Text(selectedItem?.sName ?? "No School Selected");
-                    },
-                  ),
+                  // DropdownSearch<School>(
+                  //   items: _schoolList,
+                  //   dropdownDecoratorProps: DropDownDecoratorProps(
+                  //     dropdownSearchDecoration: InputDecoration(
+                  //       labelText: 'Select School/College',
+                  //       prefixIcon: Icon(Icons.school),
+                  //       border: OutlineInputBorder(
+                  //         borderRadius: BorderRadius.circular(8.0),
+                  //       ),
+                  //     ),
+                  //   ),
+                  //   onChanged: (School? selected) {
+                  //     setState(() {
+                  //       _selectedSchool = selected;
+                  //       sId = _selectedSchool!.sId;
+                  //     });
+                  //   },
+                  //   selectedItem: _selectedSchool,
+                  //   popupProps: PopupProps.menu(
+                  //     showSearchBox: true, // Enables the search box
+                  //     itemBuilder: (context, item, isSelected) => ListTile(
+                  //       title: Text(item.sName!),
+                  //       //subtitle: Text("sId: ${item.sId}"),
+                  //     ),
+                  //   ),
+                  //   dropdownBuilder: (context, selectedItem) {
+                  //     return Text(selectedItem?.sName ?? "No School Selected");
+                  //   },
+                  // ),
                   
-                    if (_selectedSchool != null)
+                  //   if (_selectedSchool != null)
                     // Text(
                     //   "Selected School: ${_selectedSchool!.sName}, sId: ${_selectedSchool!.sId}",
                     //   style: TextStyle(fontSize: 16),
@@ -368,8 +369,6 @@ void stopListening() {
                       fillColor: Colors.grey[200],
                     ),
                     items: const [
-                      DropdownMenuItem(value: '3', child: Text('Student',)),
-                      DropdownMenuItem(value: '2', child: Text('Teacher')),
                       DropdownMenuItem(value: '1', child: Text('Admin')),
                       // Add more departments as needed
                     ],
@@ -451,7 +450,7 @@ void stopListening() {
   void onTabSignInButton() {
     Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context)=>const SignInScreen()),
+        MaterialPageRoute(builder: (context)=>const AdminLogin()),
         (route)=>false,
     );
   }
@@ -517,7 +516,6 @@ void showSnackBarMsg(BuildContext context, String message) {
 
                   local.User newUser = local.User(
                     uniqueid: uniqueId,
-                    sid: sId,
                     uname: "${firstNameController.text.trim()} ${lastNameController.text.trim()}",
                     phone: mobileController.text.trim(),
                     pass: passWordController.text.trim(),
@@ -556,7 +554,6 @@ void showSnackBarMsg(BuildContext context, String message) {
 
                     local.User newUser = local.User(
                       uniqueid: uniqueId,
-                      sid: sId,
                       uname: "${firstNameController.text.trim()} ${lastNameController.text.trim()}",
                       phone: mobileController.text.trim(),
                       pass: passWordController.text.trim(),

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../preference/logout.dart';
 import '../../ui/screens/auth/SignInScreen.dart';
 import '../../ui/screens/students_screen/settings_screen.dart';
+import '../../web/black_box_online.dart';
 import 'teacher_panel.dart';
 
 class t_DrawerWidget extends StatefulWidget {
@@ -66,6 +67,7 @@ class _DrawerWidgetState extends State<t_DrawerWidget> {
             title: const Text('BLACKBOX'),
             onTap: () {
               Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => BlackBoxOnline()));
             },
           ),
           ListTile(
