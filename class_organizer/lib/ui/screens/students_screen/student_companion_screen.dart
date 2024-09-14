@@ -2,7 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../models/user.dart';
+import '../../../preference/logout.dart';
 import '../../../style/app_color.dart';
+import '../../../web/black_box.dart';
 
 class StudentCompanionScreen extends StatefulWidget {
   const StudentCompanionScreen({super.key});
@@ -12,7 +15,11 @@ class StudentCompanionScreen extends StatefulWidget {
 }
 
 class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
-  String _userName = 'Tasnim'; // Default user name
+  String _userName = 'Tasnim';
+  
+  User? _user;
+  
+  User? _user_data; // Default user name
 
   @override
   void initState() {
@@ -30,6 +37,17 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
         _userName = userData['uname'] ?? 'Tasnim';
       });
     }
+  }
+
+    Future<void> _loadUser() async {
+    Logout logout = Logout();
+    User? user = await logout.getUserDetails(key: 'user_data');
+    Map<String, dynamic>? userMap = await logout.getUser(key: 'user_logged_in');
+    User user_data = User.fromMap(userMap!);
+    setState(() {
+      _user = user;
+      _user_data = user_data;
+    });
   }
 
   @override
@@ -116,7 +134,9 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
                       child: const Text("PROFILE"),
                     ),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => BlackBox()));
+                      },
                       child: const Text("RDS"),
                     ),
                   ],

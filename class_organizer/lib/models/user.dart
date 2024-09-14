@@ -71,14 +71,14 @@ class User {
       'id': _id,
       'utype': _utype,
       'status': _status,
-      'uniqueid': _uniqueid,
+      'uniqueId': _uniqueid,
       'sync_key': _sync_key,
       'sync_status': _sync_status,
       'uname': _uname,
       'email': _email,
       'pass': _pass,
       'phone': _phone,
-      'sid': _sid,
+      'sId': _sid,
       'userid': _userid,
     };
   }
@@ -88,15 +88,50 @@ class User {
       id: map['id'],
       utype: map['utype'],
       status: map['status'],
-      uniqueid: map['uniqueid'],
+      uniqueid: map['uniqueId'],
       sync_key: map['sync_key'],
       sync_status: map['sync_status'],
       uname: map['uname'],
       email: map['email'],
       pass: map['pass'],
       phone: map['phone'],
-      sid: map['sid'],
+      sid: map['sId'],
       userid: map['userid'],
     );
   }
+
+    Map<String, dynamic> toJson() {
+    return {
+      'id': _id,
+      'utype': _utype,
+      'status': _status,
+      'uniqueId': _uniqueid,
+      'sync_key': _sync_key,
+      'sync_status': _sync_status,
+      'uname': _uname,
+      'email': _email,
+      'pass': _pass,
+      'phone': _phone,
+      'sId': _sid,
+      'userid': _userid,
+    };
+  }
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['id'],
+      utype: json['utype'],
+      status: json['status'],
+      uniqueid: json['uniqueId'],
+      sync_key: json['sync_key'],
+      sync_status: json['sync_status'],
+      uname: json['uname'],
+      email: json['email'],
+      pass: json['pass'],
+      phone: json['phone'],
+      sid: json['sId'],
+      userid: json['userid'],
+    );
+  }
+
 }

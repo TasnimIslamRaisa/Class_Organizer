@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
+import '../models/user.dart';
 import '../pages/login/login_page.dart';
 
 class Logout {
@@ -20,6 +21,12 @@ class Logout {
     prefs.setString(key, jsonEncode(user));
   }
 
+  Future<void> saveUserDetails(User user, {String key = USER_KEY}) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  String userJson = jsonEncode(user.toJson());
+  await prefs.setString(key, userJson);
+}
+
   Future<Map<String, dynamic>?> getUser({String key = USER_KEY}) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userJson = prefs.getString(key);
@@ -30,9 +37,21 @@ class Logout {
     }
   }
 
-  Future<void> clearUser({String key = USER_KEY}) async {
+  Future<User?> getUserDetails({String key = USER_KEY}) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? userJson = prefs.getString(key);
+
+  if (userJson != null) {
+    Map<String, dynamic> userMap = jsonDecode(userJson);
+    return User.fromJson(userMap);
+  }
+  return null;
+}
+
+  Future<void> clearUser({String key = USER_KEY, String key_key = USER_KEY}) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove(key);
+    prefs.remove(key_key);
   }
 
   Future<void> getOut(BuildContext context) async {
