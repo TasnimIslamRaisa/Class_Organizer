@@ -67,6 +67,9 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
       },
     ];
 
+    final brightness = Theme.of(context).brightness;
+    final isLightMode = brightness == Brightness.light;
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(22),
@@ -83,7 +86,7 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
                   height: 65,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.blueGrey[100],
+                    color:isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
                   ),
                   child: const Icon(
                     Icons.person,
@@ -108,15 +111,15 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        const Row(
+                        Row(
                           children: [
-                            Icon(Icons.school_outlined),
-                            SizedBox(width: 8),
+                            const Icon(Icons.school_outlined),
+                            const SizedBox(width: 8),
                             Text(
                               "Bs in CSE",
                               style: TextStyle(
                                 fontSize: 16,
-                                color: AppColors.textColor,
+                                color: isLightMode ? AppColors.textColor : Colors.blueGrey[300],
                               ),
                             ),
                           ],
@@ -157,7 +160,7 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.blueGrey[50],
+                        color: isLightMode ? Colors.blueGrey[50] : Colors.blueGrey[600],
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: ListTile(
