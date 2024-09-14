@@ -296,14 +296,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_webview_pro:
-    dependency: "direct main"
-    description:
-      name: flutter_webview_pro
-      sha256: "2761eda57720077505cfddadf2892688d6009fb13718b5489889e0bf1bd99fb7"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.1+4"
   get:
     dependency: "direct main"
     description:
@@ -845,30 +837,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.14.0"
-  webview_pro_android:
-    dependency: transitive
-    description:
-      name: webview_pro_android
-      sha256: "8f1b4c531a2ca20f4f60cee233a13c0d0155ac96d5b8c2ae1a6ccf366f96a78f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.8.3+3"
-  webview_pro_platform_interface:
-    dependency: transitive
-    description:
-      name: webview_pro_platform_interface
-      sha256: "8f199fcadf403a10bbe536431f811b45068c21c5c0d4553911afd32d443c559b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.8.1+2"
-  webview_pro_wkwebview:
-    dependency: transitive
-    description:
-      name: webview_pro_wkwebview
-      sha256: db0d1edeac7d9ac2c7d6d017e9bac8c020e5b0caa315dbded9cda6fa89599667
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.7.1+3"
   win32:
     dependency: transitive
     description:
