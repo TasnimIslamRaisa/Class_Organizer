@@ -1,9 +1,8 @@
-import 'package:class_organizer/ui/screens/auth/SignInScreen.dart';
+import 'package:class_organizer/teacher/panel/t_drawer_Widget.dart';
 import 'package:class_organizer/ui/screens/students_screen/campus_routine.dart';
 import 'package:class_organizer/ui/screens/students_screen/class_manager_screen.dart';
 import 'package:class_organizer/ui/screens/students_screen/edit_profile_screen.dart';
 import 'package:class_organizer/ui/screens/students_screen/notes_screen.dart';
-import 'package:class_organizer/ui/screens/students_screen/settings_screen.dart';
 import 'package:class_organizer/ui/screens/students_screen/student_companion_screen.dart';
 import 'package:class_organizer/ui/widgets/drawer_widget.dart';
 import 'package:class_organizer/utility/profile_app_bar.dart';
@@ -31,7 +30,7 @@ class _TeacherPanelState extends State<TeacherPanel> {
           appBarbgColor: const Color(0xFF01579B),
       )
       : null,
-      drawer: const DrawerWidget(),
+      drawer: const t_DrawerWidget(),
       body: PageView(
         controller: _pageController,
         onPageChanged: (value) {
