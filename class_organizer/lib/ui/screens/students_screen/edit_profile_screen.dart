@@ -296,10 +296,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 }
 
-
-
-
-
 // import 'dart:async';
 // import 'package:class_organizer/ui/screens/students_screen/settings_screen.dart';
 // import 'package:flutter/material.dart';
