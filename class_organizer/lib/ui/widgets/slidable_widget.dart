@@ -25,12 +25,21 @@ class SlidableClassItem extends StatelessWidget {
         children: [
           SlidableAction(
             onPressed: (context) {
-              showConfirmationDialog(context, classItem, onDeleteClass);
+              showConfirmationDialog(context, classItem, onDeleteClass,'delete');
             },
             backgroundColor: Colors.red,
             foregroundColor: Colors.white,
             icon: Icons.delete,
             label: 'Delete',
+          ),
+          SlidableAction(
+            onPressed: (context) {
+              showConfirmationDialog(context, classItem, onDeleteClass,'edit');
+            },
+            backgroundColor: Colors.pink,
+            foregroundColor: Colors.white,
+            icon: Icons.edit,
+            label: 'Edit',
           ),
         ],
       ),

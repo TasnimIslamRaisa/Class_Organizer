@@ -24,7 +24,7 @@ class FridayContent extends StatelessWidget {
                 children: [
                   SlidableAction(
                     onPressed: (context) {
-                      showConfirmationDialog(context, classItem,onDeleteClass);
+                      showConfirmationDialog(context, classItem,onDeleteClass,'delete');
                     },
                     backgroundColor: Colors.red,
                     foregroundColor: Colors.white,

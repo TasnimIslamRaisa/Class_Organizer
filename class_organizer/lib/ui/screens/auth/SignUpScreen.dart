@@ -96,7 +96,7 @@ final _databaseRef = FirebaseDatabase.instance.ref();
   final internetChecker = InternetConnectivity();
   StreamSubscription<InternetConnectionStatus>? connectionSubscription;
   
-  String? sId;
+  String? sId = "";
 
 @override
   void initState() {
@@ -125,25 +125,25 @@ final _databaseRef = FirebaseDatabase.instance.ref();
   }
 
 
-  StreamSubscription<InternetConnectionStatus> checkConnectionContinuously() {
-    return InternetConnectionChecker().onStatusChange.listen((InternetConnectionStatus status) {
-      if (status == InternetConnectionStatus.connected) {
-        isConnected = true;
-        print('Connected to the internet');
-      } else {
-        isConnected = false;
-        print('Disconnected from the internet');
-      }
-    });
-  }
+    StreamSubscription<InternetConnectionStatus> checkConnectionContinuously() {
+      return InternetConnectionChecker().onStatusChange.listen((InternetConnectionStatus status) {
+        if (status == InternetConnectionStatus.connected) {
+          isConnected = true;
+          print('Connected to the internet');
+        } else {
+          isConnected = false;
+          print('Disconnected from the internet');
+        }
+      });
+    }
 
-void startListening() {
-  connectionSubscription = checkConnectionContinuously();
-}
+    void startListening() {
+      connectionSubscription = checkConnectionContinuously();
+    }
 
-void stopListening() {
-  connectionSubscription?.cancel();
-}
+    void stopListening() {
+      connectionSubscription?.cancel();
+    }
 
    Future<void> _loadSchoolData() async {
      final String response = await rootBundle.loadString('assets/schools.json');

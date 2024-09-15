@@ -11,6 +11,7 @@ import 'package:flutter/widgets.dart';
 import 'package:lottie/lottie.dart';
 
 import '../../db/database_helper.dart';
+import '../../models/school.dart';
 import '../../models/user.dart' as local;
 import '../../preference/logout.dart';
 import '../../ui/screens/auth/email_verification_screen.dart';
@@ -500,7 +501,9 @@ class AdminLoginState extends State<AdminLogin> {
                 // await Logout().setLoggedIn(true);
                 // await Logout().saveUser(user.toMap(), key: "user_logged_in");
                 // await Logout().saveUserDetails(user,key: "user_data");
-                
+
+                print('user sid: ${user.phone}');
+
                 if (mounted) {
                   checkOnlineSchool(user);
                 }
@@ -589,6 +592,8 @@ void showSnackBarMsg(BuildContext context, String message) {
 
     Future<void> checkOnlineSchool(local.User user) async {
     if(user.sid == null){
+      await Logout().saveUser(user.toMap(), key: "user_logged_in");
+      await Logout().saveUserDetails(user,key: "user_data");
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -599,7 +604,9 @@ void showSnackBarMsg(BuildContext context, String message) {
           await Logout().setLoggedIn(true);
           await Logout().saveUser(user.toMap(), key: "user_logged_in");
           await Logout().saveUserDetails(user,key: "user_data");
-          
+
+          getSchoolBySId(user.sid);
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -608,5 +615,33 @@ void showSnackBarMsg(BuildContext context, String message) {
       );
     }
   }
+
+  void getSchoolBySId(String? sid) async {
+    if (sid == null) {
+      print("SID is null, unable to fetch school data.");
+      return;
+    }
+
+    final DatabaseReference dbRef = FirebaseDatabase.instance.ref("schools").child(sid);
+
+    try {
+      final DataSnapshot snapshot = await dbRef.get();
+
+      if (snapshot.exists) {
+        final Map<String, dynamic> schoolData = Map<String, dynamic>.from(snapshot.value as Map);
+        School school = School.fromMap(schoolData);
+
+        await Logout().saveSchool(school as Map<String, dynamic>,key: "school_data");
+
+        print("School data fetched successfully: ${school.sName}");
+
+      } else {
+        print("School with SID $sid does not exist.");
+      }
+    } catch (e) {
+      print("Error fetching school data: $e");
+    }
+  }
+
 
 }
