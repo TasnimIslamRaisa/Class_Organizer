@@ -1,16 +1,22 @@
+import 'dart:async';
+
 import 'package:class_organizer/admin/panel/admin_panel.dart';
 import 'package:class_organizer/db/database_helper.dart';
 import 'package:class_organizer/pages/login/admin_login.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import '../../models/school.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../models/user.dart';
+import '../../models/user.dart' as local;
 import '../../preference/logout.dart';
 import '../../utility/unique.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
+
+import '../../web/internet_connectivity.dart';
 
 class CreateSchool extends StatefulWidget {
   @override
@@ -20,7 +26,7 @@ class CreateSchool extends StatefulWidget {
 }
 
 class CreateSchoolState extends State<CreateSchool> {
-  User? _user, _user_data;
+  local.User? _user, _user_data;
   final _formKey = GlobalKey<FormState>();
   String? sid;
   School? school;
@@ -36,18 +42,55 @@ class CreateSchoolState extends State<CreateSchool> {
   final schoolItEmail = TextEditingController();
   final schoolTrx = TextEditingController();
 
+  bool isConnected = false;
+  late StreamSubscription subscription;
+  final internetChecker = InternetConnectivity();
+  StreamSubscription<InternetConnectionStatus>? connectionSubscription;
 
   @override
   void initState() {
     super.initState();
     _loadUser();
+
+    startListening();
+    checkConnection();
+
+    subscription = internetChecker.checkConnectionContinuously((status) {
+      setState(() {
+        isConnected = status;
+      });
+    });
+  }
+
+  void checkConnection() async {
+    bool result = await internetChecker.hasInternetConnection();
+    setState(() {
+      isConnected = result;
+    });
+  }
+  StreamSubscription<InternetConnectionStatus> checkConnectionContinuously() {
+    return InternetConnectionChecker().onStatusChange.listen((InternetConnectionStatus status) {
+      if (status == InternetConnectionStatus.connected) {
+        isConnected = true;
+        print('Connected to the internet');
+      } else {
+        isConnected = false;
+        print('Disconnected from the internet');
+      }
+    });
+  }
+  void startListening() {
+    connectionSubscription = checkConnectionContinuously();
+  }
+  void stopListening() {
+    connectionSubscription?.cancel();
   }
 
   Future<void> _loadUser() async {
     Logout logout = Logout();
-    User? user = await logout.getUserDetails(key: 'user_data');
+    local.User? user = await logout.getUserDetails(key: 'user_data');
     Map<String, dynamic>? userMap = await logout.getUser(key: 'user_logged_in');
-    User user_data = User.fromMap(userMap!);
+    local.User user_data = local.User.fromMap(userMap!);
     setState(() {
       _user = user;
       _user_data = user_data;
@@ -194,14 +237,12 @@ void showSnackBarMsg(BuildContext context, String message) {
 }
   
 void saveSchool() async {
-
+  await _loadUser();
   var uuid = Uuid();
 
   String uniqueId = Unique().generateUniqueID();
 
   final newSchool = School(
-
-
     sId: uuid.v4(),
     uniqueId: uniqueId,
     sName: schoolName.text,
@@ -220,20 +261,44 @@ void saveSchool() async {
     sid = newSchool.sId;
   });
 
-  final result = await DatabaseHelper().insertSchool(newSchool);
+  if(await InternetConnectionChecker().hasConnection){
+    final DatabaseReference dbRef = FirebaseDatabase.instance.ref("schools").child(newSchool.sId!);
 
-  if (result > 0) {
+    try {
+      await dbRef.set(newSchool.toMap());
 
-    setUserSid(_user ??_user_data);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('School saved successfully!')),
+      );
 
-    ScaffoldMessenger.of(context).showSnackBar(
+      if (mounted) {
+        setState(() {});
+      }
 
-      SnackBar(content: Text('School saved successfully!')),
-    );
+      await setUserSidOnline(_user ?? _user_data);
 
-    if (mounted) {
-      setState(() {});
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const AdminLogin(),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to save school: $e')),
+      );
     }
+  }else{
+    final result = await DatabaseHelper().insertSchool(newSchool);
+    if (result > 0) {
+      setUserSid(_user ??_user_data);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('School saved successfully!')),
+      );
+
+      if (mounted) {
+        setState(() {});
+      }
 
       Navigator.pushReplacement(
         context,
@@ -242,15 +307,46 @@ void saveSchool() async {
         ),
       );
 
-  } else {
+    } else {
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Failed to save school')),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to save school')),
+      );
+    }
   }
+
 }
 
-  Future<void> setUserSid(User? user) async {
+  Future<void> setUserSidOnline(local.User? user) async {
+
+    if (user != null) {
+      user.sid = sid;
+      final DatabaseReference userRef = FirebaseDatabase.instance.ref("users").child(user.userid!);
+
+      try {
+        await userRef.update({'sId': sid});
+
+        setState(() {
+          _user = user;
+          _user_data = user;
+        });
+
+        await Logout().clearUser(key: "user_logged_in", key_key: "user_data");
+        await Logout().saveUser(user.toMap(), key: "user_logged_in");
+        await Logout().saveUserDetails(user, key: "user_data");
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('User updated successfully!')),
+        );
+      } catch (e) {
+        print('Failed to update user: $e');
+      }
+    } else {
+      print("User is null.");
+    }
+  }
+
+  Future<void> setUserSid(local.User? user) async {
   if (user != null) {
     user.sid = sid;
     int result = await DatabaseHelper().updateUser(user);
