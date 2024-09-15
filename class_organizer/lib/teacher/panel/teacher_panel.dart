@@ -8,6 +8,8 @@ import 'package:class_organizer/ui/widgets/drawer_widget.dart';
 import 'package:class_organizer/utility/profile_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+
+import '../../utility/profile_app_bar_teacher.dart';
 class TeacherPanel extends StatefulWidget {
   const TeacherPanel({super.key});
 
@@ -23,7 +25,7 @@ class _TeacherPanelState extends State<TeacherPanel> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: index == 0
-          ? ProfileAppBar(
+          ? ProfileAppBarTeacher(
           title:  'Teacher Companions',
           actionIcon: Icons.more_vert,
           onActionPressed: (){},
