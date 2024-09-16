@@ -130,9 +130,11 @@ final _databaseRef = FirebaseDatabase.instance.ref();
         if (status == InternetConnectionStatus.connected) {
           isConnected = true;
           print('Connected to the internet');
+           _loadSchoolData();
         } else {
           isConnected = false;
           print('Disconnected from the internet');
+          // _loadSchoolData();
         }
       });
     }
@@ -183,11 +185,18 @@ final _databaseRef = FirebaseDatabase.instance.ref();
           });
         });
     }else{
+          setState(() {
+            _isLoading = true;
+          });
       showSnackBarMsg(context, "You are in Offline mode now, Please, connect Internet!");
+          setState(() {
+            _isLoading = false;
+          });
      final String response = await rootBundle.loadString('assets/schools.json');
      final data = json.decode(response) as List<dynamic>;
      setState(() {
        _schoolList = data.map((json) => School.fromJson(json)).toList();
+       _isLoading = false;
      });
     }
 
