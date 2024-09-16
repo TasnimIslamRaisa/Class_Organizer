@@ -1,3 +1,6 @@
+import 'package:class_organizer/admin/school/pages/programs.dart';
+import 'package:class_organizer/admin/school/pages/students.dart';
+import 'package:class_organizer/ui/screens/students_screen/settings_screen.dart';
 import 'package:flutter/material.dart';
 
 class SchoolSetup extends StatefulWidget {
@@ -46,7 +49,7 @@ class _SchoolSetupState extends State<SchoolSetup> {
                   _buildMenuItem(Icons.schedule, 'Timetable', () => _navigateToPage(context, 'time')),
                   _buildMenuItem(Icons.event_note, 'Schedule', () => _navigateToPage(context, 'schedules'), hasNotification: true, notificationCount: 3),
                   _buildMenuItem(Icons.note, 'Notes', () => _navigateToPage(context, 'notes')),
-                  _buildMenuItem(Icons.person_search_outlined, 'Students', () => _navigateToPage(context, 'student')),
+                  _buildMenuItem(Icons.person_search_outlined, 'Students', () => _navigateToPage(context, 'students')),
                   _buildMenuItem(Icons.people, 'Teachers', () => _navigateToPage(context, 'faculty')),
                   _buildMenuItem(Icons.school_outlined, 'Exams', () => _navigateToPage(context, 'exams')),
                   _buildMenuItem(Icons.punch_clock_outlined, 'Routines', () => _navigateToPage(context, 'routines')),
@@ -150,16 +153,23 @@ class _SchoolSetupState extends State<SchoolSetup> {
 
   // Navigation method
   void _navigateToPage(BuildContext context, String pageName) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) {
-        // Placeholder for different pages, replace with actual page widgets
-        return Scaffold(
-          appBar: AppBar(title: Text(pageName)),
-          body: Center(child: Text('This is the $pageName page')),
-        );
-      }),
-    );
+    if(pageName=='programs'){
+      Navigator.push(context, MaterialPageRoute(builder: (context) => ProgramListPage()));
+    }else if(pageName=='students'){
+      Navigator.push(context, MaterialPageRoute(builder: (context) => StudentsPage()));
+    }else{
+
+    }
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(builder: (context) {
+    //     // Placeholder for different pages, replace with actual page widgets
+    //     return Scaffold(
+    //       appBar: AppBar(title: Text(pageName)),
+    //       body: Center(child: Text('This is the $pageName page')),
+    //     );
+    //   }),
+    // );
   }
 }
 
