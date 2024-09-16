@@ -146,11 +146,52 @@ final _databaseRef = FirebaseDatabase.instance.ref();
     }
 
    Future<void> _loadSchoolData() async {
+
+        if(await InternetConnectionChecker().hasConnection){
+              setState(() {
+          _isLoading = true;
+        });
+        
+        DatabaseReference schoolRef = _databaseRef.child('schools');
+
+        schoolRef.once().then((DatabaseEvent event) {
+          final dataSnapshot = event.snapshot;
+
+          if (dataSnapshot.exists) {
+            final Map<dynamic, dynamic> schoolsData = dataSnapshot.value as Map<dynamic, dynamic>;
+
+            setState(() {
+              _schoolList = schoolsData.entries.map((entry) {
+                Map<String, dynamic> schoolMap = {
+                  'sName': entry.value['sName'],
+                  'sId': entry.value['sId']
+                };
+                return School.fromMap(schoolMap);
+              }).toList();
+              _isLoading = false;
+            });
+          } else {
+            print('No school data available.');
+            setState(() {
+              _isLoading = false;
+            });
+          }
+        }).catchError((error) {
+          print('Failed to load school data: $error');
+          setState(() {
+            _isLoading = false;
+          });
+        });
+    }else{
+      showSnackBarMsg(context, "You are in Offline mode now, Please, connect Internet!");
      final String response = await rootBundle.loadString('assets/schools.json');
      final data = json.decode(response) as List<dynamic>;
      setState(() {
        _schoolList = data.map((json) => School.fromJson(json)).toList();
      });
+    }
+
+
    }
 
   @override
@@ -158,7 +199,8 @@ final _databaseRef = FirebaseDatabase.instance.ref();
     return Scaffold(
       body: BackgroundWidget(
         //BackgroundWidget
-        child: SingleChildScrollView(
+        child: _isLoading 
+        ? Center(child: CircularProgressIndicator()) : SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(30.0),
             child:  Form(
