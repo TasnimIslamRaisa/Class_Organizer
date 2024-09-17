@@ -1,3 +1,4 @@
+import 'package:class_organizer/models/school.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -128,6 +129,16 @@ class Logout {
     String? schoolJson = prefs.getString(key);
     if (schoolJson != null) {
       return jsonDecode(schoolJson);
+    } else {
+      return null;
+    }
+  }
+  Future<School?> getSchoolDetails({String key = SCHOOL_KEY}) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? schoolJson = prefs.getString(key);
+    if (schoolJson != null) {
+      Map<String, dynamic> schoolMap = jsonDecode(schoolJson);
+      return School.fromJson(schoolMap);
     } else {
       return null;
     }

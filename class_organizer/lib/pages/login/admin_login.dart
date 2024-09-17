@@ -631,7 +631,7 @@ void showSnackBarMsg(BuildContext context, String message) {
         final Map<String, dynamic> schoolData = Map<String, dynamic>.from(snapshot.value as Map);
         School school = School.fromMap(schoolData);
 
-        await Logout().saveSchool(school as Map<String, dynamic>,key: "school_data");
+        await Logout().saveSchool(school.toMap(),key: "school_data");
 
         print("School data fetched successfully: ${school.sName}");
 

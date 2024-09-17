@@ -106,4 +106,41 @@ class Major {
       syncKey: map['syncKey'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': _id,
+      'sId': _sId,
+      'uniqueId': _uniqueId,
+      'location': _location,
+      'deanId': _deanId,
+      'phone': _phone,
+      'mName': _mName,
+      'mStart': _mStart,
+      'mEnd': _mEnd,
+      'mStatus': _mStatus,
+      'currentId': _currentId,
+      'syncStatus': _syncStatus,
+      'syncKey': _syncKey,
+    };
+  }
+
+  factory Major.fromJson(Map<String, dynamic> json) {
+    return Major(
+      id: json['id'],
+      sId: json['sId'],
+      uniqueId: json['uniqueId'],
+      location: json['location'],
+      deanId: json['deanId'],
+      phone: json['phone'],
+      mName: json['mName'],
+      mStart: json['mStart'],
+      mEnd: json['mEnd'],
+      mStatus: json['mStatus'],
+      currentId: json['currentId'],
+      syncStatus: json['syncStatus'],
+      syncKey: json['syncKey'],
+    );
+  }
+
 }

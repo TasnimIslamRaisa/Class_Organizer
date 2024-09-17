@@ -88,15 +88,15 @@ class User {
       id: map['id'],
       utype: map['utype'],
       status: map['status'],
-      uniqueid: map['uniqueId'],
-      sync_key: map['sync_key'],
+      uniqueid: map['uniqueId'] ?? '',
+      sync_key: map['sync_key'] ?? '',
       sync_status: map['sync_status'],
-      uname: map['uname'],
-      email: map['email'],
-      pass: map['pass'],
-      phone: map['phone'],
-      sid: map['sId'],
-      userid: map['userid'],
+      uname: map['uname'] ?? '',
+      email: map['email'] ?? '',
+      pass: map['pass'] ?? '',
+      phone: map['phone'] ?? '',
+      sid: map['sId'] ?? '',
+      userid: map['userid'] ?? '',
     );
   }
 

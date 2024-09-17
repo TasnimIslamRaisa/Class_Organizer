@@ -1,3 +1,4 @@
+import 'package:class_organizer/admin/school/school_setup.dart';
 import 'package:class_organizer/onboarding/get_start.dart';
 import 'package:flutter/material.dart';
 
@@ -45,6 +46,12 @@ class ProfileAppBarAdmin extends StatelessWidget implements PreferredSizeWidget 
                     MaterialPageRoute(
                         builder: (context) => const SettingScreen()));
                 break;
+              case 'school':
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SchoolSetup()));
+                break;
               case 'restart':
 
               await Logout().logoutUser();
@@ -79,6 +86,10 @@ class ProfileAppBarAdmin extends StatelessWidget implements PreferredSizeWidget 
             const PopupMenuItem(
               value: 'settings',
               child: Text('Settings'),
+            ),
+            const PopupMenuItem(
+              value: 'school',
+              child: Text('School'),
             ),
             const PopupMenuItem(
               value: 'restart',
