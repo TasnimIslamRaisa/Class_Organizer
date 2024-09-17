@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:class_organizer/admin/school/pages/semesters.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../models/faculties.dart';
 import '../../../models/major.dart';  // Updated from faculties to major
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -27,7 +30,7 @@ class _DepartmentListPageState extends State<DepartmentListPage> {
   List<Major> departments = [];
 
   final _databaseRef = FirebaseDatabase.instance.ref();
-  final DatabaseReference _database = FirebaseDatabase.instance.ref().child('departments');
+  // final DatabaseReference _database = FirebaseDatabase.instance.ref().child('departments');
   bool _isLoading = true;
   bool isConnected = false;
   late StreamSubscription subscription;
@@ -41,12 +44,15 @@ class _DepartmentListPageState extends State<DepartmentListPage> {
   String? sid;
   School? school;
 
+  List<Faculties> _facultiesList = [];
+  Faculties? _selectedFaculty;
+
 
   @override
   void initState() {
     super.initState();
     _loadUserData();
-    _loadMajorsData();  // Updated method name
+    _loadMajorsData();
     startListening();
     checkConnection();
     subscription = internetChecker.checkConnectionContinuously((status) {
@@ -54,6 +60,8 @@ class _DepartmentListPageState extends State<DepartmentListPage> {
         isConnected = status;
       });
     });
+
+    _loadFacultiesData();
   }
 
   void checkConnection() async {
@@ -203,11 +211,13 @@ class _DepartmentListPageState extends State<DepartmentListPage> {
   }
 
   void saveNewDepartment() async {
-    String departmentName = _departmentNameController.text.trim();
+    String departmentName = '${_departmentNameController.text.trim()} (${_selectedFaculty?.fname ?? "Unknown Faculty"})';
+
     String departmentLocation = _departmentLocationController.text;
     await _loadUserData();
     var uuid = Uuid();
     String uniqueId = Unique().generateUniqueID();
+
 
     if (departmentName.isNotEmpty) {
       Major newMajor = Major(
@@ -220,6 +230,7 @@ class _DepartmentListPageState extends State<DepartmentListPage> {
         deanId: 'Dean-new',
         sId: school?.sId,
         location: departmentLocation,
+        currentId: _selectedFaculty?.uniqueid,
       );
 
       if (await InternetConnectionChecker().hasConnection) {
@@ -316,7 +327,71 @@ class _DepartmentListPageState extends State<DepartmentListPage> {
     );
   }
 
+  Future<void> _loadFacultiesData() async {
 
+    if(await InternetConnectionChecker().hasConnection){
+      setState(() {
+        _isLoading = true;
+      });
+
+      DatabaseReference schoolRef = _databaseRef.child('faculties');
+
+      schoolRef.once().then((DatabaseEvent event) {
+        final dataSnapshot = event.snapshot;
+
+        if (dataSnapshot.exists) {
+          final Map<dynamic, dynamic> facultiesData = dataSnapshot.value as Map<dynamic, dynamic>;
+
+          setState(() {
+            _facultiesList = facultiesData.entries.map((entry) {
+              Map<String, dynamic> facultiesMap = {
+                'id': entry.value['id'] ?? null,
+                'status': entry.value['status'] ?? null,
+                'uniqueId': entry.value['uniqueId'] ?? null,
+                'sync_key': entry.value['sync_key'] ?? null,
+                'sync_status': entry.value['sync_status'] ?? null,
+                'fname': entry.value['fname'] ?? '',
+                'created_date': entry.value['created_date'] ?? null,
+                'nums_dept': entry.value['nums_dept'] ?? 0,
+                't_id': entry.value['t_id'] ?? '',
+                'sId': entry.value['sId'] ?? null,
+                'userid': entry.value['userid'] ?? null,
+              };
+              return Faculties.fromMap(facultiesMap);
+            }).toList();
+            _isLoading = false;
+          });
+
+        } else {
+          print('No Faculties data available.');
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }).catchError((error) {
+        print('Failed to load school data: $error');
+        setState(() {
+          _isLoading = false;
+        });
+      });
+    }else{
+      setState(() {
+        _isLoading = true;
+      });
+      showSnackBarMsg(context, "You are in Offline mode now, Please, connect Internet!");
+      setState(() {
+        _isLoading = false;
+      });
+      final String response = await rootBundle.loadString('assets/faculties.json');
+      final data = json.decode(response) as List<dynamic>;
+      setState(() {
+        _facultiesList = data.map((json) => Faculties.fromJson(json)).toList();
+        _isLoading = false;
+      });
+    }
+
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -357,6 +432,14 @@ class _DepartmentListPageState extends State<DepartmentListPage> {
               title: Text(departments[index].mName ?? ''),
               onTap: () {
                 showDepartmentDetails(index);
+                Future.delayed(const Duration(seconds: 3), () {
+                  if (mounted) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SemestersPage(department: departments[index],)),
+                    );
+                  }
+                });
               },
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -400,8 +483,9 @@ class _DepartmentListPageState extends State<DepartmentListPage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
+        onPressed: () async {
           _showDepartmentForm(context);
+          await _loadFacultiesData();
           setState(() {
             // programs.add(Faculties(
             //   fname: 'New Faculty',
@@ -431,6 +515,34 @@ class _DepartmentListPageState extends State<DepartmentListPage> {
           context,
           'Create Department',
           [
+            DropdownSearch<Faculties>(
+              items: _facultiesList,  // Assuming you have a list of faculties
+              dropdownDecoratorProps: DropDownDecoratorProps(
+                dropdownSearchDecoration: InputDecoration(
+                  labelText: 'Select Program/Faculty',
+                  prefixIcon: Icon(Icons.person),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+              ),
+              onChanged: (Faculties? selectedFaculty) {
+                setState(() {
+                  _selectedFaculty = selectedFaculty;
+                  // Use selected faculty data as needed, e.g., _selectedFaculty.fname
+                });
+              },
+              selectedItem: _selectedFaculty,
+              popupProps: PopupProps.menu(
+                showSearchBox: true,
+                itemBuilder: (context, item, isSelected) => ListTile(
+                  title: Text(item.fname ?? 'Unknown Faculty'),
+                ),
+              ),
+              dropdownBuilder: (context, selectedItem) {
+                return Text(selectedItem?.fname ?? "No Faculty Selected");
+              },
+            ),
             _buildTextField('Department Name', Icons.business, _departmentNameController),
             _buildTextField('Department Location', Icons.room_outlined, _departmentLocationController),
           ],

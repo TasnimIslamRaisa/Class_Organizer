@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../../models/major.dart';
+
 class SemestersPage extends StatefulWidget {
+  final Major department;
+
+  SemestersPage({required this.department});
+
   @override
   _SemestersPageState createState() => _SemestersPageState();
 }
@@ -12,6 +18,12 @@ class _SemestersPageState extends State<SemestersPage> {
     {'name': 'Semester 3', 'sId': 'sem3@example.com', 'uniqueId': '123456289'},
     {'name': 'Semester 4', 'sId': 'sem4@example.com', 'uniqueId': '987655321'},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    print(widget.department.mName);
+  }
 
   void editSemester(int index) {
     // Handle editing a semester
