@@ -7,7 +7,6 @@ import '../../preference/logout.dart';
 import '../../ui/screens/auth/SignInScreen.dart';
 import '../../ui/screens/students_screen/settings_screen.dart';
 import '../../web/black_box_online.dart';
-import 'teacher_panel.dart';
 
 class t_DrawerWidget extends StatefulWidget {
   const t_DrawerWidget({Key? key}) : super(key: key);

@@ -1,3 +1,4 @@
+import 'package:class_organizer/admin/school/pages/departments.dart';
 import 'package:class_organizer/admin/school/pages/programs.dart';
 import 'package:class_organizer/admin/school/pages/students.dart';
 import 'package:class_organizer/ui/screens/students_screen/settings_screen.dart';
@@ -157,6 +158,8 @@ class _SchoolSetupState extends State<SchoolSetup> {
       Navigator.push(context, MaterialPageRoute(builder: (context) => ProgramListPage()));
     }else if(pageName=='students'){
       Navigator.push(context, MaterialPageRoute(builder: (context) => StudentsPage()));
+    }else if(pageName=='departments'){
+      Navigator.push(context, MaterialPageRoute(builder: (context) => DepartmentListPage()));
     }else{
 
     }
@@ -172,6 +175,23 @@ class _SchoolSetupState extends State<SchoolSetup> {
     // );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // import 'package:flutter/material.dart';

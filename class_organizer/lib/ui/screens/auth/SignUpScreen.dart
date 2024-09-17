@@ -106,14 +106,11 @@ final _databaseRef = FirebaseDatabase.instance.ref();
    
     startListening();
     checkConnection();
-
     subscription = internetChecker.checkConnectionContinuously((status) {
       setState(() {
         isConnected = status;
       });
     });
-
-
 
   }
 
