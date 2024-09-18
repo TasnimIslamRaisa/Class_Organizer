@@ -82,7 +82,7 @@ class _SchedulesPageState extends State<SchedulesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Semesters'),
+        title: Text('Schedules - ${widget.routine.tempName}'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
