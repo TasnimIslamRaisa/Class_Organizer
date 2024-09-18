@@ -96,6 +96,9 @@ class ClassManagerScreen extends StatelessWidget {
 
   void _showAddClassBottomSheet(BuildContext context) {
     showModalBottomSheet(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(40.0)),
+      ),
       context: context,
       isScrollControlled: true,
       builder: (context) {

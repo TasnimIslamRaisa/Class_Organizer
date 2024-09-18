@@ -11,38 +11,35 @@ class AddClassBottomSheet extends StatefulWidget {
 }
 
 class _AddClassBottomSheetState extends State<AddClassBottomSheet> {
+  final _formKey = GlobalKey<FormState>();
   final _courseNameController = TextEditingController();
-
   final _courseCodeController = TextEditingController();
-
   final _teacherController = TextEditingController();
-
   final _sectionController = TextEditingController();
-
   final _starttimeController = TextEditingController();
-
   final _endingtimeController = TextEditingController();
-
   final _classroomController = TextEditingController();
 
   String selectedDay = 'Monday'; // Default selected day
 
+  // Time picker for better time input
+  Future<void> _selectTime(BuildContext context, TextEditingController controller) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        controller.text = picked.format(context); // Format the selected time
+      });
+    }
+  }
+
   void _submitForm(BuildContext context) {
-    if (_courseNameController.text.isEmpty ||
-        _courseCodeController.text.isEmpty ||
-        _teacherController.text.isEmpty ||
-        _sectionController.text.isEmpty ||
-        _starttimeController.text.isEmpty ||
-        _endingtimeController.text.isEmpty ||
-        _classroomController.text.isEmpty) {
-      // Show an error message or prevent submission
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all fields')),
-      );
-      return;
+    if (!_formKey.currentState!.validate()) {
+      return; // If validation fails, don't submit
     }
 
-    // Create and add the new class
     final newClass = Class(
       courseName: _courseNameController.text,
       courseCode: _courseCodeController.text,
@@ -51,90 +48,139 @@ class _AddClassBottomSheetState extends State<AddClassBottomSheet> {
       startTime: _starttimeController.text,
       endTime: _endingtimeController.text,
       roomNumber: _classroomController.text,
-      day: selectedDay, // Use the selected day
+      day: selectedDay,
     );
 
     widget.onAddClass(newClass);
-    if (Navigator.canPop(context)) {
-      Navigator.pop(context);
-    }
+
+    // Clear input fields after submission
+    _courseNameController.clear();
+    _courseCodeController.clear();
+    _teacherController.clear();
+    _sectionController.clear();
+    _starttimeController.clear();
+    _endingtimeController.clear();
+    _classroomController.clear();
+
+    Navigator.pop(context); // Close the bottom sheet
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text("Add Your Class",
-                style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 8),
-            DropdownButtonFormField(
-              value: selectedDay,
-              items: [
-                'Monday',
-                'Tuesday',
-                'Wednesday',
-                'Thursday',
-                'Friday',
-                'Saturday',
-                'Sunday'
-              ]
-                  .map((day) => DropdownMenuItem<String>(
-                        value: day,
-                        child: Text(day),
-                      ))
-                  .toList(),
-              onChanged: (value) {
-                setState(() {
-                  selectedDay = value!;
-                });
-              },
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _courseNameController,
-              decoration: const InputDecoration(labelText: 'Course Name'),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _courseCodeController,
-              decoration: const InputDecoration(labelText: 'Course Code'),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _teacherController,
-              decoration: const InputDecoration(labelText: 'Teacher Initial'),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _sectionController,
-              decoration: const InputDecoration(labelText: 'Section'),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _starttimeController,
-              decoration: const InputDecoration(labelText: 'Start Time'),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _endingtimeController,
-              decoration: const InputDecoration(labelText: 'Ending Time'),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _classroomController,
-              decoration: const InputDecoration(labelText: 'Classroom'),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => _submitForm(context),
-              child: const Text('Add Class'),
-            ),
-            const SizedBox(height: 8),
-          ],
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+        left: 16,
+        right: 16,
+        top: 16,
+      ),
+      child: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Add Your Class", style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                value: selectedDay,
+                items: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+                    .map((day) => DropdownMenuItem(value: day, child: Text(day)))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    selectedDay = value!;
+                  });
+                },
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _courseNameController,
+                decoration: const InputDecoration(labelText: 'Course Name'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a course name';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _courseCodeController,
+                decoration: const InputDecoration(labelText: 'Course Code'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a course code';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _teacherController,
+                decoration: const InputDecoration(labelText: 'Teacher Initial'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the teacher\'s initials';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _sectionController,
+                decoration: const InputDecoration(labelText: 'Section'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the section';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _starttimeController,
+                readOnly: true, // To prevent manual editing
+                onTap: () => _selectTime(context, _starttimeController),
+                decoration: const InputDecoration(labelText: 'Start Time'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select the start time';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _endingtimeController,
+                readOnly: true,
+                onTap: () => _selectTime(context, _endingtimeController),
+                decoration: const InputDecoration(labelText: 'Ending Time'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select the end time';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _classroomController,
+                decoration: const InputDecoration(labelText: 'Classroom'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the classroom';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () => _submitForm(context),
+                child: const Text('Add Class'),
+              ),
+            ],
+          ),
         ),
       ),
     );
