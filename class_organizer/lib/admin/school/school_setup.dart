@@ -2,6 +2,7 @@ import 'package:class_organizer/admin/school/pages/courses.dart';
 import 'package:class_organizer/admin/school/pages/departments.dart';
 import 'package:class_organizer/admin/school/pages/programs.dart';
 import 'package:class_organizer/admin/school/pages/rooms.dart';
+import 'package:class_organizer/admin/school/pages/routines.dart';
 import 'package:class_organizer/admin/school/pages/sessions.dart';
 import 'package:class_organizer/admin/school/pages/students.dart';
 import 'package:class_organizer/ui/screens/students_screen/settings_screen.dart';
@@ -170,7 +171,7 @@ class _SchoolSetupState extends State<SchoolSetup> {
     }else if(pageName=='courses'){
       Navigator.push(context, MaterialPageRoute(builder: (context) => CoursesListPage()));
     }else if(pageName=='routines'){
-      // Navigator.push(context, MaterialPageRoute(builder: (context) => RoutinePage()));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => RoutinesListPage()));
     }else{
 
     }

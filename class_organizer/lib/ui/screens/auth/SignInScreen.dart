@@ -9,6 +9,7 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 // import '../../../data/network_caller.dart';
 // import '../../../data/network_response.dart';
 // import '../../../data/urls.dart';
+import '../../../admin/panel/admin_panel.dart';
 import '../../../db/database_helper.dart';
 import '../../../models/user.dart' as local;
 import '../../../style/app_color.dart';
@@ -327,6 +328,7 @@ void showSnackBarMsg(BuildContext context, String message) {
                 if(uType==user.utype){
                   
                   await Logout().setLoggedIn(true);
+                  await Logout().setUserType(uType);
                   await Logout().saveUser(user.toMap(), key: "user_logged_in");
                   await Logout().saveUserDetails(user, key: "user_data");
 
@@ -343,6 +345,7 @@ void showSnackBarMsg(BuildContext context, String message) {
                 uType = 2;
                 if(uType==user.utype){
                   await Logout().setLoggedIn(true);
+                  await Logout().setUserType(uType);
                   await Logout().saveUser(user.toMap(), key: "user_logged_in");
                   await Logout().saveUserDetails(user, key: "user_data");
 
@@ -393,6 +396,7 @@ void showSnackBarMsg(BuildContext context, String message) {
                 uType = 3;
                 if(uType==user.utype){
                       await Logout().setLoggedIn(true);
+                      await Logout().setUserType(uType);
                       await Logout().saveUser(user.toMap(), key: "user_logged_in");
                       await Logout().saveUserDetails(user,key: "user_data");
 
@@ -409,6 +413,7 @@ void showSnackBarMsg(BuildContext context, String message) {
                 uType = 2;
                 if(uType==user.utype){
                       await Logout().setLoggedIn(true);
+                      await Logout().setUserType(uType);
                       await Logout().saveUser(user.toMap(), key: "user_logged_in");
                       await Logout().saveUserDetails(user,key: "user_data");
 
@@ -497,18 +502,39 @@ void showSnackBarMsg(BuildContext context, String message) {
 
 
 
-  void checkLoginStatus() async {
+void checkLoginStatus() async {
 
   bool isLoggedIn = await Logout().isLoggedIn();
+  int? isUser = await Logout().getUserType();
 
   if (isLoggedIn) {
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => HomeScreen(),
-      ),
-    );
+    if(isUser != null){
+      if(isUser==1){
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AdminPanel(),
+          ),
+        );
+      }else if(isUser==2){
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TeacherPanel(),
+          ),
+        );
+      }
+      else{
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomeScreen(),
+          ),
+        );
+      }
+    }
+
   } else {
     // User is not logged in, stay on the sign-in screen
   }

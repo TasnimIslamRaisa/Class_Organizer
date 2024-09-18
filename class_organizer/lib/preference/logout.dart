@@ -16,6 +16,7 @@ class Logout {
   static const String USER_EMAIL = 'userEmail';
   static const String USER_KEY = 'userKey';
   static const String SCHOOL_KEY = 'schoolKey';
+  static const String KEY_USER_TYPE = "u_type";
 
   Future<void> saveUser(Map<String, dynamic> user, {String key = USER_KEY}) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -72,6 +73,15 @@ class Logout {
   Future<void> setLoggedIn(bool isLoggedIn) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool(KEY_IS_LOGGED_IN, isLoggedIn);
+  }
+  Future<void> setUserType(int userType) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt(KEY_USER_TYPE, userType);
+  }
+
+  Future<int?> getUserType() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(Logout.KEY_USER_TYPE);
   }
 
     Future<void> logoutUser() async {

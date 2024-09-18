@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:class_organizer/admin/panel/admin_panel.dart';
 import 'package:class_organizer/pages/school/create_school.dart';
 import 'package:class_organizer/preference/preferences.dart';
+import 'package:class_organizer/teacher/panel/teacher_panel.dart';
+import 'package:class_organizer/ui/Home_Screen.dart';
 import 'package:class_organizer/ui/screens/auth/SignUpScreen.dart';
 import 'package:class_organizer/ui/screens/auth/admin_sign_up.dart';
 import 'package:flutter/cupertino.dart';
@@ -458,15 +460,36 @@ class AdminLoginState extends State<AdminLogin> {
     void checkLoginStatus() async {
 
   bool isLoggedIn = await Logout().isLoggedIn();
+  int? isUser = await Logout().getUserType();
 
   if (isLoggedIn) {
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AdminPanel(),
-      ),
-    );
+    if(isUser != null){
+      if(isUser==1){
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AdminPanel(),
+          ),
+        );
+      }else if(isUser==2){
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TeacherPanel(),
+          ),
+        );
+      }
+      else{
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomeScreen(),
+          ),
+        );
+      }
+    }
+
   } else {
     // User is not logged in, stay on the sign-in screen
   }
@@ -499,6 +522,7 @@ class AdminLoginState extends State<AdminLogin> {
             local.User user = local.User.fromMap(userData);
 
                 // await Logout().setLoggedIn(true);
+            // await Logout().setUserType(uType);
                 // await Logout().saveUser(user.toMap(), key: "user_logged_in");
                 // await Logout().saveUserDetails(user,key: "user_data");
 
@@ -539,6 +563,7 @@ class AdminLoginState extends State<AdminLogin> {
 
         if (user != null) {
           await Logout().setLoggedIn(true);
+          await Logout().setUserType(user.utype ?? 1);
           await Logout().saveUser(user.toMap(), key: "user_logged_in");
           await Logout().saveUserDetails(user,key: "user_data");
           
@@ -602,6 +627,7 @@ void showSnackBarMsg(BuildContext context, String message) {
       );
     }else{
           await Logout().setLoggedIn(true);
+          await Logout().setUserType(user.utype ?? 1);
           await Logout().saveUser(user.toMap(), key: "user_logged_in");
           await Logout().saveUserDetails(user,key: "user_data");
 
