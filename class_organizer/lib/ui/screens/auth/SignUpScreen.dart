@@ -579,73 +579,18 @@ void showSnackBarMsg(BuildContext context, String message) {
 
             print("User successfully signed up and saved to database");
 
+            saveUserOffline(uniqueId, uuid);
+
           }
         } catch (e) {
           print("Signup failed: $e");
         }
 
     }else{
-      showSnackBarMsg(context, "You are in offline mode now, Please! connect internet");
+      saveUserOffline(uniqueId, uuid);
     }
 
 
-
-                  // sqlite
-
-              local.User? existingUser = await DatabaseHelper().getUserByPhone(mobileController.text.trim());
-
-              if (existingUser != null) {
-
-                  if (mounted) {
-                    showSnackBarMsg(context, 'User already registered');
-                  }
-                  registrationInProgress = false;
-                  if (mounted) {
-                    setState(() {});
-                  }
-                  return;
-              }
-
-                    local.User newUser = local.User(
-                      uniqueid: uniqueId,
-                      sid: sId,
-                      uname: "${firstNameController.text.trim()} ${lastNameController.text.trim()}",
-                      phone: mobileController.text.trim(),
-                      pass: passWordController.text.trim(),
-                      email: emailController.text.trim(),
-                      userid: uuid.v4(),
-                      utype: uType,
-                      status: 1,
-                    );
-
-              int result = await DatabaseHelper().insertUser(newUser);
-
-
-                  registrationInProgress = false;
-                  if (mounted) {
-                    setState(() {});
-                  }
-
-                if (result > 0) {
-                  if (mounted) {
-                    showSnackBarMsg(context, 'Registration Successful');
-
-                  Future.delayed(const Duration(seconds: 0), () {
-                    if (mounted) {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => GetStart()),
-                      );
-                    }
-                  });
-
-                  }
-                  clearfield();
-                } else {
-                  if (mounted) {
-                    showSnackBarMsg(context, 'Registration Failed');
-                  }
-                }
 
 
 
@@ -743,5 +688,66 @@ void checkLoginStatus() async {
     stopListening();
     subscription.cancel();
     super.dispose();
+  }
+
+  Future<void> saveUserOffline(String uniqueId, Uuid uuid) async {
+
+    // sqlite
+
+    local.User? existingUser = await DatabaseHelper().getUserByPhone(mobileController.text.trim());
+
+    if (existingUser != null) {
+
+      if (mounted) {
+        showSnackBarMsg(context, 'User already registered');
+      }
+      registrationInProgress = false;
+      if (mounted) {
+        setState(() {});
+      }
+      return;
+    }
+
+    local.User newUser = local.User(
+      uniqueid: uniqueId,
+      sid: sId,
+      uname: "${firstNameController.text.trim()} ${lastNameController.text.trim()}",
+      phone: mobileController.text.trim(),
+      pass: passWordController.text.trim(),
+      email: emailController.text.trim(),
+      userid: uuid.v4(),
+      utype: uType,
+      status: 1,
+    );
+
+    int result = await DatabaseHelper().insertUser(newUser);
+
+
+    registrationInProgress = false;
+    if (mounted) {
+      setState(() {});
+    }
+
+    if (result > 0) {
+      if (mounted) {
+        showSnackBarMsg(context, 'Registration Successful');
+
+        Future.delayed(const Duration(seconds: 0), () {
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => GetStart()),
+            );
+          }
+        });
+
+      }
+      clearfield();
+    } else {
+      if (mounted) {
+        showSnackBarMsg(context, 'Registration Failed');
+      }
+    }
+
   }
 }
