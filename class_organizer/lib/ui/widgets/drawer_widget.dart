@@ -6,6 +6,7 @@ import 'dart:convert';
 import '../../preference/logout.dart';
 import '../../style/app_color.dart';
 import '../screens/auth/SignInScreen.dart';
+import '../screens/students_screen/class_manager.dart';
 import '../screens/students_screen/edit_profile_screen.dart';
 import '../screens/students_screen/settings_screen.dart';
 
@@ -110,13 +111,17 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               Navigator.push(context, MaterialPageRoute(builder: (context) => const EditProfileScreen()));
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.bloodtype),
-            title: const Text('B L O O D B A N K'),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
+    ListTile(
+    leading: const Icon(Icons.bloodtype),
+    title: const Text('C L A S S  M A N A G E R'),
+    onTap: () {
+    Navigator.pop(context);
+    Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => ClassManagerPage()),
+    );
+    },
+    ),
           ListTile(
             leading: const Icon(Icons.note),
             title: const Text('N O T E S & T A S K S'),
