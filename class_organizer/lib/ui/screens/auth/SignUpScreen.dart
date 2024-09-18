@@ -584,7 +584,11 @@ void showSnackBarMsg(BuildContext context, String message) {
           print("Signup failed: $e");
         }
 
+    }else{
+      showSnackBarMsg(context, "You are in offline mode now, Please! connect internet");
     }
+
+
 
                   // sqlite
 
