@@ -215,11 +215,12 @@ class _SessionListPageState extends State<SessionListPage> {
   }
 
   void saveNewSession() async {
+
     String sessionName = _sessionNameController.text.trim();
-    int startMonth = int.parse(_selectedMonth!);
-    int endM = int.parse(endMonth!);
-    int startYear = int.parse(_selectedYear!);
-    int endY = int.parse(endYear!);
+    int startMonth = int.tryParse(_selectedMonth ?? '1') ?? 1;
+    int endM = int.tryParse(endMonth ?? '12') ?? 12;
+    int startYear = int.tryParse(_selectedYear ?? '2024') ?? 2024;
+    int endY = int.tryParse(endYear ?? '2024') ?? 2024;
 
     await _loadUserData();
     var uuid = Uuid();
@@ -511,6 +512,10 @@ class _SessionListPageState extends State<SessionListPage> {
   Widget _buildMonthSelectDropdownField(String labelText, IconData icon, String? selectedMonth, ValueChanged<String?> onChanged) {
     List<String> months = List.generate(12, (index) => (index + 1).toString());
 
+    if (selectedMonth != null && !months.contains(selectedMonth)) {
+      selectedMonth = null;
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: DropdownButtonFormField<String>(
@@ -534,6 +539,10 @@ class _SessionListPageState extends State<SessionListPage> {
   Widget _buildYearSelectDropdownField(String labelText, IconData icon, String? selectedYear, ValueChanged<String?> onChanged) {
     int currentYear = DateTime.now().year;
     List<String> years = List.generate(6, (index) => (currentYear + index).toString()); // Generate years from current year to next 5 years
+
+    if (selectedYear != null && !years.contains(selectedYear)) {
+      selectedYear = null;
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),

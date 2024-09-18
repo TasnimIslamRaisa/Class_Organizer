@@ -1,3 +1,4 @@
+import 'package:class_organizer/admin/school/pages/courses.dart';
 import 'package:class_organizer/admin/school/pages/departments.dart';
 import 'package:class_organizer/admin/school/pages/programs.dart';
 import 'package:class_organizer/admin/school/pages/rooms.dart';
@@ -154,7 +155,7 @@ class _SchoolSetupState extends State<SchoolSetup> {
     );
   }
 
-  // Navigation method
+
   void _navigateToPage(BuildContext context, String pageName) {
     if(pageName=='programs'){
       Navigator.push(context, MaterialPageRoute(builder: (context) => ProgramListPage()));
@@ -166,6 +167,10 @@ class _SchoolSetupState extends State<SchoolSetup> {
       Navigator.push(context, MaterialPageRoute(builder: (context) => SessionListPage()));
     }else if(pageName=='rooms'){
       Navigator.push(context, MaterialPageRoute(builder: (context) => RoomListPage()));
+    }else if(pageName=='courses'){
+      Navigator.push(context, MaterialPageRoute(builder: (context) => CoursesListPage()));
+    }else if(pageName=='routines'){
+      // Navigator.push(context, MaterialPageRoute(builder: (context) => RoutinePage()));
     }else{
 
     }

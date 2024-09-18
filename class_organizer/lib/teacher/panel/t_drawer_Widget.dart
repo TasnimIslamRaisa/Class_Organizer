@@ -1,8 +1,8 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../models/user.dart';
 import '../../preference/logout.dart';
 import '../../ui/screens/auth/SignInScreen.dart';
 import '../../ui/screens/students_screen/settings_screen.dart';
@@ -16,28 +16,43 @@ class t_DrawerWidget extends StatefulWidget {
 }
 
 class _DrawerWidgetState extends State<t_DrawerWidget> {
-  String? userName;
-  String? userPhone;
-  String? userEmail;
+  String _userName = 'Rafi';
+  String? _userPhone = '+008 1800-445566';
+  String? _userEmail = 'r@gmail.com';
+
+  User? _user;
+  User? _user_data;
 
   @override
   void initState() {
     super.initState();
+    _loadUserName();
     _loadUserData();
   }
 
-  Future<void> _loadUserData() async {
+  Future<void> _loadUserName() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userDataString = prefs.getString('user_logged_in');
+    String? savedUserData = prefs.getString('user_logged_in');
 
-    if (userDataString != null) {
-      Map<String, dynamic> userData = jsonDecode(userDataString);
+    if (savedUserData != null) {
+      Map<String, dynamic> userData = jsonDecode(savedUserData);
       setState(() {
-        userName = userData['uname'];
-        userPhone = userData['phone'];
-        userEmail = userData['email'];
+        _userName = userData['uname'] ?? 'Rafi';
+        _userPhone = userData['phone'] ?? '+008 1800-445566';
+        _userEmail = userData['email'] ?? 'r@gmail.com';
       });
     }
+  }
+
+  Future<void> _loadUserData() async {
+    Logout logout = Logout();
+    User? user = await logout.getUserDetails(key: 'user_data');
+    Map<String, dynamic>? userMap = await logout.getUser(key: 'user_logged_in');
+    User user_data = User.fromMap(userMap!);
+    setState(() {
+      _user = user;
+      _user_data = user_data;
+    });
   }
 
   @override
@@ -46,19 +61,52 @@ class _DrawerWidgetState extends State<t_DrawerWidget> {
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
-          const UserAccountsDrawerHeader(
-            accountName: Text('s m rafi'),
-            accountEmail: Text('rafi@gmail.com'),
-            currentAccountPicture: CircleAvatar(
-              backgroundColor: Colors.white,
-              child: Icon(
-                Icons.person,
-                size: 50.0,
-                color: Colors.blue,
-              ),
+          // Extended DrawerHeader
+          DrawerHeader(
+            decoration: const BoxDecoration(
+              color: Color(0xFF246481), // Using color from your previous designs
             ),
-            decoration: BoxDecoration(
-              color: Color(0xFF01579B),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.person_pin_circle_sharp,
+                  size: 60,
+                  color: Colors.white,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  _userName,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.phone, size: 14, color: Colors.white),
+                    Text(
+                      _userPhone ?? '',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(width: 15),
+                    const Icon(Icons.email_outlined, size: 14, color: Colors.white),
+                    Text(
+                      _userEmail ?? '',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
           ListTile(
@@ -95,7 +143,7 @@ class _DrawerWidgetState extends State<t_DrawerWidget> {
             title: const Text('ROUTINES'),
             onTap: () {
               Navigator.pop(context);
-              _showRoutineForm(context); // Open Routine form
+              _showRoutineForm(context);
             },
           ),
           ListTile(
@@ -103,7 +151,7 @@ class _DrawerWidgetState extends State<t_DrawerWidget> {
             title: const Text('SESSION'),
             onTap: () {
               Navigator.pop(context);
-              _showSessionForm(context); // Open Session form
+              _showSessionForm(context);
             },
           ),
           ListTile(
@@ -111,7 +159,7 @@ class _DrawerWidgetState extends State<t_DrawerWidget> {
             title: const Text('DEPARTMENT'),
             onTap: () {
               Navigator.pop(context);
-              _showDepartmentForm(context); // Open Department form
+              _showDepartmentForm(context);
             },
           ),
           ListTile(
@@ -119,7 +167,7 @@ class _DrawerWidgetState extends State<t_DrawerWidget> {
             title: const Text('SCHEDULES'),
             onTap: () {
               Navigator.pop(context);
-              _showScheduleForm(context); // Open Schedule form
+              _showScheduleForm(context);
             },
           ),
           ListTile(
@@ -155,11 +203,7 @@ class _DrawerWidgetState extends State<t_DrawerWidget> {
             title: const Text('S E T T I N G S'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context)=>const SettingScreen()),
-
-              );
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingScreen()));
             },
           ),
           ListTile(
@@ -171,9 +215,9 @@ class _DrawerWidgetState extends State<t_DrawerWidget> {
 
               Navigator.pop(context);
               Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context)=>const SignInScreen()),
-                      (route)=>false
+                context,
+                MaterialPageRoute(builder: (context) => const SignInScreen()),
+                    (route) => false,
               );
             },
           ),
@@ -181,8 +225,7 @@ class _DrawerWidgetState extends State<t_DrawerWidget> {
       ),
     );
   }
-
-  // Function to show the Routine Form
+// Function to show the Routine Form
   void _showRoutineForm(BuildContext context) {
     showModalBottomSheet(
       shape: const RoundedRectangleBorder(
@@ -194,15 +237,15 @@ class _DrawerWidgetState extends State<t_DrawerWidget> {
           context,
           'New Routine',
           [
-            _buildTextField('Routine Name', Icons.text_fields),
-            _buildTextField('Routine Description', Icons.description),
+            _buildTextField('Routine Name'),
+            _buildTextField('Routine Description'),
           ],
         );
       },
     );
   }
 
-  // Function to show the Session Form
+// Function to show the Session Form
   void _showSessionForm(BuildContext context) {
     showModalBottomSheet(
       shape: const RoundedRectangleBorder(
@@ -214,18 +257,18 @@ class _DrawerWidgetState extends State<t_DrawerWidget> {
           context,
           'Create Session',
           [
-            _buildTextField('Start Month (1,2,3...12)', Icons.calendar_today),
-            _buildTextField('Start Year (2023, 2024...)', Icons.event),
-            _buildTextField('Session Name', Icons.text_fields),
-            _buildTextField('End Month (1,2,3...12)', Icons.calendar_today),
-            _buildTextField('End Year (2023, 2024...)', Icons.event),
+            _buildTextField('Start Month (1,2,3...12)'),
+            _buildTextField('Start Year (2023, 2024...)'),
+            _buildTextField('Session Name'),
+            _buildTextField('End Month (1,2,3...12)'),
+            _buildTextField('End Year (2023, 2024...)'),
           ],
         );
       },
     );
   }
 
-  // Function to show the Department Form
+// Function to show the Department Form
   void _showDepartmentForm(BuildContext context) {
     showModalBottomSheet(
       shape: const RoundedRectangleBorder(
@@ -237,17 +280,17 @@ class _DrawerWidgetState extends State<t_DrawerWidget> {
           context,
           'Create Department',
           [
-            _buildTextField('ID', Icons.numbers),
-            _buildTextField('Department Name', Icons.business),
-            _buildTextField('Location', Icons.location_city),
-            _buildTextField('Phone', Icons.phone),
+            _buildTextField('ID'),
+            _buildTextField('Department Name'),
+            _buildTextField('Location'),
+            _buildTextField('Phone'),
           ],
         );
       },
     );
   }
 
-  // Function to show the Schedule Form
+// Function to show the Schedule Form
   void _showScheduleForm(BuildContext context) {
     showModalBottomSheet(
       shape: const RoundedRectangleBorder(
@@ -259,109 +302,72 @@ class _DrawerWidgetState extends State<t_DrawerWidget> {
           context,
           'New Schedule',
           [
-            _buildTextField('Course Title', Icons.book),
-            _buildTextField('Course Code', Icons.code),
-            _buildTextField('Section', Icons.group),
-            _buildTextField('Room Name', Icons.room),
-            _buildDropdownField('Select Day', Icons.calendar_today, [
-              'Monday',
-              'Tuesday',
-              'Wednesday',
-              'Thursday',
-              'Friday',
-              'Saturday',
-              'Sunday',
-            ]),
-            // Wrap Start and End Time in a Row to display them horizontally
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextField('Start Time', Icons.access_time),
-                ),
-                const SizedBox(width: 10), // Spacing between fields
-                Expanded(
-                  child: _buildTextField('End Time', Icons.access_time),
-                ),
-              ],
-            ),
+            _buildTextField('Course Title'),
+            _buildTextField('Course Code'),
+            _buildTextField('Instructor'),
           ],
         );
       },
     );
   }
 
-  // Helper function to build text fields
-  Widget _buildTextField(String labelText, IconData icon) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: TextField(
-        decoration: InputDecoration(
-          border: const UnderlineInputBorder(),
-          labelText: labelText,
-          suffixIcon: Icon(icon),
-        ),
-      ),
-    );
-  }
-
-  // Helper function to build dropdown fields
-  Widget _buildDropdownField(String labelText, IconData icon, List<String> items) {
-    String selectedItem = items[0]; // default selected item
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: DropdownButtonFormField<String>(
-        decoration: InputDecoration(
-          labelText: labelText,
-          suffixIcon: Icon(icon),
-          border: const UnderlineInputBorder(),
-        ),
-        value: selectedItem,
-        onChanged: (String? newValue) {
-          selectedItem = newValue!;
-        },
-        items: items.map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: Text(value),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  // Helper function to build the modal form structure
+// Helper function to build a form with text fields
   Widget _buildForm(BuildContext context, String title, List<Widget> fields) {
-    return Container(
-      padding: const EdgeInsets.all(25.0),
-      height: 400, // Set height for the form
+    return Padding(
+      padding: const EdgeInsets.all(15.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Text(
             title,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: ListView(
-              children: fields,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
           ),
+          const SizedBox(height: 10),
+          ...fields,
+          const SizedBox(height: 15),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(40.0)),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-            ),
-            child: const Center(child: Text('SAVE')),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Save'),
           ),
         ],
       ),
     );
   }
+
+// Helper function to build a text field without an icon
+  Widget _buildTextField(String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0), // Increase vertical padding for spacing
+      child: TextField(
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15.0), // More rounded corners
+            borderSide: BorderSide(
+              color: Colors.grey.shade400, // Light grey border color
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15.0),
+            borderSide: BorderSide(
+              color: Colors.grey.shade400, // Apply to enabled state
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15.0),
+            borderSide: const BorderSide(
+              color: Colors.blue, // Blue color when the field is focused
+            ),
+          ),
+          contentPadding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 15.0), // Larger padding inside the field
+        ),
+        style: const TextStyle(fontSize: 16), // Font size adjustment
+      ),
+    );
+  }
+
+
 }

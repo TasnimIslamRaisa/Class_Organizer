@@ -575,7 +575,7 @@ void showSnackBarMsg(BuildContext context, String message) {
                   if (mounted) {
                     showSnackBarMsg(context, 'Registration Successful');
 
-                  Future.delayed(const Duration(seconds: 1), () {
+                  Future.delayed(const Duration(seconds: 0), () {
                     if (mounted) {
                       Navigator.pushReplacement(
                         context,
