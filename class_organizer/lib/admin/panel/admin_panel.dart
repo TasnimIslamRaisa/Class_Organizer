@@ -43,7 +43,7 @@ class _AdminPanelState extends State<AdminPanel> {
           StudentCompanionScreen(),
           ClassManagerScreen(),
           CampusRoutine(),
-          Notes(),
+          AcademicCalender(),
           EditProfileScreen(),
         ],
       ),

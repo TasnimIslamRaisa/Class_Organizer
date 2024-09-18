@@ -44,7 +44,7 @@ class _TeacherPanelState extends State<TeacherPanel> {
           const StudentCompanionScreen(),
           ClassManagerScreen(),
           const CampusRoutine(),
-          const Notes(),
+          const AcademicCalender(),
           const EditProfileScreen(),
         ],
       ),

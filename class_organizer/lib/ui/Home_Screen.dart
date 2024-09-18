@@ -43,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
           StudentCompanionScreen(),
           ClassManagerScreen(),
           CampusRoutine(),
-          Notes(),
+          AcademicCalender(),
           EditProfileScreen(),
         ],
       ),
@@ -75,8 +75,8 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Routines',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Notes',
+            icon: Icon(Icons.calendar_month_outlined),
+            label: 'Academic Calender',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle),
