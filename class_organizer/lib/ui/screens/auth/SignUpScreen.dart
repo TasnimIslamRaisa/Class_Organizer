@@ -418,7 +418,7 @@ final _databaseRef = FirebaseDatabase.instance.ref();
                     items: const [
                       DropdownMenuItem(value: '3', child: Text('Student',)),
                       DropdownMenuItem(value: '2', child: Text('Teacher')),
-                      DropdownMenuItem(value: '1', child: Text('Admin')),
+                      DropdownMenuItem(value: '4', child: Text('User')),
                       // Add more departments as needed
                     ],
                     onChanged: (value) {
@@ -626,7 +626,7 @@ void showSnackBarMsg(BuildContext context, String message) {
                   if (mounted) {
                     showSnackBarMsg(context, 'Registration Successful');
 
-                  Future.delayed(const Duration(seconds: 1), () {
+                  Future.delayed(const Duration(seconds: 0), () {
                     if (mounted) {
                       Navigator.pushReplacement(
                         context,

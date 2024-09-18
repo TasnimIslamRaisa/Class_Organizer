@@ -127,4 +127,52 @@ class Subject {
       syncKey: map['syncKey'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': _id,
+      'subName': _subName,
+      'uniqueId': _uniqueId,
+      'credit': _credit,
+      'subCode': _subCode,
+      'subId': _subId,
+      'depId': _depId,
+      'typeId': _typeId,
+      'subFee': _subFee,
+      'status': _status,
+      'sId': _sId,
+      'semester': _semester,
+      'program': _program,
+      'departmentId': _departmentId,
+      'syncStatus': _syncStatus,
+      'syncKey': _syncKey,
+    };
+  }
+
+  factory Subject.fromJson(Map<String, dynamic> json) {
+    return Subject(
+      id: json['id'],
+      subName: json['subName'],
+      uniqueId: json['uniqueId'],
+      credit: json['credit'],
+      subCode: json['subCode'],
+      subId: json['subId'],
+      depId: json['depId'],
+      typeId: json['typeId'],
+      subFee: json['subFee'],
+      status: json['status'],
+      sId: json['sId'],
+      semester: json['semester'],
+      program: json['program'],
+      departmentId: json['departmentId'],
+      syncStatus: json['syncStatus'],
+      syncKey: json['syncKey'],
+    );
+  }
+
+  @override
+  String toString() {
+    return _subName ?? '';
+  }
+
 }

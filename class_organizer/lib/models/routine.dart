@@ -114,6 +114,45 @@ class Routine {
     );
   }
 
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': _id,
+      'sId': _sId,
+      'uId': _uId,
+      'stdId': _stdId,
+      'tempName': _tempName,
+      'tempCode': _tempCode,
+      'tempDetails': _tempDetails,
+      'tempNum': _tempNum,
+      'uniqueId': _uniqueId,
+      'syncKey': _syncKey,
+      'syncStatus': _syncStatus,
+      'aStatus': _aStatus,
+      'key': _key,
+      'tId': _tId,
+    };
+  }
+
+  factory Routine.fromJson(Map<String, dynamic> json) {
+    return Routine(
+      id: json['id'],
+      sId: json['sId'],
+      uId: json['uId'],
+      stdId: json['stdId'],
+      tempName: json['tempName'],
+      tempCode: json['tempCode'],
+      tempDetails: json['tempDetails'],
+      tempNum: json['tempNum'],
+      uniqueId: json['uniqueId'],
+      syncKey: json['syncKey'],
+      syncStatus: json['syncStatus'],
+      aStatus: json['aStatus'],
+      key: json['key'],
+      tId: json['tId'],
+    );
+  }
+
   @override
   String toString() {
     return _tempName ?? '';
