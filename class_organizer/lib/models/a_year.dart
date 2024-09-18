@@ -99,4 +99,37 @@ class AYear {
       syncKey: map['syncKey'],
     );
   }
+  Map<String, dynamic> toJson() {
+    return {
+      'id': _id,
+      'uId': _uId,
+      'aYname': _aYname,
+      'uniqueId': _uniqueId,
+      'sYear': _sYear,
+      'sMonth': _sMonth,
+      'eYear': _eYear,
+      'eMonth': _eMonth,
+      'aStatus': _aStatus,
+      'sId': _sId,
+      'syncStatus': _syncStatus,
+      'syncKey': _syncKey,
+    };
+  }
+
+  factory AYear.fromJson(Map<String, dynamic> json) {
+    return AYear(
+      id: json['id'],
+      uId: json['uId'],
+      aYname: json['aYname'],
+      uniqueId: json['uniqueId'],
+      sYear: json['sYear'],
+      sMonth: json['sMonth'],
+      eYear: json['eYear'],
+      eMonth: json['eMonth'],
+      aStatus: json['aStatus'],
+      sId: json['sId'],
+      syncStatus: json['syncStatus'],
+      syncKey: json['syncKey'],
+    );
+  }
 }

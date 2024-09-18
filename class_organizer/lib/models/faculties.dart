@@ -65,14 +65,14 @@ class Faculties {
     return {
       'id': _id,
       'status': _status,
-      'uniqueid': _uniqueid,
+      'uniqueId': _uniqueid,
       'sync_key': _sync_key,
       'sync_status': _sync_status,
       'fname': _fname,
       'created_date': _created_date,
       'nums_dept': _nums_dept,
       't_id': _t_id,
-      'sid': _sid,
+      'sId': _sid,
       'userid': _userid,
     };
   }
@@ -81,15 +81,48 @@ class Faculties {
     return Faculties(
       id: map['id'],
       status: map['status'],
-      uniqueid: map['uniqueid'],
+      uniqueid: map['uniqueId'],
       sync_key: map['sync_key'],
       sync_status: map['sync_status'],
       fname: map['fname'],
       created_date: map['created_date'],
       nums_dept: map['nums_dept'],
       t_id: map['t_id'],
-      sid: map['sid'],
+      sid: map['sId'],
       userid: map['userid'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': _id,
+      'status': _status,
+      'uniqueId': _uniqueid,
+      'sync_key': _sync_key,
+      'sync_status': _sync_status,
+      'fname': _fname,
+      'created_date': _created_date,
+      'nums_dept': _nums_dept,
+      't_id': _t_id,
+      'sId': _sid,
+      'userid': _userid,
+    };
+  }
+
+  static Faculties fromJson(Map<String, dynamic> json) {
+    return Faculties(
+      id: json['id'],
+      status: json['status'],
+      uniqueid: json['uniqueId'],
+      sync_key: json['sync_key'],
+      sync_status: json['sync_status'],
+      fname: json['fname'],
+      created_date: json['created_date'],
+      nums_dept: json['nums_dept'],
+      t_id: json['t_id'],
+      sid: json['sId'],
+      userid: json['userid'],
+    );
+  }
+
 }

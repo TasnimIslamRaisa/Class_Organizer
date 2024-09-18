@@ -3,7 +3,6 @@ import 'package:class_organizer/ui/screens/controller/theme_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-
 import 'provider/admin_provider.dart';
 import 'provider/school_provider.dart';
 import 'provider/u_data_provider.dart';
@@ -25,12 +24,12 @@ class ClassOrganizerApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AdminProvider()),
       ],
       child: Obx(
-        () => GetMaterialApp(
-          title: 'Class Organizer',
-          debugShowCheckedModeBanner: false,
-          theme: themeController.themeData.value, // Observe theme changes
-          home: const SplashScreenV1(),
-        ),
+            () => GetMaterialApp(
+              title: 'Class Organizer',
+              debugShowCheckedModeBanner: false,
+              theme: themeController.themeData.value, // Observe theme changes
+              home: const SplashScreenV1(),
+            ),
       ),
     );
   }

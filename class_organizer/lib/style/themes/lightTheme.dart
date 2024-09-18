@@ -1,29 +1,29 @@
 import 'package:flutter/material.dart';
 
-ThemeData lightMode = ThemeData(
+import '../app_color.dart';
+
+ThemeData lightMode= ThemeData(
   colorScheme: ColorScheme.light(
-    surface: Colors.white,
-    primary: Colors.grey.shade600, // Slightly adjusted
-    secondary: Colors.grey.shade200, // Slightly adjusted for contrast
-    inversePrimary: Colors.black54,
+    surface: Colors.grey.shade100,
+    primary: Colors.grey.shade500,
+    secondary: Colors.grey.shade50,
+    inversePrimary: Colors.grey.shade900,
   ),
   textTheme: const TextTheme(
     titleLarge: TextStyle(
-      fontSize: 25,
-      fontWeight: FontWeight.bold,
-      color: Colors.black87, // Slightly darker for better contrast
-    ),
-    labelMedium: TextStyle(
-      fontSize: 12,
-      fontWeight: FontWeight.w600,
-      color: Colors.black54, // Slightly darker
-    ),
+        fontSize: 25,
+        fontWeight: FontWeight.bold,
+        color: AppColors.textColor),
+    labelMedium : TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        color: AppColors.subtitleColor),
   ),
   inputDecorationTheme: InputDecorationTheme(
-    fillColor: Colors.white,
+    fillColor: AppColors.secondaryColor,
     filled: true,
     hintStyle: const TextStyle(
-      color: Colors.black45,
+      color: AppColors.subtitleColor,
     ),
     border: OutlineInputBorder(
       borderSide: BorderSide.none,
@@ -31,22 +31,20 @@ ThemeData lightMode = ThemeData(
     ),
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
-    style: ElevatedButton.styleFrom(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      foregroundColor: Colors.white,
-      backgroundColor: Colors.grey.shade600,
-      fixedSize: const Size.fromWidth(double.maxFinite),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-    ),
-  ),
+      style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          foregroundColor: AppColors.secondaryColor,
+          backgroundColor: AppColors.primaryColor,
+          fixedSize: const Size.fromWidth(double.maxFinite),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ))),
   textButtonTheme: TextButtonThemeData(
     style: TextButton.styleFrom(
-      foregroundColor: Colors.black54,
-      textStyle: const TextStyle(
-        fontWeight: FontWeight.w600,
-      ),
+        foregroundColor: AppColors.subtitleColor,
+        textStyle:const TextStyle(
+          fontWeight: FontWeight.w600,
+        )
     ),
   ),
 );

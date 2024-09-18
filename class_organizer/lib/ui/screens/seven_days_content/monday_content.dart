@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:get/get.dart';
 import '../../../models/class_model.dart';
-import '../../../utility/confirmationDialog.dart';
 import '../../widgets/slidable_widget.dart';
-import '../controller/class_routine_controller.dart';
 
 class MondayContent extends StatelessWidget {
   final List<Class> classes;

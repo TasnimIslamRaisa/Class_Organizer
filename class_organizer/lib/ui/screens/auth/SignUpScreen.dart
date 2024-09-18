@@ -1,5 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
-import 'package:class_organizer/models/user.dart';
+import 'package:class_organizer/models/user.dart' as local;
 import 'package:class_organizer/onboarding/get_start.dart';
 import 'package:class_organizer/ui/Home_Screen.dart';
 import 'package:class_organizer/ui/screens/auth/SignInScreen.dart';
@@ -8,13 +9,19 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import '../../../db/database_helper.dart';
 import '../../../models/school.dart';
 import '../../../preference/logout.dart';
 import '../../../style/app_color.dart';
 import '../../../utility/app_constant.dart';
+import '../../../web/internet_connectivity.dart';
 import '../../widgets/background_widget.dart';
 import 'package:uuid/uuid.dart';
+
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -24,8 +31,13 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+
+final _auth = FirebaseAuth.instance;
+final _databaseRef = FirebaseDatabase.instance.ref();
+  
+
   List<School> _schoolList = [
-    School(sName: 'University of Chittagong'),
+    School(sName: 'University of Chittagong',sId: "1111"),
     School(sName: 'Chittagong Independent University'),
     School(sName: 'East Delta University'),
     School(sName: 'University of Creative Technology Chittagong'),
@@ -60,7 +72,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   ];
 
   bool _isLoading = true;
-    School? _selectedSchool;
+  School? _selectedSchool;
 
 
   final TextEditingController emailController = TextEditingController();
@@ -79,19 +91,113 @@ class _SignUpScreenState extends State<SignUpScreen> {
   int uType = 0;
 
 
+  bool isConnected = false;
+  late StreamSubscription subscription;
+  final internetChecker = InternetConnectivity();
+  StreamSubscription<InternetConnectionStatus>? connectionSubscription;
+  
+  String? sId = "";
+
 @override
   void initState() {
     super.initState();
     checkLoginStatus();
    _loadSchoolData();
+   
+    startListening();
+    checkConnection();
+    subscription = internetChecker.checkConnectionContinuously((status) {
+      setState(() {
+        isConnected = status;
+      });
+    });
+
   }
 
+  void checkConnection() async {
+    bool result = await internetChecker.hasInternetConnection();
+    setState(() {
+      isConnected = result;
+    });
+  }
+
+
+    StreamSubscription<InternetConnectionStatus> checkConnectionContinuously() {
+      return InternetConnectionChecker().onStatusChange.listen((InternetConnectionStatus status) {
+        if (status == InternetConnectionStatus.connected) {
+          isConnected = true;
+          print('Connected to the internet');
+           _loadSchoolData();
+        } else {
+          isConnected = false;
+          print('Disconnected from the internet');
+          // _loadSchoolData();
+        }
+      });
+    }
+
+    void startListening() {
+      connectionSubscription = checkConnectionContinuously();
+    }
+
+    void stopListening() {
+      connectionSubscription?.cancel();
+    }
+
    Future<void> _loadSchoolData() async {
+
+        if(await InternetConnectionChecker().hasConnection){
+              setState(() {
+          _isLoading = true;
+        });
+        
+        DatabaseReference schoolRef = _databaseRef.child('schools');
+
+        schoolRef.once().then((DatabaseEvent event) {
+          final dataSnapshot = event.snapshot;
+
+          if (dataSnapshot.exists) {
+            final Map<dynamic, dynamic> schoolsData = dataSnapshot.value as Map<dynamic, dynamic>;
+
+            setState(() {
+              _schoolList = schoolsData.entries.map((entry) {
+                Map<String, dynamic> schoolMap = {
+                  'sName': entry.value['sName'],
+                  'sId': entry.value['sId']
+                };
+                return School.fromMap(schoolMap);
+              }).toList();
+              _isLoading = false;
+            });
+          } else {
+            print('No school data available.');
+            setState(() {
+              _isLoading = false;
+            });
+          }
+        }).catchError((error) {
+          print('Failed to load school data: $error');
+          setState(() {
+            _isLoading = false;
+          });
+        });
+    }else{
+          setState(() {
+            _isLoading = true;
+          });
+      showSnackBarMsg(context, "You are in Offline mode now, Please, connect Internet!");
+          setState(() {
+            _isLoading = false;
+          });
      final String response = await rootBundle.loadString('assets/schools.json');
      final data = json.decode(response) as List<dynamic>;
      setState(() {
        _schoolList = data.map((json) => School.fromJson(json)).toList();
+       _isLoading = false;
      });
+    }
+
+
    }
 
   @override
@@ -99,7 +205,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Scaffold(
       body: BackgroundWidget(
         //BackgroundWidget
-        child: SingleChildScrollView(
+        child: _isLoading 
+        ? Center(child: CircularProgressIndicator()) : SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(30.0),
             child:  Form(
@@ -137,6 +244,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     onChanged: (School? selected) {
                       setState(() {
                         _selectedSchool = selected;
+                        sId = _selectedSchool!.sId;
                       });
                     },
                     selectedItem: _selectedSchool,
@@ -151,13 +259,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       return Text(selectedItem?.sName ?? "No School Selected");
                     },
                   ),
-                  /*
-                   if (_selectedSchool != null)
-                Text(
-                  "Selected School: ${_selectedSchool!.sName}, sId: ${_selectedSchool!.sId}",
-                  style: TextStyle(fontSize: 16),
-                ),
-                  */
+                  
+                    if (_selectedSchool != null)
+                    // Text(
+                    //   "Selected School: ${_selectedSchool!.sName}, sId: ${_selectedSchool!.sId}",
+                    //   style: TextStyle(fontSize: 16),
+                    // ),
+                  
 
                   const SizedBox(
                     height: 8,
@@ -310,7 +418,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     items: const [
                       DropdownMenuItem(value: '3', child: Text('Student',)),
                       DropdownMenuItem(value: '2', child: Text('Teacher')),
-                      DropdownMenuItem(value: '1', child: Text('Admin')),
+                      DropdownMenuItem(value: '4', child: Text('User')),
                       // Add more departments as needed
                     ],
                     onChanged: (value) {
@@ -411,47 +519,137 @@ void showSnackBarMsg(BuildContext context, String message) {
       setState(() {});
     }
 
-    // sqlite
 
-    User? existingUser = await DatabaseHelper().getUserByPhone(mobileController.text.trim());
+      var uuid = Uuid();
 
-  if (existingUser != null) {
+      String uniqueId = Unique().generateUniqueID();
 
-    if (mounted) {
-      showSnackBarMsg(context, 'User already registered');
+      if(selectedRole=="3"){
+        uType = 3;
+      }else if(selectedRole=="2"){
+        uType = 2;
+      }else{
+        uType = 1;
+      }
+
+
+
+    if(await InternetConnectionChecker().hasConnection){
+
+          try {
+
+              List<String> signInMethods = await _auth.fetchSignInMethodsForEmail(emailController.text.trim());
+
+              if (signInMethods.isNotEmpty) {
+                showSnackBarMsg(context, 'Email is already registered.');
+                return;
+              }
+
+              DatabaseReference usersRef = _databaseRef.child("users");
+              DatabaseEvent event = await usersRef.orderByChild("phone").equalTo(mobileController.text.trim()).once();
+              DataSnapshot snapshot = event.snapshot;
+
+              if (snapshot.exists) {
+                showSnackBarMsg(context, 'Phone number is already registered.');
+                return;
+              }
+
+          UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+            email: emailController.text.trim(),
+            password: passWordController.text.trim(),
+          );
+
+          User? firebaseUser = userCredential.user;
+
+          if (firebaseUser != null) {
+
+                  local.User newUser = local.User(
+                    uniqueid: uniqueId,
+                    sid: sId,
+                    uname: "${firstNameController.text.trim()} ${lastNameController.text.trim()}",
+                    phone: mobileController.text.trim(),
+                    pass: passWordController.text.trim(),
+                    email: emailController.text.trim(),
+                    userid: firebaseUser.uid,
+                    utype: uType,
+                    status: 1,
+                  );
+
+            await _databaseRef.child("users").child(firebaseUser.uid).set(newUser.toMap());
+
+            print("User successfully signed up and saved to database");
+
+          }
+        } catch (e) {
+          print("Signup failed: $e");
+        }
+
+    }else{
+      showSnackBarMsg(context, "You are in offline mode now, Please! connect internet");
     }
-    registrationInProgress = false;
-    if (mounted) {
-      setState(() {});
-    }
-    return;
-  }
 
 
-var uuid = Uuid();
 
-String uniqueId = Unique().generateUniqueID();
+                  // sqlite
 
-if(selectedRole=="3"){
-  uType = 3;
-}else if(selectedRole=="2"){
-  uType = 2;
-}else{
-  uType = 1;
-}
+              local.User? existingUser = await DatabaseHelper().getUserByPhone(mobileController.text.trim());
 
-User newUser = User(
-  uniqueid: uniqueId,
-  uname: "${firstNameController.text.trim()} ${lastNameController.text.trim()}",
-  phone: mobileController.text.trim(),
-  pass: passWordController.text.trim(),
-  email: emailController.text.trim(),
-  userid: uuid.v4(),
-  utype: uType,
-  status: 1,
-);
+              if (existingUser != null) {
 
-int result = await DatabaseHelper().insertUser(newUser);
+                  if (mounted) {
+                    showSnackBarMsg(context, 'User already registered');
+                  }
+                  registrationInProgress = false;
+                  if (mounted) {
+                    setState(() {});
+                  }
+                  return;
+              }
+
+                    local.User newUser = local.User(
+                      uniqueid: uniqueId,
+                      sid: sId,
+                      uname: "${firstNameController.text.trim()} ${lastNameController.text.trim()}",
+                      phone: mobileController.text.trim(),
+                      pass: passWordController.text.trim(),
+                      email: emailController.text.trim(),
+                      userid: uuid.v4(),
+                      utype: uType,
+                      status: 1,
+                    );
+
+              int result = await DatabaseHelper().insertUser(newUser);
+
+
+                  registrationInProgress = false;
+                  if (mounted) {
+                    setState(() {});
+                  }
+
+                if (result > 0) {
+                  if (mounted) {
+                    showSnackBarMsg(context, 'Registration Successful');
+
+                  Future.delayed(const Duration(seconds: 0), () {
+                    if (mounted) {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => GetStart()),
+                      );
+                    }
+                  });
+
+                  }
+                  clearfield();
+                } else {
+                  if (mounted) {
+                    showSnackBarMsg(context, 'Registration Failed');
+                  }
+                }
+
+
+
+
 
     // Map<String, dynamic> requestInput = {
     //   "email": emailController.text.trim(),
@@ -463,33 +661,6 @@ int result = await DatabaseHelper().insertUser(newUser);
     // };
     // NetworkResponse response =
     //     await NetworkCaller.postRequest(Urls.registration, body: requestInput);
-    registrationInProgress = false;
-    if (mounted) {
-      setState(() {});
-    }
-
-  if (result > 0) {
-    if (mounted) {
-      showSnackBarMsg(context, 'Registration Successful');
-
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => GetStart()),
-        );
-      }
-    });
-
-    }
-    clearfield();
-  } else {
-    if (mounted) {
-      showSnackBarMsg(context, 'Registration Failed');
-    }
-  }
-
-
     // if (response.isSuccess) {
     //   if (mounted) {
     //     showSnackBarMsg(context, 'Registration Successful');
@@ -568,6 +739,9 @@ void checkLoginStatus() async {
     mobileController.dispose();
     passWordController.dispose();
     confirmPasswordController.dispose();
+
+    stopListening();
+    subscription.cancel();
     super.dispose();
   }
 }

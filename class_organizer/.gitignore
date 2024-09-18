@@ -44,16 +44,12 @@ app.*.map.json
 windows/flutter/generated_plugin_registrant.cc
 windows/flutter/generated_plugins.cmake
 
-# macOS Flutter Plugin Registrant
+# pubspec lock file
+pubspec.lock
+
+# macOS
 macos/Flutter/GeneratedPluginRegistrant.swift
 
-# Windows Flutter Plugin Registrant
-windows/flutter/generated_plugin_registrant.cc
-windows/flutter/generated_plugins.cmake
-
-# macOS Flutter Plugin Registrant
-macos/Flutter/GeneratedPluginRegistrant.swift
-
-# Windows Flutter Plugin Registrant
+# Windows
 windows/flutter/generated_plugin_registrant.cc
 windows/flutter/generated_plugins.cmake

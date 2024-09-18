@@ -1,3 +1,4 @@
+import 'package:class_organizer/models/school.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -15,6 +16,7 @@ class Logout {
   static const String USER_EMAIL = 'userEmail';
   static const String USER_KEY = 'userKey';
   static const String SCHOOL_KEY = 'schoolKey';
+  static const String KEY_USER_TYPE = "u_type";
 
   Future<void> saveUser(Map<String, dynamic> user, {String key = USER_KEY}) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -72,6 +74,15 @@ class Logout {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool(KEY_IS_LOGGED_IN, isLoggedIn);
   }
+  Future<void> setUserType(int userType) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt(KEY_USER_TYPE, userType);
+  }
+
+  Future<int?> getUserType() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(Logout.KEY_USER_TYPE);
+  }
 
     Future<void> logoutUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -128,6 +139,16 @@ class Logout {
     String? schoolJson = prefs.getString(key);
     if (schoolJson != null) {
       return jsonDecode(schoolJson);
+    } else {
+      return null;
+    }
+  }
+  Future<School?> getSchoolDetails({String key = SCHOOL_KEY}) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? schoolJson = prefs.getString(key);
+    if (schoolJson != null) {
+      Map<String, dynamic> schoolMap = jsonDecode(schoolJson);
+      return School.fromJson(schoolMap);
     } else {
       return null;
     }

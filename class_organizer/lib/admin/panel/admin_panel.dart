@@ -6,6 +6,9 @@ import 'package:class_organizer/ui/screens/students_screen/student_companion_scr
 import 'package:class_organizer/ui/widgets/drawer_widget.dart';
 import 'package:class_organizer/utility/profile_app_bar.dart';
 import 'package:flutter/material.dart';
+
+import '../../utility/profile_app_bar_admin.dart';
+import '../widgets/drawer_widget_admin.dart';
 class AdminPanel extends StatefulWidget {
   const AdminPanel({super.key});
 
@@ -21,14 +24,14 @@ class _AdminPanelState extends State<AdminPanel> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: index == 0
-          ? ProfileAppBar(
+          ? ProfileAppBarAdmin(
           title:  'Admin Companions',
           actionIcon: Icons.more_vert,
           onActionPressed: (){},
           appBarbgColor: const Color(0xFF01579B),
       )
       : null,
-      drawer: const DrawerWidget(),
+      drawer: const DrawerWidgetAdmin(),
       body: PageView(
         controller: _pageController,
         onPageChanged: (value) {
