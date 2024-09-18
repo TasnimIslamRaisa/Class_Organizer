@@ -579,15 +579,16 @@ void showSnackBarMsg(BuildContext context, String message) {
 
             print("User successfully signed up and saved to database");
 
-            saveUserOffline(uniqueId, uuid);
+            await saveUserOffline(uniqueId, uuid);
 
           }
         } catch (e) {
-          print("Signup failed: $e");
+          showSnackBarMsg(context,"Signup failed: $e");
         }
 
     }else{
-      saveUserOffline(uniqueId, uuid);
+      showSnackBarMsg(context, "You are in Offline Mode now, Please connect Internet");
+      await saveUserOffline(uniqueId, uuid);
     }
 
 
