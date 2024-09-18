@@ -2,6 +2,7 @@ import 'package:class_organizer/admin/school/pages/courses.dart';
 import 'package:class_organizer/admin/school/pages/departments.dart';
 import 'package:class_organizer/admin/school/pages/programs.dart';
 import 'package:class_organizer/admin/school/pages/rooms.dart';
+import 'package:class_organizer/admin/school/pages/routines.dart';
 import 'package:class_organizer/admin/school/pages/sessions.dart';
 import 'package:class_organizer/admin/school/pages/students.dart';
 import 'package:flutter/material.dart';
@@ -197,28 +198,23 @@ class _SchoolSetupState extends State<SchoolSetup> {
   }
 
   void _navigateToPage(BuildContext context, String pageName) {
-    if (pageName == 'programs') {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => ProgramListPage()));
-    } else if (pageName == 'students') {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => StudentsPage()));
-    } else if (pageName == 'departments') {
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => DepartmentListPage()));
-    } else if (pageName == 'sessions') {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => SessionListPage()));
-    } else if (pageName == 'rooms') {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => RoomListPage()));
-    } else if (pageName == 'courses') {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => CoursesListPage()));
-    } else if (pageName == 'routines') {
-      // Navigator.push(context, MaterialPageRoute(builder: (context) =>
-      // RoutinePage()));
-    } else {}
+    if(pageName=='programs'){
+      Navigator.push(context, MaterialPageRoute(builder: (context) => ProgramListPage()));
+    }else if(pageName=='students'){
+      Navigator.push(context, MaterialPageRoute(builder: (context) => StudentsPage()));
+    }else if(pageName=='departments'){
+      Navigator.push(context, MaterialPageRoute(builder: (context) => DepartmentListPage()));
+    }else if(pageName=='sessions'){
+      Navigator.push(context, MaterialPageRoute(builder: (context) => SessionListPage()));
+    }else if(pageName=='rooms'){
+      Navigator.push(context, MaterialPageRoute(builder: (context) => RoomListPage()));
+    }else if(pageName=='courses'){
+      Navigator.push(context, MaterialPageRoute(builder: (context) => CoursesListPage()));
+    }else if(pageName=='routines'){
+      Navigator.push(context, MaterialPageRoute(builder: (context) => RoutinesListPage()));
+    }else{
+
+    }
     // Navigator.push(
     //   context,
     //   MaterialPageRoute(builder: (context) {

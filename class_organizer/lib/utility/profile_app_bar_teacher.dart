@@ -1,3 +1,4 @@
+import 'package:class_organizer/admin/school/school_setup.dart';
 import 'package:class_organizer/onboarding/get_start.dart';
 import 'package:flutter/material.dart';
 
@@ -39,6 +40,14 @@ class ProfileAppBarTeacher extends StatelessWidget implements PreferredSizeWidge
                   ),
                 );
                 break;
+              case 'school':
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SchoolSetup(),
+                  ),
+                );
+                break;
               case 'settings':
                 Navigator.push(
                     context,
@@ -72,6 +81,10 @@ class ProfileAppBarTeacher extends StatelessWidget implements PreferredSizeWidge
             }
           },
           itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: 'school',
+              child: Text('School'),
+            ),
             const PopupMenuItem(
               value: 'edit',
               child: Text('Edit'),
