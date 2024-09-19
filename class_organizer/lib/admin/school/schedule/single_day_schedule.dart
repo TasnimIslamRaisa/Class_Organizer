@@ -1,9 +1,11 @@
 import 'package:class_organizer/admin/school/schedule/schedule_card.dart';
 import 'package:class_organizer/admin/school/schedule/widget/slidable_schedule.dart';
 import 'package:class_organizer/models/schedule_item.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:intl/intl.dart';
 
 import '../../../ui/screens/controller/schedule_controller.dart';
@@ -22,6 +24,7 @@ class _SingleDayScheduleState extends State<SingleDaySchedule> {
   final ScheduleController scheduleController = Get.find();
   late List<ScheduleItem> dailySchedule;
 
+  final _databaseRef = FirebaseDatabase.instance.ref();
   List<ScheduleItem> schedules = [];
   List<ScheduleItem> schedulesList = [];
 
@@ -50,13 +53,14 @@ class _SingleDayScheduleState extends State<SingleDaySchedule> {
           return SlidableSchedule(
             classItem: dailySchedule[index],
             onDeleteClass: (ScheduleItem schedule) {
-              scheduleController.removeSchedule(schedule);
+              deleteSchedule(schedule);
+
             },
             onEditClass: (ScheduleItem schedule) {
-
+              editSchedule(schedule);
             },
             onDuplicateClass: (ScheduleItem schedule) {
-
+              duplicateSchedule(schedule);
             },
           );
         },
@@ -107,6 +111,43 @@ class _SingleDayScheduleState extends State<SingleDaySchedule> {
         day: dayName, // Add dayName to your ScheduleItem
       ),
     ];
+  }
+
+  void deleteSchedule(ScheduleItem schedule) async {
+    // Check if an internet connection is available
+    if (await InternetConnectionChecker().hasConnection) {
+      // Reference to the schedules node in Firebase
+      DatabaseReference scheduleRef = _databaseRef.child('schedules').child(schedule.uniqueId!);
+
+      scheduleRef.remove().then((_) {
+        // Remove the schedule from the local list using the controller
+        scheduleController.removeSchedule(schedule);
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Schedule deleted successfully')),
+        );
+      }).catchError((error) {
+        // Handle the error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete schedule: $error')),
+        );
+      });
+    } else {
+      // Handle offline mode
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No internet connection')),
+      );
+    }
+  }
+
+
+  void editSchedule(ScheduleItem schedule) {
+
+  }
+
+  void duplicateSchedule(ScheduleItem schedule) {
+
   }
 
 }
