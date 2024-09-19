@@ -111,21 +111,25 @@ class _ProgramListPageState extends State<ProgramListPage> {
   }
 
   Future<void> _loadFacultiesData() async {
-
-    if(await InternetConnectionChecker().hasConnection){
+    if (await InternetConnectionChecker().hasConnection) {
       setState(() {
         _isLoading = true;
       });
 
-      DatabaseReference schoolRef = _databaseRef.child('faculties');
+      // Reference to the faculties node in Firebase
+      DatabaseReference facultiesRef = _databaseRef.child('faculties');
 
-      schoolRef.once().then((DatabaseEvent event) {
+      // Query faculties that match the current school's sId
+      Query query = facultiesRef.orderByChild('sId').equalTo(school?.sId);
+
+      query.once().then((DatabaseEvent event) {
         final dataSnapshot = event.snapshot;
 
         if (dataSnapshot.exists) {
           final Map<dynamic, dynamic> facultiesData = dataSnapshot.value as Map<dynamic, dynamic>;
 
           setState(() {
+            // Convert the faculties data into a list of Faculties objects
             programs = facultiesData.entries.map((entry) {
               Map<String, dynamic> facultiesMap = {
                 'id': entry.value['id'] ?? null,
@@ -144,20 +148,20 @@ class _ProgramListPageState extends State<ProgramListPage> {
             }).toList();
             _isLoading = false;
           });
-
         } else {
-          print('No Faculties data available.');
+          print('No faculties data available for the current school.');
           setState(() {
             _isLoading = false;
           });
         }
       }).catchError((error) {
-        print('Failed to load school data: $error');
+        print('Failed to load faculties data: $error');
         setState(() {
           _isLoading = false;
         });
       });
-    }else{
+    } else {
+      // Handle offline mode
       setState(() {
         _isLoading = true;
       });
@@ -172,9 +176,8 @@ class _ProgramListPageState extends State<ProgramListPage> {
         _isLoading = false;
       });
     }
-
-
   }
+
 
   Future<void> _loadUserData() async {
     Logout logout = Logout();
