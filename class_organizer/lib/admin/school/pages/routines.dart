@@ -99,6 +99,68 @@ class _RoutinesListPageState extends State<RoutinesListPage> {
     connectionSubscription?.cancel();
   }
 
+  // Future<void> _loadMajorsData() async {
+  //   if (await InternetConnectionChecker().hasConnection) {
+  //     setState(() {
+  //       _isLoading = true;
+  //     });
+  //
+  //     DatabaseReference majorRef = _databaseRef.child('departments');
+  //
+  //     majorRef.once().then((DatabaseEvent event) {
+  //       final dataSnapshot = event.snapshot;
+  //
+  //       if (dataSnapshot.exists) {
+  //         final Map<dynamic, dynamic> majorsData = dataSnapshot.value as Map<dynamic, dynamic>;
+  //
+  //         setState(() {
+  //           departments = majorsData.entries.map((entry) {
+  //             Map<String, dynamic> majorMap = {
+  //               'id': entry.value['id'] ?? null,
+  //               'status': entry.value['status'] ?? null,
+  //               'uniqueId': entry.value['uniqueId'] ?? null,
+  //               'sync_key': entry.value['sync_key'] ?? null,
+  //               'sync_status': entry.value['sync_status'] ?? null,
+  //               'mName': entry.value['mName'] ?? '',
+  //               'mStart': entry.value['mStart'] ?? null,
+  //               'mEnd': entry.value['mEnd'] ?? null,
+  //               'mStatus': entry.value['mStatus'] ?? 0,
+  //               'deanId': entry.value['deanId'] ?? '',
+  //               'sId': entry.value['sId'] ?? null,
+  //             };
+  //             return Major.fromMap(majorMap);
+  //           }).toList();
+  //           _isLoading = false;
+  //         });
+  //       } else {
+  //         print('No majors data available.');
+  //         setState(() {
+  //           _isLoading = false;
+  //         });
+  //       }
+  //     }).catchError((error) {
+  //       print('Failed to load majors data: $error');
+  //       setState(() {
+  //         _isLoading = false;
+  //       });
+  //     });
+  //   } else {
+  //     setState(() {
+  //       _isLoading = true;
+  //     });
+  //     showSnackBarMsg(context, "You are in Offline mode now, Please, connect Internet!");
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //     final String response = await rootBundle.loadString('assets/majors.json');
+  //     final data = json.decode(response) as List<dynamic>;
+  //     setState(() {
+  //       departments = data.map((json) => Major.fromJson(json)).toList();
+  //       _isLoading = false;
+  //     });
+  //   }
+  // }
+
   Future<void> _loadMajorsData() async {
     if (await InternetConnectionChecker().hasConnection) {
       setState(() {
@@ -107,7 +169,9 @@ class _RoutinesListPageState extends State<RoutinesListPage> {
 
       DatabaseReference majorRef = _databaseRef.child('departments');
 
-      majorRef.once().then((DatabaseEvent event) {
+      Query query = majorRef.orderByChild('sId').equalTo(school?.sId);
+
+      query.once().then((DatabaseEvent event) {
         final dataSnapshot = event.snapshot;
 
         if (dataSnapshot.exists) {
@@ -133,7 +197,7 @@ class _RoutinesListPageState extends State<RoutinesListPage> {
             _isLoading = false;
           });
         } else {
-          print('No majors data available.');
+          print('No majors data available for the current school.');
           setState(() {
             _isLoading = false;
           });
@@ -148,7 +212,7 @@ class _RoutinesListPageState extends State<RoutinesListPage> {
       setState(() {
         _isLoading = true;
       });
-      showSnackBarMsg(context, "You are in Offline mode now, Please, connect Internet!");
+      showSnackBarMsg(context, "You are in Offline mode now, Please, connect to the Internet!");
       setState(() {
         _isLoading = false;
       });
@@ -160,6 +224,7 @@ class _RoutinesListPageState extends State<RoutinesListPage> {
       });
     }
   }
+
 
   Future<void> _loadUserData() async {
     Logout logout = Logout();
@@ -352,21 +417,92 @@ class _RoutinesListPageState extends State<RoutinesListPage> {
 
 
 
+  // Future<void> _loadRoutinesData() async {
+  //   if (await InternetConnectionChecker().hasConnection) {
+  //     setState(() {
+  //       _isLoading = true;
+  //     });
+  //
+  //     DatabaseReference routinesRef = _databaseRef.child('routines');
+  //
+  //     routinesRef.once().then((DatabaseEvent event) {
+  //       final dataSnapshot = event.snapshot;
+  //
+  //       if (dataSnapshot.exists) {
+  //         final Map<dynamic, dynamic> routinesData = dataSnapshot.value as Map<dynamic, dynamic>;
+  //
+  //         setState(() {
+  //           routines = routinesData.entries.map((entry) {
+  //             Map<String, dynamic> routineMap = {
+  //               'id': entry.value['id'] ?? null,
+  //               'sId': entry.value['sId'] ?? null,
+  //               'uId': entry.value['uId'] ?? null,
+  //               'stdId': entry.value['stdId'] ?? null,
+  //               'tempName': entry.value['tempName'] ?? '',
+  //               'tempCode': entry.value['tempCode'] ?? '',
+  //               'tempDetails': entry.value['tempDetails'] ?? '',
+  //               'tempNum': entry.value['tempNum'] ?? '',
+  //               'uniqueId': entry.value['uniqueId'] ?? null,
+  //               'syncKey': entry.value['syncKey'] ?? null,
+  //               'syncStatus': entry.value['syncStatus'] ?? 0,
+  //               'aStatus': entry.value['aStatus'] ?? 0,
+  //               'key': entry.value['key'] ?? null,
+  //               'tId': entry.value['tId'] ?? null,
+  //             };
+  //             return Routine.fromMap(routineMap);
+  //           }).toList();
+  //           _isLoading = false;
+  //         });
+  //       } else {
+  //         print('No routines data available.');
+  //         setState(() {
+  //           _isLoading = false;
+  //         });
+  //       }
+  //     }).catchError((error) {
+  //       print('Failed to load routines data: $error');
+  //       setState(() {
+  //         _isLoading = false;
+  //       });
+  //     });
+  //   } else {
+  //     setState(() {
+  //       _isLoading = true;
+  //     });
+  //     showSnackBarMsg(context, "You are in Offline mode now, Please, connect to the Internet!");
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //     final String response = await rootBundle.loadString('assets/routines.json');
+  //     final data = json.decode(response) as List<dynamic>;
+  //     setState(() {
+  //       routines = data.map((json) => Routine.fromJson(json)).toList();
+  //       _isLoading = false;
+  //     });
+  //   }
+  // }
+
+
   Future<void> _loadRoutinesData() async {
     if (await InternetConnectionChecker().hasConnection) {
       setState(() {
         _isLoading = true;
       });
 
+      // Reference to the routines node in Firebase
       DatabaseReference routinesRef = _databaseRef.child('routines');
 
-      routinesRef.once().then((DatabaseEvent event) {
+      // Query routines that match the current school's sId
+      Query query = routinesRef.orderByChild('sId').equalTo(school?.sId);
+
+      query.once().then((DatabaseEvent event) {
         final dataSnapshot = event.snapshot;
 
         if (dataSnapshot.exists) {
           final Map<dynamic, dynamic> routinesData = dataSnapshot.value as Map<dynamic, dynamic>;
 
           setState(() {
+            // Convert the routines data into a list of Routine objects
             routines = routinesData.entries.map((entry) {
               Map<String, dynamic> routineMap = {
                 'id': entry.value['id'] ?? null,
@@ -389,7 +525,7 @@ class _RoutinesListPageState extends State<RoutinesListPage> {
             _isLoading = false;
           });
         } else {
-          print('No routines data available.');
+          print('No routines data available for the current school.');
           setState(() {
             _isLoading = false;
           });

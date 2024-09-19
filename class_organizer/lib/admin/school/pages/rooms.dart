@@ -96,9 +96,13 @@ class _RoomListPageState extends State<RoomListPage> {
         _isLoading = true;
       });
 
+      // Reference to the rooms node in Firebase
       DatabaseReference roomsRef = _databaseRef.child('rooms');
 
-      roomsRef.once().then((DatabaseEvent event) {
+      // Query rooms that match the current school's sId
+      Query query = roomsRef.orderByChild('sId').equalTo(school?.sId);
+
+      query.once().then((DatabaseEvent event) {
         final dataSnapshot = event.snapshot;
 
         if (dataSnapshot.exists) {
@@ -124,7 +128,7 @@ class _RoomListPageState extends State<RoomListPage> {
             _isLoading = false;
           });
         } else {
-          print('No Rooms data available.');
+          print('No Rooms data available for the current school.');
           setState(() {
             _isLoading = false;
           });
@@ -136,6 +140,7 @@ class _RoomListPageState extends State<RoomListPage> {
         });
       });
     } else {
+      // Handle offline mode
       setState(() {
         _isLoading = true;
       });
@@ -151,6 +156,7 @@ class _RoomListPageState extends State<RoomListPage> {
       });
     }
   }
+
 
 
 

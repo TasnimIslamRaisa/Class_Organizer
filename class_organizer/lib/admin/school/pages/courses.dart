@@ -103,7 +103,9 @@ class _CoursesListPageState extends State<CoursesListPage> {
 
       DatabaseReference majorRef = _databaseRef.child('departments');
 
-      majorRef.once().then((DatabaseEvent event) {
+      Query query = majorRef.orderByChild('sId').equalTo(school?.sId);
+
+      query.once().then((DatabaseEvent event) {
         final dataSnapshot = event.snapshot;
 
         if (dataSnapshot.exists) {
@@ -129,7 +131,7 @@ class _CoursesListPageState extends State<CoursesListPage> {
             _isLoading = false;
           });
         } else {
-          print('No majors data available.');
+          print('No majors data available for the current school.');
           setState(() {
             _isLoading = false;
           });
@@ -144,7 +146,7 @@ class _CoursesListPageState extends State<CoursesListPage> {
       setState(() {
         _isLoading = true;
       });
-      showSnackBarMsg(context, "You are in Offline mode now, Please, connect Internet!");
+      showSnackBarMsg(context, "You are in Offline mode now, Please, connect to the Internet!");
       setState(() {
         _isLoading = false;
       });
@@ -156,6 +158,68 @@ class _CoursesListPageState extends State<CoursesListPage> {
       });
     }
   }
+
+  // Future<void> _loadMajorsData() async {
+  //   if (await InternetConnectionChecker().hasConnection) {
+  //     setState(() {
+  //       _isLoading = true;
+  //     });
+  //
+  //     DatabaseReference majorRef = _databaseRef.child('departments');
+  //
+  //     majorRef.once().then((DatabaseEvent event) {
+  //       final dataSnapshot = event.snapshot;
+  //
+  //       if (dataSnapshot.exists) {
+  //         final Map<dynamic, dynamic> majorsData = dataSnapshot.value as Map<dynamic, dynamic>;
+  //
+  //         setState(() {
+  //           departments = majorsData.entries.map((entry) {
+  //             Map<String, dynamic> majorMap = {
+  //               'id': entry.value['id'] ?? null,
+  //               'status': entry.value['status'] ?? null,
+  //               'uniqueId': entry.value['uniqueId'] ?? null,
+  //               'sync_key': entry.value['sync_key'] ?? null,
+  //               'sync_status': entry.value['sync_status'] ?? null,
+  //               'mName': entry.value['mName'] ?? '',
+  //               'mStart': entry.value['mStart'] ?? null,
+  //               'mEnd': entry.value['mEnd'] ?? null,
+  //               'mStatus': entry.value['mStatus'] ?? 0,
+  //               'deanId': entry.value['deanId'] ?? '',
+  //               'sId': entry.value['sId'] ?? null,
+  //             };
+  //             return Major.fromMap(majorMap);
+  //           }).toList();
+  //           _isLoading = false;
+  //         });
+  //       } else {
+  //         print('No majors data available.');
+  //         setState(() {
+  //           _isLoading = false;
+  //         });
+  //       }
+  //     }).catchError((error) {
+  //       print('Failed to load majors data: $error');
+  //       setState(() {
+  //         _isLoading = false;
+  //       });
+  //     });
+  //   } else {
+  //     setState(() {
+  //       _isLoading = true;
+  //     });
+  //     showSnackBarMsg(context, "You are in Offline mode now, Please, connect Internet!");
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //     final String response = await rootBundle.loadString('assets/majors.json');
+  //     final data = json.decode(response) as List<dynamic>;
+  //     setState(() {
+  //       departments = data.map((json) => Major.fromJson(json)).toList();
+  //       _isLoading = false;
+  //     });
+  //   }
+  // }
 
   Future<void> _loadUserData() async {
     Logout logout = Logout();
@@ -360,16 +424,19 @@ class _CoursesListPageState extends State<CoursesListPage> {
     );
   }
 
-
   Future<void> _loadCoursesData() async {
     if (await InternetConnectionChecker().hasConnection) {
       setState(() {
         _isLoading = true;
       });
 
+      // Reference to the subjects node in Firebase
       DatabaseReference coursesRef = _databaseRef.child('subjects');
 
-      coursesRef.once().then((DatabaseEvent event) {
+      // Query subjects based on the current school's sId
+      Query query = coursesRef.orderByChild('sId').equalTo(school?.sId);
+
+      query.once().then((DatabaseEvent event) {
         final dataSnapshot = event.snapshot;
 
         if (dataSnapshot.exists) {
@@ -398,7 +465,7 @@ class _CoursesListPageState extends State<CoursesListPage> {
             _isLoading = false;
           });
         } else {
-          print('No courses data available.');
+          print('No courses data available for the current school.');
           setState(() {
             _isLoading = false;
           });
@@ -410,21 +477,94 @@ class _CoursesListPageState extends State<CoursesListPage> {
         });
       });
     } else {
+      // Handle offline mode
       setState(() {
         _isLoading = true;
       });
       showSnackBarMsg(context, "You are in Offline mode now, Please, connect to the Internet!");
-      setState(() {
-        _isLoading = false;
-      });
-      final String response = await rootBundle.loadString('assets/subjects.json');
-      final data = json.decode(response) as List<dynamic>;
-      setState(() {
-        subjects = data.map((json) => Subject.fromJson(json)).toList();
-        _isLoading = false;
-      });
+
+      try {
+        final String response = await rootBundle.loadString('assets/subjects.json');
+        final data = json.decode(response) as List<dynamic>;
+
+        setState(() {
+          subjects = data.map((json) => Subject.fromJson(json)).toList();
+          _isLoading = false;
+        });
+      } catch (error) {
+        print('Failed to load local subjects data: $error');
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
+
+
+  // Future<void> _loadCoursesData() async {
+  //   if (await InternetConnectionChecker().hasConnection) {
+  //     setState(() {
+  //       _isLoading = true;
+  //     });
+  //
+  //     DatabaseReference coursesRef = _databaseRef.child('subjects');
+  //
+  //     coursesRef.once().then((DatabaseEvent event) {
+  //       final dataSnapshot = event.snapshot;
+  //
+  //       if (dataSnapshot.exists) {
+  //         final Map<dynamic, dynamic> coursesData = dataSnapshot.value as Map<dynamic, dynamic>;
+  //
+  //         setState(() {
+  //           subjects = coursesData.entries.map((entry) {
+  //             Map<String, dynamic> subjectMap = {
+  //               'id': entry.value['id'] ?? null,
+  //               'subName': entry.value['subName'] ?? '',
+  //               'uniqueId': entry.value['uniqueId'] ?? null,
+  //               'sync_key': entry.value['sync_key'] ?? null,
+  //               'sync_status': entry.value['sync_status'] ?? null,
+  //               'subCode': entry.value['subCode'] ?? '',
+  //               'credit': entry.value['credit'] ?? 0,
+  //               'subFee': entry.value['subFee'] ?? 0,
+  //               'depId': entry.value['depId'] ?? null,
+  //               'typeId': entry.value['typeId'] ?? null,
+  //               'status': entry.value['status'] ?? null,
+  //               'semester': entry.value['semester'] ?? null,
+  //               'program': entry.value['program'] ?? null,
+  //               'sId': entry.value['sId'] ?? null,
+  //             };
+  //             return Subject.fromMap(subjectMap);
+  //           }).toList();
+  //           _isLoading = false;
+  //         });
+  //       } else {
+  //         print('No courses data available.');
+  //         setState(() {
+  //           _isLoading = false;
+  //         });
+  //       }
+  //     }).catchError((error) {
+  //       print('Failed to load courses data: $error');
+  //       setState(() {
+  //         _isLoading = false;
+  //       });
+  //     });
+  //   } else {
+  //     setState(() {
+  //       _isLoading = true;
+  //     });
+  //     showSnackBarMsg(context, "You are in Offline mode now, Please, connect to the Internet!");
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //     final String response = await rootBundle.loadString('assets/subjects.json');
+  //     final data = json.decode(response) as List<dynamic>;
+  //     setState(() {
+  //       subjects = data.map((json) => Subject.fromJson(json)).toList();
+  //       _isLoading = false;
+  //     });
+  //   }
+  // }
 
 
   @override
