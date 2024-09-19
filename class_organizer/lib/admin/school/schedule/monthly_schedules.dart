@@ -1,5 +1,6 @@
 import 'package:class_organizer/admin/school/schedule/single_day_schedule.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:intl/intl.dart';
 
 import '../../../models/routine.dart';
@@ -50,6 +51,27 @@ class _MonthlySchedulesState extends State<MonthlySchedules> {
             return SingleDaySchedule(date: date);
           }).toList(),
         ),
+        floatingActionButton: SpeedDial(
+          animatedIcon: AnimatedIcons.menu_close,
+          backgroundColor: Colors.lightBlueAccent,
+          children: [
+            SpeedDialChild(
+              child: const Icon(Icons.add),
+              label: 'Add Class',
+              onTap: () {
+                // _showAddClassBottomSheet(context);
+              },
+            ),
+            SpeedDialChild(
+              child: const Icon(Icons.edit),
+              label: 'Edit Class',
+              onTap: () {
+
+              },
+            ),
+          ],
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
     );
   }
