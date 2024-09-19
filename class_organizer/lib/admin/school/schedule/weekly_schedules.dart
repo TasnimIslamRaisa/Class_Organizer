@@ -2,7 +2,12 @@ import 'package:class_organizer/admin/school/schedule/single_day_schedule.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../models/routine.dart';
+
 class WeeklySchedules extends StatefulWidget {
+  final Routine routine;
+  WeeklySchedules({required this.routine});
+
   @override
   _WeeklySchedulesState createState() => _WeeklySchedulesState();
 }
@@ -21,7 +26,7 @@ class _WeeklySchedulesState extends State<WeeklySchedules> {
     DateTime now = DateTime.now();
     dateList = List.generate(7, (index) => now.add(Duration(days: index)));
     tabTitles = dateList.map((date) {
-      return DateFormat('EEEE').format(date); // e.g., "Thursday, Sep 19"
+      return DateFormat('EEE').format(date); // e.g., "EEEE Thursday, Sep 19"
     }).toList();
   }
 
@@ -31,9 +36,12 @@ class _WeeklySchedulesState extends State<WeeklySchedules> {
       length: tabTitles.length,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Dynamic Date Tabs'),
+          title: Text('Schedules - ${widget.routine.tempName}'),
           bottom: TabBar(
-            isScrollable: true, // Scrollable for many tabs
+            isScrollable: true,
+            indicatorColor: Colors.blue,
+            labelColor: Colors.blue,
+            unselectedLabelColor: Colors.grey,
             tabs: tabTitles.map((title) => Tab(text: title)).toList(),
           ),
         ),

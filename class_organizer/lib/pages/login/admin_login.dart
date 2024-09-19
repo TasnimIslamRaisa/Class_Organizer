@@ -631,7 +631,7 @@ void showSnackBarMsg(BuildContext context, String message) {
           await Logout().saveUser(user.toMap(), key: "user_logged_in");
           await Logout().saveUserDetails(user,key: "user_data");
 
-          getSchoolBySId(user.sid);
+          await getSchoolBySId(user.sid);
 
       Navigator.pushReplacement(
         context,
@@ -642,7 +642,7 @@ void showSnackBarMsg(BuildContext context, String message) {
     }
   }
 
-  void getSchoolBySId(String? sid) async {
+  Future<void> getSchoolBySId(String? sid) async {
     if (sid == null) {
       print("SID is null, unable to fetch school data.");
       return;

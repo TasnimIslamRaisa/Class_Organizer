@@ -10,6 +10,7 @@ import 'package:class_organizer/models/routine.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
@@ -500,12 +501,13 @@ class _RoutinesListPageState extends State<RoutinesListPage> {
               onTap: () {
                 showRoutineDetails(index);
                 Future.delayed(const Duration(seconds: 1), () {
+                  Navigator.pop(context);
                   if (mounted) {
                     Navigator.push(
                       context,
                       // MaterialPageRoute(builder: (context) => SchedulesPage(routine: routines[index],)),
-                      // MaterialPageRoute(builder: (context) => MonthlySchedules()),
-                      MaterialPageRoute(builder: (context) => WeeklySchedules()),
+                      // MaterialPageRoute(builder: (context) => MonthlySchedules(routine: routines[index],)),
+                      MaterialPageRoute(builder: (context) => WeeklySchedules(routine: routines[index],)),
                     );
                   }
                 });
