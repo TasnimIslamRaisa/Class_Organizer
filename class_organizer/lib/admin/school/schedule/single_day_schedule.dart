@@ -40,8 +40,8 @@ class _SingleDayScheduleState extends State<SingleDaySchedule> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      String dayKey = DateFormat('yyyy-MM-dd').format(widget.date);
-      List<ScheduleItem> dailySchedule = scheduleController.getSchedulesForDays(dayKey);
+      String dayName = DateFormat('EEEE').format(widget.date);
+      List<ScheduleItem> dailySchedule = scheduleController.getSchedulesForDays(dayName);
 
       return ListView.builder(
         padding: const EdgeInsets.all(8.0),
