@@ -169,4 +169,60 @@ class ScheduleItem {
       dateTime: DateTime.parse(map['dateTime']),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': _id,
+      'uniqueId': _uniqueId,
+      'sId': _sId,
+      'stdId': _stdId,
+      'tId': _tId,
+      'temp_code': _tempCode,
+      'temp_num': _tempNum,
+      'sub_name': _subName,
+      'sub_code': _subCode,
+      't_id': _tId2,
+      't_name': _tName,
+      'room': _room,
+      'campus': _campus,
+      'section': _section,
+      'start_time': _startTime,
+      'end_time': _endTime,
+      'day': _day,
+      'key': _key,
+      'sync_key': _syncKey,
+      'min': _min,
+      'sync_status': _syncStatus,
+      'dateTime': _dateTime?.toIso8601String(),
+    };
+  }
+
+  // Create a ScheduleItem object from a JSON map
+  factory ScheduleItem.fromJson(Map<String, dynamic> json) {
+    return ScheduleItem(
+      id: json['id'],
+      uniqueId: json['uniqueId'],
+      sId: json['sId'],
+      stdId: json['stdId'],
+      tId: json['tId'],
+      tempCode: json['temp_code'],
+      tempNum: json['temp_num'],
+      subName: json['sub_name'],
+      subCode: json['sub_code'],
+      tId2: json['t_id'],
+      tName: json['t_name'],
+      room: json['room'],
+      campus: json['campus'],
+      section: json['section'],
+      startTime: json['start_time'],
+      endTime: json['end_time'],
+      day: json['day'],
+      key: json['key'],
+      syncKey: json['sync_key'],
+      min: json['min'],
+      syncStatus: json['sync_status'],
+      dateTime: json['dateTime'] != null ? DateTime.parse(json['dateTime']) : null,
+    );
+  }
+
 }
