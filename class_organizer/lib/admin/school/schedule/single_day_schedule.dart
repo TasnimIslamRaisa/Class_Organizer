@@ -1,37 +1,80 @@
 import 'package:class_organizer/admin/school/schedule/schedule_card.dart';
+import 'package:class_organizer/admin/school/schedule/widget/slidable_schedule.dart';
 import 'package:class_organizer/models/schedule_item.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
+
+import '../../../ui/screens/controller/schedule_controller.dart';
 
 class SingleDaySchedule extends StatefulWidget {
   final DateTime date;
+  final List<ScheduleItem> schedules;
 
-  const SingleDaySchedule({required this.date, Key? key}) : super(key: key);
+  SingleDaySchedule({required this.date, required this.schedules, Key? key}) : super(key: key);
 
   @override
   _SingleDayScheduleState createState() => _SingleDayScheduleState();
 }
 
 class _SingleDayScheduleState extends State<SingleDaySchedule> {
+  final ScheduleController scheduleController = Get.find();
   late List<ScheduleItem> dailySchedule;
+
+  List<ScheduleItem> schedules = [];
+  List<ScheduleItem> schedulesList = [];
 
   @override
   void initState() {
     super.initState();
-    // Initialize the schedule data based on the provided date
+
     dailySchedule = getScheduleForDate(widget.date);
+    setState(() {
+      schedules = widget.schedules;
+      dailySchedule = schedules;
+
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(8.0),
-      itemCount: dailySchedule.length,
-      itemBuilder: (context, index) {
-        return ScheduleCard(schedule: dailySchedule[index]);
-      },
-    );
+    return Obx(() {
+      String dayKey = DateFormat('yyyy-MM-dd').format(widget.date);
+      List<ScheduleItem> dailySchedule = scheduleController.getSchedulesForDays(dayKey);
+
+      return ListView.builder(
+        padding: const EdgeInsets.all(8.0),
+        itemCount: dailySchedule.length,
+        itemBuilder: (context, index) {
+          return SlidableSchedule(
+            classItem: dailySchedule[index],
+            onDeleteClass: (ScheduleItem schedule) {
+              scheduleController.removeSchedule(schedule);
+            },
+            onEditClass: (ScheduleItem schedule) {
+
+            },
+            onDuplicateClass: (ScheduleItem schedule) {
+
+            },
+          );
+        },
+      );
+    });
   }
+
+  // @override
+  // Widget build(BuildContext context) {
+  //   return ListView.builder(
+  //     padding: const EdgeInsets.all(8.0),
+  //     itemCount: dailySchedule.length,
+  //     itemBuilder: (context, index) {
+  //       // return ScheduleCard(schedule: dailySchedule[index]);
+  //       return SlidableSchedule(classItem: dailySchedule[index], onDeleteClass: (ScheduleItem ) {  }, onEditClass: (ScheduleItem ) {  }, onDuplicateClass: (ScheduleItem ) {  },);
+  //     },
+  //   );
+  // }
 
   List<ScheduleItem> getScheduleForDate(DateTime date) {
     // Get the day name from the date
