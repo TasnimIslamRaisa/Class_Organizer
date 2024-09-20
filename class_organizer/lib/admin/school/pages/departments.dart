@@ -436,7 +436,8 @@ class _DepartmentListPageState extends State<DepartmentListPage> {
               title: Text(departments[index].mName ?? ''),
               onTap: () {
                 showDepartmentDetails(index);
-                Future.delayed(const Duration(seconds: 3), () {
+                Future.delayed(const Duration(seconds: 0), () {
+                  Navigator.pop(context);
                   if (mounted) {
                     Navigator.push(
                       context,
