@@ -1,3 +1,5 @@
+import 'package:class_organizer/ui/screens/students_screen/academic_calender_screen.dart';
+import 'package:class_organizer/ui/screens/students_screen/notes_screen.dart';
 import 'package:class_organizer/web/black_box.dart';
 import 'package:class_organizer/web/black_box_online.dart';
 import 'package:flutter/material.dart';
@@ -70,27 +72,32 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.phone, size: 14, color: Colors.white),
-                    Text(
-                      userPhone ?? '+008 1800-445566',
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
+                SingleChildScrollView( // Enable horizontal scrolling
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.phone, size: 14, color: Colors.white),
+                      const SizedBox(width: 4),
+                      Text(
+                        userPhone ?? '+008 1800-445566',
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 15),
-                    const Icon(Icons.email_outlined, size: 14, color: Colors.white),
-                    Text(
-                      userEmail ?? 'r@gmail.com',
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
+                      const SizedBox(width: 15),
+                      const Icon(Icons.email_outlined, size: 14, color: Colors.white),
+                      const SizedBox(width: 4),
+                      Text(
+                        userEmail ?? 'r@gmail.com',
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -111,22 +118,26 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               Navigator.push(context, MaterialPageRoute(builder: (context) => const EditProfileScreen()));
             },
           ),
-    ListTile(
-    leading: const Icon(Icons.bloodtype),
-    title: const Text('C L A S S  M A N A G E R'),
-    onTap: () {
-    Navigator.pop(context);
-    Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => ClassManagerPage()),
-    );
-    },
-    ),
+          ListTile(
+            leading: const Icon(Icons.bloodtype),
+            title: const Text('C L A S S  M A N A G E R'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ClassManagerPage()),
+              );
+            },
+          ),
           ListTile(
             leading: const Icon(Icons.note),
             title: const Text('N O T E S & T A S K S'),
             onTap: () {
               Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => NotesScreen()),
+              );
             },
           ),
           ListTile(
@@ -148,6 +159,10 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             title: const Text('ACADEMIC - C A L E N D A R'),
             onTap: () {
               Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AcademicCalender()),
+              );
             },
           ),
           ListTile(

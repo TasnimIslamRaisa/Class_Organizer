@@ -9,8 +9,6 @@ import '../../ui/screens/auth/SignInScreen.dart';
 import '../../ui/screens/students_screen/edit_profile_screen.dart';
 import '../../ui/screens/students_screen/settings_screen.dart';
 
-
-
 class DrawerWidgetAdmin extends StatefulWidget {
   const DrawerWidgetAdmin({Key? key}) : super(key: key);
 
@@ -71,27 +69,34 @@ class _DrawerWidgetAdminState extends State<DrawerWidgetAdmin> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.phone, size: 14, color: Colors.white),
-                    Text(
-                      userPhone ?? '+008 1800-445566',
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
+                SingleChildScrollView(
+                  // Enable horizontal scrolling
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.phone, size: 14, color: Colors.white),
+                      const SizedBox(width: 4),
+                      Text(
+                        userPhone ?? '+008 1800-445566',
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 15),
-                    const Icon(Icons.email_outlined, size: 14, color: Colors.white),
-                    Text(
-                      userEmail ?? 'r@gmail.com',
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
+                      const SizedBox(width: 15),
+                      const Icon(Icons.email_outlined,
+                          size: 14, color: Colors.white),
+                      const SizedBox(width: 4),
+                      Text(
+                        userEmail ?? 'r@gmail.com',
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -101,7 +106,8 @@ class _DrawerWidgetAdminState extends State<DrawerWidgetAdmin> {
             title: const Text('B L A C K B O X'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => BlackBoxOnline()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => BlackBoxOnline()));
             },
           ),
           ListTile(
@@ -109,7 +115,10 @@ class _DrawerWidgetAdminState extends State<DrawerWidgetAdmin> {
             title: const Text('P R O F I L E'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const EditProfileScreen()));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const EditProfileScreen()));
             },
           ),
           ListTile(
@@ -167,9 +176,8 @@ class _DrawerWidgetAdminState extends State<DrawerWidgetAdmin> {
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context)=>const SettingScreen()),
-
+                context,
+                MaterialPageRoute(builder: (context) => const SettingScreen()),
               );
             },
           ),
@@ -183,9 +191,8 @@ class _DrawerWidgetAdminState extends State<DrawerWidgetAdmin> {
               Navigator.pop(context);
               Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context)=>const SignInScreen()),
-                  (route)=>false
-              );
+                  MaterialPageRoute(builder: (context) => const SignInScreen()),
+                  (route) => false);
             },
           ),
         ],
@@ -193,8 +200,6 @@ class _DrawerWidgetAdminState extends State<DrawerWidgetAdmin> {
     );
   }
 }
-
-
 
 // import 'package:class_organizer/ui/screens/auth/SignInScreen.dart';
 // import 'package:class_organizer/ui/screens/students_screen/settings_screen.dart';
@@ -207,8 +212,6 @@ class _DrawerWidgetAdminState extends State<DrawerWidgetAdmin> {
 //   const DrawerWidgetAdmin({
 //     super.key,
 //   });
-
-  
 
 //   @override
 //   Widget build(BuildContext context) {
