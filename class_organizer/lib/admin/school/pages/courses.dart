@@ -679,7 +679,7 @@ class _CoursesListPageState extends State<CoursesListPage> {
               items: departments,  // Assuming you have a list of faculties
               dropdownDecoratorProps: DropDownDecoratorProps(
                 dropdownSearchDecoration: InputDecoration(
-                  labelText: 'Select Program/Faculty',
+                  labelText: 'Select Department/Faculty',
                   prefixIcon: Icon(Icons.person),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),

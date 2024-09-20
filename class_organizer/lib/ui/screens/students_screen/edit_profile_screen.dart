@@ -7,6 +7,7 @@ import '../../widgets/drawer_widget.dart';
 import '../../../utility/profile_app_bar.dart';
 import '../../widgets/background_widget.dart';
 import '../students_screen/settings_screen.dart';
+import 'class_manager.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -271,7 +272,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               onPressed: () {
                 Navigator.push(
                   context, 
-                  MaterialPageRoute(builder: (contex) => const SettingScreen()),
+                  MaterialPageRoute(builder: (contex) => const ClassManagerPage()),
                 );
               },
               heroTag: 'settings',

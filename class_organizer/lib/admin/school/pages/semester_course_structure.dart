@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:class_organizer/models/course_structure.dart';
 import 'package:class_organizer/models/semester.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
@@ -58,6 +59,7 @@ class _SemesterCourseStructureState extends State<SemesterCourseStructure> {
   String? _selectedSemester;
   late Major department;
   late Semester semester;
+  Subject? _selectedSubject;
 
   @override
   void initState() {
@@ -230,6 +232,50 @@ class _SemesterCourseStructureState extends State<SemesterCourseStructure> {
     _subjectCreditController.dispose();
     _selectedTypeId.dispose();
     super.dispose();
+  }
+
+  Future<void> setSubjectToSemester() async {
+    _selectedSubject?.departmentId = department.uniqueId;
+    _selectedSubject?.semester = "${semester.semName}";
+
+    Subject updatedSubject = _selectedSubject!;
+
+    if (await InternetConnectionChecker().hasConnection) {
+    if (updatedSubject.uniqueId != null && updatedSubject.uniqueId!.isNotEmpty) {
+    final DatabaseReference _database = FirebaseDatabase.instance
+        .ref("subjects")
+        .child(updatedSubject.uniqueId!);
+
+    // Update the existing subject with new values
+    _database.update(updatedSubject.toMap()).then((_) {
+    setState(() {
+    // Update the local subjects list with the updated subject
+    int index = subjects.indexWhere((subject) => subject.uniqueId == updatedSubject.uniqueId);
+    if (index != -1) {
+    subjects[index] = updatedSubject;
+    }
+    });
+    Navigator.of(context).pop();
+    _loadCoursesData();
+    ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('Subject updated')),
+    );
+    }).catchError((error) {
+    ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('Failed to update subject: $error')),
+    );
+    print("Error updating subject: $error");
+    });
+    } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('Invalid unique ID')),
+    );
+    }
+    } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('No internet connection')),
+    );
+    }
   }
 
   void saveNewSubject() async {
@@ -702,24 +748,104 @@ class _SemesterCourseStructureState extends State<SemesterCourseStructure> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          _showSubjectForm(context); // Call a form for adding a new subject
-          await _loadCoursesData();
-          setState(() {
-            // You can add any additional functionality here for the floating action button
-          });
-        },
-        child: Icon(Icons.add),
-        backgroundColor: Colors.teal,
+      floatingActionButton: Stack(
+        children: <Widget>[
+          // First Floating Action Button (left)
+          Positioned(
+            left: 30, // Adjust the left position as needed
+            bottom: 20,
+            child: FloatingActionButton(
+              onPressed: () async {
+                _showSubjectForm(context); // Open a form for adding a new subject
+                // await _loadCoursesData();
+                setState(() {
+                  // Add any additional functionality here for the first floating action button
+                });
+              },
+              child: Icon(Icons.add),
+              backgroundColor: Colors.teal,
+            ),
+          ),
+
+          // Second Floating Action Button (right)
+          Positioned(
+            right: 30, // Adjust the right position as needed
+            bottom: 20,
+            child: FloatingActionButton(
+              onPressed: () async {
+                _showSubjectAddForm(context);
+                // await _loadCoursesData();
+                setState(() {
+                  // Add any additional functionality here for the second floating action button
+                });
+              },
+              child: Icon(Icons.edit),
+              backgroundColor: Colors.purple,
+            ),
+          ),
+        ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
 
 
+  void _showSubjectAddForm(BuildContext context) {
+    showModalBottomSheet(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(40.0)),
+      ),
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return _buildAddForm(
+          context,
+          'Select Subject|Course',
+          [
 
+
+            DropdownSearch<Subject>(
+              items: courses,
+              dropdownDecoratorProps: DropDownDecoratorProps(
+                dropdownSearchDecoration: InputDecoration(
+                  labelText: 'Select Subject',
+                  prefixIcon: Icon(Icons.book),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+              ),
+              onChanged: (Subject? selected) {
+                setState(() {
+                  _selectedSubject = selected;
+                });
+              },
+              selectedItem: _selectedSubject,
+              popupProps: PopupProps.menu(
+                showSearchBox: true, // Enables the search box for subjects
+                itemBuilder: (context, item, isSelected) => ListTile(
+                  title: Text("SEM: ${item.semester ?? "-"} - "+ "${item.subName ?? "No Name"}"), // Display subject name
+                  subtitle: Text(
+                    "Subject Code: ${item.subCode ?? ''} - " +
+                        (item.departmentId == department?.uniqueId ? "This Department" : "Different Department"),
+                  ),
+                ),
+              ),
+              dropdownBuilder: (context, selectedItem) {
+                return Text(
+                  selectedItem?.subName ?? "No Subject Selected", // Display selected subject's name
+                );
+              },
+            ),
+
+
+
+          ],
+        );
+      },
+    );
+  }
   void _showSubjectForm(BuildContext context) {
     showModalBottomSheet(
       shape: const RoundedRectangleBorder(
@@ -831,6 +957,43 @@ class _SemesterCourseStructureState extends State<SemesterCourseStructure> {
                 ),
                 child: const Center(child: Text('SAVE')),
                 onPressed: saveNewSubject,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  Widget _buildAddForm(BuildContext context, String title, List<Widget> fields) {
+    final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+    return Padding(
+      padding: EdgeInsets.only(bottom: bottomPadding),
+      child: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(25.0),
+          height: 400,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                title,
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              Expanded(
+                child: ListView(
+                  children: fields,
+                ),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(40.0)),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                ),
+                child: const Center(child: Text('ADD')),
+                onPressed: setSubjectToSemester,
               ),
             ],
           ),
