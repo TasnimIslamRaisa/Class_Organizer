@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:class_organizer/models/course_structure.dart';
+import 'package:class_organizer/models/semester.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,18 +20,24 @@ import '../../../preference/logout.dart';
 import '../../../utility/unique.dart';
 import '../../../web/internet_connectivity.dart';
 
-class CoursesListPage extends StatefulWidget {
+class SemesterCourseStructure extends StatefulWidget {
+  final Semester semester;
+  final Major department;
+
+  const SemesterCourseStructure({super.key, required this.semester, required this.department});
+
   @override
-  _CoursesListPageState createState() => _CoursesListPageState();
+  _SemesterCourseStructureState createState() => _SemesterCourseStructureState();
 }
 
-class _CoursesListPageState extends State<CoursesListPage> {
+class _SemesterCourseStructureState extends State<SemesterCourseStructure> {
   final TextEditingController _subjectNameController = TextEditingController();
   final TextEditingController _subjectCodeController = TextEditingController();
   final TextEditingController _subjectFeeController = TextEditingController();
   final TextEditingController _subjectCreditController = TextEditingController();
   final TextEditingController _selectedTypeId = TextEditingController();
   List<Subject> subjects = [];
+  List<Subject> courses = [];
 
   final _databaseRef = FirebaseDatabase.instance.ref();
   // final DatabaseReference _database = FirebaseDatabase.instance.ref().child('subjects');
@@ -49,13 +57,16 @@ class _CoursesListPageState extends State<CoursesListPage> {
   List<Major> departments = [];
   Major? _selectedDepartment;
   String? _selectedSemester;
-
+  late Major department;
+  late Semester semester;
+  Subject? _selectedSubject;
 
   @override
   void initState() {
     super.initState();
     _loadUserData();
     _loadCoursesData();
+    _loadCourseData();
     startListening();
     checkConnection();
     subscription = internetChecker.checkConnectionContinuously((status) {
@@ -63,7 +74,12 @@ class _CoursesListPageState extends State<CoursesListPage> {
         isConnected = status;
       });
     });
+    setState(() {
+      semester = widget.semester;
+      department = widget.department;
+      _selectedSemester = "${semester?.semName}";
 
+    });
     _loadMajorsData();
   }
 
@@ -159,68 +175,6 @@ class _CoursesListPageState extends State<CoursesListPage> {
     }
   }
 
-  // Future<void> _loadMajorsData() async {
-  //   if (await InternetConnectionChecker().hasConnection) {
-  //     setState(() {
-  //       _isLoading = true;
-  //     });
-  //
-  //     DatabaseReference majorRef = _databaseRef.child('departments');
-  //
-  //     majorRef.once().then((DatabaseEvent event) {
-  //       final dataSnapshot = event.snapshot;
-  //
-  //       if (dataSnapshot.exists) {
-  //         final Map<dynamic, dynamic> majorsData = dataSnapshot.value as Map<dynamic, dynamic>;
-  //
-  //         setState(() {
-  //           departments = majorsData.entries.map((entry) {
-  //             Map<String, dynamic> majorMap = {
-  //               'id': entry.value['id'] ?? null,
-  //               'status': entry.value['status'] ?? null,
-  //               'uniqueId': entry.value['uniqueId'] ?? null,
-  //               'sync_key': entry.value['sync_key'] ?? null,
-  //               'sync_status': entry.value['sync_status'] ?? null,
-  //               'mName': entry.value['mName'] ?? '',
-  //               'mStart': entry.value['mStart'] ?? null,
-  //               'mEnd': entry.value['mEnd'] ?? null,
-  //               'mStatus': entry.value['mStatus'] ?? 0,
-  //               'deanId': entry.value['deanId'] ?? '',
-  //               'sId': entry.value['sId'] ?? null,
-  //             };
-  //             return Major.fromMap(majorMap);
-  //           }).toList();
-  //           _isLoading = false;
-  //         });
-  //       } else {
-  //         print('No majors data available.');
-  //         setState(() {
-  //           _isLoading = false;
-  //         });
-  //       }
-  //     }).catchError((error) {
-  //       print('Failed to load majors data: $error');
-  //       setState(() {
-  //         _isLoading = false;
-  //       });
-  //     });
-  //   } else {
-  //     setState(() {
-  //       _isLoading = true;
-  //     });
-  //     showSnackBarMsg(context, "You are in Offline mode now, Please, connect Internet!");
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-  //     final String response = await rootBundle.loadString('assets/majors.json');
-  //     final data = json.decode(response) as List<dynamic>;
-  //     setState(() {
-  //       departments = data.map((json) => Major.fromJson(json)).toList();
-  //       _isLoading = false;
-  //     });
-  //   }
-  // }
-
   Future<void> _loadUserData() async {
     Logout logout = Logout();
     User? user = await logout.getUserDetails(key: 'user_data');
@@ -280,8 +234,52 @@ class _CoursesListPageState extends State<CoursesListPage> {
     super.dispose();
   }
 
+  Future<void> setSubjectToSemester() async {
+    _selectedSubject?.departmentId = department.uniqueId;
+    _selectedSubject?.semester = "${semester.semName}";
+
+    Subject updatedSubject = _selectedSubject!;
+
+    if (await InternetConnectionChecker().hasConnection) {
+    if (updatedSubject.uniqueId != null && updatedSubject.uniqueId!.isNotEmpty) {
+    final DatabaseReference _database = FirebaseDatabase.instance
+        .ref("subjects")
+        .child(updatedSubject.uniqueId!);
+
+    // Update the existing subject with new values
+    _database.update(updatedSubject.toMap()).then((_) {
+    setState(() {
+    // Update the local subjects list with the updated subject
+    int index = subjects.indexWhere((subject) => subject.uniqueId == updatedSubject.uniqueId);
+    if (index != -1) {
+    subjects[index] = updatedSubject;
+    }
+    });
+    Navigator.of(context).pop();
+    _loadCoursesData();
+    ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('Subject updated')),
+    );
+    }).catchError((error) {
+    ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('Failed to update subject: $error')),
+    );
+    print("Error updating subject: $error");
+    });
+    } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('Invalid unique ID')),
+    );
+    }
+    } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('No internet connection')),
+    );
+    }
+  }
+
   void saveNewSubject() async {
-    String subjectName = '${_subjectNameController.text.trim()} (${_selectedDepartment?.mName ?? "UD"})';
+    String subjectName = '${_subjectNameController.text.trim()} (${department?.mName ?? "UD"})';
     String subjectCode = _subjectCodeController.text.trim();
     String credit = _subjectCreditController.text.trim();
 
@@ -307,7 +305,7 @@ class _CoursesListPageState extends State<CoursesListPage> {
         credit: credit,
         subFee: _subjectFeeController.text.trim(),
         depId: null,
-        departmentId: _selectedDepartment?.uniqueId,
+        departmentId: department?.uniqueId,
         program: null,
         typeId: typeId,
         semester: _selectedSemester,
@@ -431,6 +429,176 @@ class _CoursesListPageState extends State<CoursesListPage> {
         _isLoading = true;
       });
 
+      // Debug: Print the department and semester
+      print("Department ID: ${department?.uniqueId}");
+      print("Semester Name: ${semester?.semName}");
+
+      // Reference to the subjects node in Firebase
+      DatabaseReference coursesRef = _databaseRef.child('subjects');
+
+      // Query subjects based on the school's sId only
+      Query query = coursesRef.orderByChild('sId').equalTo(school?.sId);
+
+      query.once().then((DatabaseEvent event) {
+        final dataSnapshot = event.snapshot;
+
+        if (dataSnapshot.exists) {
+          final Map<dynamic, dynamic> coursesData = dataSnapshot.value as Map<dynamic, dynamic>;
+
+          setState(() {
+            subjects = coursesData.entries.map((entry) {
+              Map<String, dynamic> subjectMap = {
+                'id': entry.value['id'] ?? null,
+                'subName': entry.value['subName'] ?? '',
+                'uniqueId': entry.value['uniqueId'] ?? null,
+                'sync_key': entry.value['sync_key'] ?? null,
+                'sync_status': entry.value['sync_status'] ?? null,
+                'subCode': entry.value['subCode'] ?? '',
+                'credit': entry.value['credit'] ?? 0,
+                'subFee': entry.value['subFee'] ?? 0,
+                'depId': entry.value['depId'] ?? null,
+                'departmentId': entry.value['departmentId'] ?? null,
+                'typeId': entry.value['typeId'] ?? null,
+                'status': entry.value['status'] ?? null,
+                'semester': entry.value['semester'] ?? null,
+                'program': entry.value['program'] ?? null,
+                'sId': entry.value['sId'] ?? null,
+              };
+              return Subject.fromMap(subjectMap);
+            })
+            // Filter the results in the app based on the department ID and semester name
+                .where((subject) {
+              print("Subject Semester: ${subject.departmentId}");
+              return subject.departmentId == department?.uniqueId &&
+                  subject.semester == "${semester?.semName}";
+            }).toList();
+            _isLoading = false;
+          });
+        } else {
+          print('No courses data available for the current school.');
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }).catchError((error) {
+        print('Failed to load courses data: $error');
+        setState(() {
+          _isLoading = false;
+        });
+      });
+    } else {
+      // Handle offline mode
+      setState(() {
+        _isLoading = true;
+      });
+      showSnackBarMsg(context, "You are in Offline mode now, Please, connect to the Internet!");
+
+      try {
+        final String response = await rootBundle.loadString('assets/subjects.json');
+        final data = json.decode(response) as List<dynamic>;
+
+        setState(() {
+          subjects = data
+              .map((json) => Subject.fromJson(json))
+          // Filter the local data similarly based on department ID and semester
+              .where((subject) =>
+          subject.departmentId == department?.uniqueId &&
+              subject.semester == "${semester?.semName}")
+              .toList();
+          _isLoading = false;
+        });
+      } catch (error) {
+        print('Failed to load local subjects data: $error');
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+
+  // Future<void> _loadCoursesData() async {
+  //   if (await InternetConnectionChecker().hasConnection) {
+  //     setState(() {
+  //       _isLoading = true;
+  //     });
+  //
+  //     // Reference to the subjects node in Firebase
+  //     DatabaseReference coursesRef = _databaseRef.child('subjects');
+  //
+  //     // Query subjects based on the current school's sId
+  //     Query query = coursesRef.orderByChild('sId').equalTo(school?.sId);
+  //
+  //     query.once().then((DatabaseEvent event) {
+  //       final dataSnapshot = event.snapshot;
+  //
+  //       if (dataSnapshot.exists) {
+  //         final Map<dynamic, dynamic> coursesData = dataSnapshot.value as Map<dynamic, dynamic>;
+  //
+  //         setState(() {
+  //           subjects = coursesData.entries.map((entry) {
+  //             Map<String, dynamic> subjectMap = {
+  //               'id': entry.value['id'] ?? null,
+  //               'subName': entry.value['subName'] ?? '',
+  //               'uniqueId': entry.value['uniqueId'] ?? null,
+  //               'sync_key': entry.value['sync_key'] ?? null,
+  //               'sync_status': entry.value['sync_status'] ?? null,
+  //               'subCode': entry.value['subCode'] ?? '',
+  //               'credit': entry.value['credit'] ?? 0,
+  //               'subFee': entry.value['subFee'] ?? 0,
+  //               'depId': entry.value['depId'] ?? null,
+  //               'typeId': entry.value['typeId'] ?? null,
+  //               'status': entry.value['status'] ?? null,
+  //               'semester': entry.value['semester'] ?? null,
+  //               'program': entry.value['program'] ?? null,
+  //               'sId': entry.value['sId'] ?? null,
+  //             };
+  //             return Subject.fromMap(subjectMap);
+  //           }).toList();
+  //           _isLoading = false;
+  //         });
+  //       } else {
+  //         print('No courses data available for the current school.');
+  //         setState(() {
+  //           _isLoading = false;
+  //         });
+  //       }
+  //     }).catchError((error) {
+  //       print('Failed to load courses data: $error');
+  //       setState(() {
+  //         _isLoading = false;
+  //       });
+  //     });
+  //   } else {
+  //     // Handle offline mode
+  //     setState(() {
+  //       _isLoading = true;
+  //     });
+  //     showSnackBarMsg(context, "You are in Offline mode now, Please, connect to the Internet!");
+  //
+  //     try {
+  //       final String response = await rootBundle.loadString('assets/subjects.json');
+  //       final data = json.decode(response) as List<dynamic>;
+  //
+  //       setState(() {
+  //         subjects = data.map((json) => Subject.fromJson(json)).toList();
+  //         _isLoading = false;
+  //       });
+  //     } catch (error) {
+  //       print('Failed to load local subjects data: $error');
+  //       setState(() {
+  //         _isLoading = false;
+  //       });
+  //     }
+  //   }
+  // }
+
+  Future<void> _loadCourseData() async {
+    if (await InternetConnectionChecker().hasConnection) {
+      setState(() {
+        _isLoading = true;
+      });
+
       // Reference to the subjects node in Firebase
       DatabaseReference coursesRef = _databaseRef.child('subjects');
 
@@ -444,7 +612,7 @@ class _CoursesListPageState extends State<CoursesListPage> {
           final Map<dynamic, dynamic> coursesData = dataSnapshot.value as Map<dynamic, dynamic>;
 
           setState(() {
-            subjects = coursesData.entries.map((entry) {
+            courses = coursesData.entries.map((entry) {
               Map<String, dynamic> subjectMap = {
                 'id': entry.value['id'] ?? null,
                 'subName': entry.value['subName'] ?? '',
@@ -489,7 +657,7 @@ class _CoursesListPageState extends State<CoursesListPage> {
         final data = json.decode(response) as List<dynamic>;
 
         setState(() {
-          subjects = data.map((json) => Subject.fromJson(json)).toList();
+          courses = data.map((json) => Subject.fromJson(json)).toList();
           _isLoading = false;
         });
       } catch (error) {
@@ -501,71 +669,6 @@ class _CoursesListPageState extends State<CoursesListPage> {
     }
   }
 
-
-  // Future<void> _loadCoursesData() async {
-  //   if (await InternetConnectionChecker().hasConnection) {
-  //     setState(() {
-  //       _isLoading = true;
-  //     });
-  //
-  //     DatabaseReference coursesRef = _databaseRef.child('subjects');
-  //
-  //     coursesRef.once().then((DatabaseEvent event) {
-  //       final dataSnapshot = event.snapshot;
-  //
-  //       if (dataSnapshot.exists) {
-  //         final Map<dynamic, dynamic> coursesData = dataSnapshot.value as Map<dynamic, dynamic>;
-  //
-  //         setState(() {
-  //           subjects = coursesData.entries.map((entry) {
-  //             Map<String, dynamic> subjectMap = {
-  //               'id': entry.value['id'] ?? null,
-  //               'subName': entry.value['subName'] ?? '',
-  //               'uniqueId': entry.value['uniqueId'] ?? null,
-  //               'sync_key': entry.value['sync_key'] ?? null,
-  //               'sync_status': entry.value['sync_status'] ?? null,
-  //               'subCode': entry.value['subCode'] ?? '',
-  //               'credit': entry.value['credit'] ?? 0,
-  //               'subFee': entry.value['subFee'] ?? 0,
-  //               'depId': entry.value['depId'] ?? null,
-  //               'typeId': entry.value['typeId'] ?? null,
-  //               'status': entry.value['status'] ?? null,
-  //               'semester': entry.value['semester'] ?? null,
-  //               'program': entry.value['program'] ?? null,
-  //               'sId': entry.value['sId'] ?? null,
-  //             };
-  //             return Subject.fromMap(subjectMap);
-  //           }).toList();
-  //           _isLoading = false;
-  //         });
-  //       } else {
-  //         print('No courses data available.');
-  //         setState(() {
-  //           _isLoading = false;
-  //         });
-  //       }
-  //     }).catchError((error) {
-  //       print('Failed to load courses data: $error');
-  //       setState(() {
-  //         _isLoading = false;
-  //       });
-  //     });
-  //   } else {
-  //     setState(() {
-  //       _isLoading = true;
-  //     });
-  //     showSnackBarMsg(context, "You are in Offline mode now, Please, connect to the Internet!");
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-  //     final String response = await rootBundle.loadString('assets/subjects.json');
-  //     final data = json.decode(response) as List<dynamic>;
-  //     setState(() {
-  //       subjects = data.map((json) => Subject.fromJson(json)).toList();
-  //       _isLoading = false;
-  //     });
-  //   }
-  // }
 
 
   @override
@@ -645,24 +748,104 @@ class _CoursesListPageState extends State<CoursesListPage> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          _showSubjectForm(context); // Call a form for adding a new subject
-          await _loadCoursesData();
-          setState(() {
-            // You can add any additional functionality here for the floating action button
-          });
-        },
-        child: Icon(Icons.add),
-        backgroundColor: Colors.teal,
+      floatingActionButton: Stack(
+        children: <Widget>[
+          // First Floating Action Button (left)
+          Positioned(
+            left: 30, // Adjust the left position as needed
+            bottom: 20,
+            child: FloatingActionButton(
+              onPressed: () async {
+                _showSubjectForm(context); // Open a form for adding a new subject
+                // await _loadCoursesData();
+                setState(() {
+                  // Add any additional functionality here for the first floating action button
+                });
+              },
+              child: Icon(Icons.add),
+              backgroundColor: Colors.teal,
+            ),
+          ),
+
+          // Second Floating Action Button (right)
+          Positioned(
+            right: 30, // Adjust the right position as needed
+            bottom: 20,
+            child: FloatingActionButton(
+              onPressed: () async {
+                _showSubjectAddForm(context);
+                // await _loadCoursesData();
+                setState(() {
+                  // Add any additional functionality here for the second floating action button
+                });
+              },
+              child: Icon(Icons.edit),
+              backgroundColor: Colors.purple,
+            ),
+          ),
+        ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
 
 
+  void _showSubjectAddForm(BuildContext context) {
+    showModalBottomSheet(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(40.0)),
+      ),
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return _buildAddForm(
+          context,
+          'Select Subject|Course',
+          [
 
+
+            DropdownSearch<Subject>(
+              items: courses,
+              dropdownDecoratorProps: DropDownDecoratorProps(
+                dropdownSearchDecoration: InputDecoration(
+                  labelText: 'Select Subject',
+                  prefixIcon: Icon(Icons.book),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+              ),
+              onChanged: (Subject? selected) {
+                setState(() {
+                  _selectedSubject = selected;
+                });
+              },
+              selectedItem: _selectedSubject,
+              popupProps: PopupProps.menu(
+                showSearchBox: true, // Enables the search box for subjects
+                itemBuilder: (context, item, isSelected) => ListTile(
+                  title: Text("SEM: ${item.semester ?? "-"} - "+ "${item.subName ?? "No Name"}"), // Display subject name
+                  subtitle: Text(
+                    "Subject Code: ${item.subCode ?? ''} - " +
+                        (item.departmentId == department?.uniqueId ? "This Department" : "Different Department"),
+                  ),
+                ),
+              ),
+              dropdownBuilder: (context, selectedItem) {
+                return Text(
+                  selectedItem?.subName ?? "No Subject Selected", // Display selected subject's name
+                );
+              },
+            ),
+
+
+
+          ],
+        );
+      },
+    );
+  }
   void _showSubjectForm(BuildContext context) {
     showModalBottomSheet(
       shape: const RoundedRectangleBorder(
@@ -675,45 +858,12 @@ class _CoursesListPageState extends State<CoursesListPage> {
           context,
           'Create Subject|Course',
           [
-            DropdownSearch<Major>(
-              items: departments,  // Assuming you have a list of faculties
-              dropdownDecoratorProps: DropDownDecoratorProps(
-                dropdownSearchDecoration: InputDecoration(
-                  labelText: 'Select Department/Faculty',
-                  prefixIcon: Icon(Icons.person),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                ),
-              ),
-              onChanged: (Major? selectedDepartment) {
-                setState(() {
-                  _selectedDepartment = selectedDepartment;
-                  // Use selected faculty data as needed, e.g., _selectedFaculty.fname
-                });
-              },
-              selectedItem: _selectedDepartment,
-              popupProps: PopupProps.menu(
-                showSearchBox: true,
-                itemBuilder: (context, item, isSelected) => ListTile(
-                  title: Text(item.mName ?? 'Unknown Department'),
-                ),
-              ),
-              dropdownBuilder: (context, selectedItem) {
-                return Text(selectedItem?.mName ?? "No Department Selected");
-              },
-            ),
             _buildTextField('Subject Code', Icons.business, _subjectCodeController),
             _buildTextField('Subject Name', Icons.room_outlined, _subjectNameController),
             _buildNumberField("Subject Credit", Icons.book_online_outlined, _subjectCreditController),
             _buildNumberField("Fee", Icons.account_balance_outlined, _subjectFeeController),
             _buildNumberField("Subject Type(123..)", Icons.bookmark, _selectedTypeId),
-            _buildMonthSelectDropdownField("Select Semester", Icons.book_rounded, _selectedSemester,                     (String? newValue) {
-              setState(() {
-                _selectedSemester = newValue;
-              });
-            }),
-          
+
           ],
         );
       },
@@ -814,167 +964,42 @@ class _CoursesListPageState extends State<CoursesListPage> {
       ),
     );
   }
+  Widget _buildAddForm(BuildContext context, String title, List<Widget> fields) {
+    final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+    return Padding(
+      padding: EdgeInsets.only(bottom: bottomPadding),
+      child: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(25.0),
+          height: 400,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                title,
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              Expanded(
+                child: ListView(
+                  children: fields,
+                ),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(40.0)),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                ),
+                child: const Center(child: Text('ADD')),
+                onPressed: setSubjectToSemester,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
 }
-
-
-// import 'package:flutter/material.dart';
-//
-// class CoursesPage extends StatefulWidget {
-//   @override
-//   _CoursesPageState createState() => _CoursesPageState();
-// }
-//
-// class _CoursesPageState extends State<CoursesPage> {
-//   final List<Map<String, dynamic>> courses = [
-//     {'name': 'Course 1', 'email': 'course1@example.com', 'phone': '123456789'},
-//     {'name': 'Course 2', 'email': 'course2@example.com', 'phone': '987654321'},
-//     {'name': 'Course 3', 'email': 'course3@example.com', 'phone': '123456289'},
-//     {'name': 'Course 4', 'email': 'course4@example.com', 'phone': '987655321'},
-//   ];
-//
-//   void editCourse(int index) {
-//     // Handle editing a course
-//     print('Editing ${courses[index]['name']}');
-//     // Implement your editing functionality here
-//   }
-//
-//   void duplicateCourse(int index) {
-//     setState(() {
-//       courses.add({
-//         'name': '${courses[index]['name']} (Duplicate)',
-//         'email': courses[index]['email'],
-//         'phone': courses[index]['phone'],
-//       });
-//     });
-//   }
-//
-//   void deleteCourse(int index) {
-//     setState(() {
-//       courses.removeAt(index);
-//     });
-//   }
-//
-//   void showCourseDetails(int index) {
-//     final course = courses[index];
-//     showDialog(
-//       context: context,
-//       builder: (BuildContext context) {
-//         return AlertDialog(
-//           title: Text('${course['name']} Details'),
-//           content: Column(
-//             mainAxisSize: MainAxisSize.min,
-//             crossAxisAlignment: CrossAxisAlignment.start,
-//             children: [
-//               Text('Name: ${course['name']}'),
-//               Text('Email: ${course['email']}'),
-//               Text('Phone: ${course['phone']}'),
-//             ],
-//           ),
-//           actions: [
-//             TextButton(
-//               child: Text('Close'),
-//               onPressed: () {
-//                 Navigator.of(context).pop();
-//               },
-//             ),
-//           ],
-//         );
-//       },
-//     );
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Courses'),
-//         leading: IconButton(
-//           icon: Icon(Icons.arrow_back),
-//           onPressed: () {
-//             Navigator.pop(context);
-//           },
-//         ),
-//       ),
-//       body: ListView.builder(
-//         itemCount: courses.length,
-//         itemBuilder: (context, index) {
-//           return Dismissible(
-//             key: Key(courses[index]['name']),
-//             onDismissed: (direction) {
-//               deleteCourse(index);
-//               ScaffoldMessenger.of(context).showSnackBar(
-//                 SnackBar(content: Text('${courses[index]['name']} deleted')),
-//               );
-//             },
-//             background: Container(
-//               color: Colors.red,
-//               alignment: Alignment.centerLeft,
-//               padding: EdgeInsets.only(left: 20.0),
-//               child: Icon(Icons.delete, color: Colors.white),
-//             ),
-//             secondaryBackground: Container(
-//               color: Colors.red,
-//               alignment: Alignment.centerRight,
-//               padding: EdgeInsets.only(right: 20.0),
-//               child: Icon(Icons.delete, color: Colors.white),
-//             ),
-//             child: ListTile(
-//               leading: Icon(Icons.circle, color: Colors.redAccent), // Icon on the left
-//               title: Text(courses[index]['name']), // Course name
-//               subtitle: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   Text('Short Detail'), // Placeholder for short detail
-//                   SizedBox(height: 4), // Spacing between text
-//                   Text('Delivery date: 17/09/2024'), // Placeholder delivery date
-//                 ],
-//               ),
-//               trailing: PopupMenuButton<String>(
-//                 onSelected: (value) {
-//                   switch (value) {
-//                     case 'Edit':
-//                       editCourse(index);
-//                       break;
-//                     case 'Duplicate':
-//                       duplicateCourse(index);
-//                       break;
-//                     case 'Delete':
-//                       deleteCourse(index);
-//                       break;
-//                   }
-//                 },
-//                 itemBuilder: (BuildContext context) {
-//                   return ['Edit', 'Duplicate', 'Delete'].map((String choice) {
-//                     return PopupMenuItem<String>(
-//                       value: choice,
-//                       child: Text(choice),
-//                     );
-//                   }).toList();
-//                 },
-//                 icon: Icon(Icons.more_vert, color: Colors.teal), // Menu icon on the right
-//               ),
-//               onTap: () {
-//                 showCourseDetails(index);
-//               },
-//             ),
-//           );
-//         },
-//       ),
-//       floatingActionButton: FloatingActionButton(
-//         onPressed: () {
-//           setState(() {
-//             courses.add({
-//               'name': 'New Course',
-//               'email': 'newcourse@example.com',
-//               'phone': '000000000',
-//             });
-//           });
-//         },
-//         child: Icon(Icons.add),
-//         backgroundColor: Colors.teal,
-//       ),
-//       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-//     );
-//   }
-// }
