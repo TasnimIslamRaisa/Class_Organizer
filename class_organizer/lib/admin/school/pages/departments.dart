@@ -100,7 +100,9 @@ class _DepartmentListPageState extends State<DepartmentListPage> {
 
       DatabaseReference majorRef = _databaseRef.child('departments');
 
-      majorRef.once().then((DatabaseEvent event) {
+      Query query = majorRef.orderByChild('sId').equalTo(school?.sId);
+
+      query.once().then((DatabaseEvent event) {
         final dataSnapshot = event.snapshot;
 
         if (dataSnapshot.exists) {
@@ -126,7 +128,7 @@ class _DepartmentListPageState extends State<DepartmentListPage> {
             _isLoading = false;
           });
         } else {
-          print('No majors data available.');
+          print('No majors data available for the current school.');
           setState(() {
             _isLoading = false;
           });
@@ -141,7 +143,7 @@ class _DepartmentListPageState extends State<DepartmentListPage> {
       setState(() {
         _isLoading = true;
       });
-      showSnackBarMsg(context, "You are in Offline mode now, Please, connect Internet!");
+      showSnackBarMsg(context, "You are in Offline mode now, Please, connect to the Internet!");
       setState(() {
         _isLoading = false;
       });
@@ -328,21 +330,25 @@ class _DepartmentListPageState extends State<DepartmentListPage> {
   }
 
   Future<void> _loadFacultiesData() async {
-
-    if(await InternetConnectionChecker().hasConnection){
+    if (await InternetConnectionChecker().hasConnection) {
       setState(() {
         _isLoading = true;
       });
 
-      DatabaseReference schoolRef = _databaseRef.child('faculties');
+      // Reference to the faculties node in Firebase
+      DatabaseReference facultiesRef = _databaseRef.child('faculties');
 
-      schoolRef.once().then((DatabaseEvent event) {
+      // Query faculties that match the current school's sId
+      Query query = facultiesRef.orderByChild('sId').equalTo(school?.sId);
+
+      query.once().then((DatabaseEvent event) {
         final dataSnapshot = event.snapshot;
 
         if (dataSnapshot.exists) {
           final Map<dynamic, dynamic> facultiesData = dataSnapshot.value as Map<dynamic, dynamic>;
 
           setState(() {
+            // Convert the faculties data into a list of Faculties objects
             _facultiesList = facultiesData.entries.map((entry) {
               Map<String, dynamic> facultiesMap = {
                 'id': entry.value['id'] ?? null,
@@ -361,20 +367,20 @@ class _DepartmentListPageState extends State<DepartmentListPage> {
             }).toList();
             _isLoading = false;
           });
-
         } else {
-          print('No Faculties data available.');
+          print('No faculties data available for the current school.');
           setState(() {
             _isLoading = false;
           });
         }
       }).catchError((error) {
-        print('Failed to load school data: $error');
+        print('Failed to load faculties data: $error');
         setState(() {
           _isLoading = false;
         });
       });
-    }else{
+    } else {
+      // Handle offline mode
       setState(() {
         _isLoading = true;
       });
@@ -389,8 +395,6 @@ class _DepartmentListPageState extends State<DepartmentListPage> {
         _isLoading = false;
       });
     }
-
-
   }
 
   @override

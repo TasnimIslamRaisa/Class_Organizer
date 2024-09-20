@@ -11,6 +11,7 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 // import '../../../data/urls.dart';
 import '../../../admin/panel/admin_panel.dart';
 import '../../../db/database_helper.dart';
+import '../../../models/school.dart';
 import '../../../models/user.dart' as local;
 import '../../../style/app_color.dart';
 import '../../../utility/app_constant.dart';
@@ -332,6 +333,8 @@ void showSnackBarMsg(BuildContext context, String message) {
                   await Logout().saveUser(user.toMap(), key: "user_logged_in");
                   await Logout().saveUserDetails(user, key: "user_data");
 
+                  await getSchoolBySId(user.sid);
+
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
@@ -348,6 +351,8 @@ void showSnackBarMsg(BuildContext context, String message) {
                   await Logout().setUserType(uType);
                   await Logout().saveUser(user.toMap(), key: "user_logged_in");
                   await Logout().saveUserDetails(user, key: "user_data");
+
+                  await getSchoolBySId(user.sid);
 
                     Navigator.pushReplacement(
                       context,
@@ -543,6 +548,33 @@ void checkLoginStatus() async {
 Future<bool> checkInternetConnection() async {
   bool isConnected = await internetChecker.hasInternetConnection();
   return isConnected;
+}
+
+Future<void> getSchoolBySId(String? sid) async {
+  if (sid == null) {
+    print("SID is null, unable to fetch school data.");
+    return;
+  }
+
+  final DatabaseReference dbRef = FirebaseDatabase.instance.ref("schools").child(sid);
+
+  try {
+    final DataSnapshot snapshot = await dbRef.get();
+
+    if (snapshot.exists) {
+      final Map<String, dynamic> schoolData = Map<String, dynamic>.from(snapshot.value as Map);
+      School school = School.fromMap(schoolData);
+
+      await Logout().saveSchool(school.toMap(),key: "school_data");
+
+      print("School data fetched successfully: ${school.sName}");
+
+    } else {
+      print("School with SID $sid does not exist.");
+    }
+  } catch (e) {
+    print("Error fetching school data: $e");
+  }
 }
 
 }

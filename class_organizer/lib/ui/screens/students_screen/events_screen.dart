@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import '../../../utility/profile_app_bar.dart';
 import '../../widgets/drawer_widget.dart';
 
-class NotesScreen extends StatefulWidget {
-  const NotesScreen({super.key});
+class EventsScreen extends StatefulWidget {
+  const EventsScreen({super.key});
 
   @override
-  _NotesScreenState createState() => _NotesScreenState();
+  _EventsScreenState createState() => _EventsScreenState();
 }
 
-class _NotesScreenState extends State<NotesScreen> with SingleTickerProviderStateMixin {
+class _EventsScreenState extends State<EventsScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -37,7 +37,7 @@ class _NotesScreenState extends State<NotesScreen> with SingleTickerProviderStat
 
     return Scaffold(
       appBar: ProfileAppBar(
-        title: 'Notice & Events',
+        title: 'Academic Calendar',
         actionIcon: Icons.more_vert,
         onActionPressed: () {},
         appBarbgColor: const Color(0xFF80D8FF),

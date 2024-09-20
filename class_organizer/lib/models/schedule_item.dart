@@ -143,30 +143,113 @@ class ScheduleItem {
     };
   }
 
-  static ScheduleItem fromMap(Map<String, dynamic> map) {
+  // static ScheduleItem fromMap(Map<String, dynamic> map) {
+  //   return ScheduleItem(
+  //     id: map['id'],
+  //     uniqueId: map['uniqueId'],
+  //     sId: map['sId'],
+  //     stdId: map['stdId'],
+  //     tId: map['tId'],
+  //     tempCode: map['temp_code'],
+  //     tempNum: map['temp_num'],
+  //     subName: map['sub_name'],
+  //     subCode: map['sub_code'],
+  //     tId2: map['t_id'],
+  //     tName: map['t_name'],
+  //     room: map['room'],
+  //     campus: map['campus'],
+  //     section: map['section'],
+  //     startTime: map['start_time'],
+  //     endTime: map['end_time'],
+  //     day: map['day'],
+  //     key: map['key'],
+  //     syncKey: map['sync_key'],
+  //     min: map['min'],
+  //     syncStatus: map['sync_status'],
+  //     dateTime: DateTime.parse(map['dateTime']),
+  //   );
+  // }
+
+  factory ScheduleItem.fromMap(Map<String, dynamic> map) {
     return ScheduleItem(
-      id: map['id'],
-      uniqueId: map['uniqueId'],
-      sId: map['sId'],
-      stdId: map['stdId'],
-      tId: map['tId'],
-      tempCode: map['temp_code'],
-      tempNum: map['temp_num'],
-      subName: map['sub_name'],
-      subCode: map['sub_code'],
-      tId2: map['t_id'],
-      tName: map['t_name'],
-      room: map['room'],
-      campus: map['campus'],
-      section: map['section'],
-      startTime: map['start_time'],
-      endTime: map['end_time'],
-      day: map['day'],
-      key: map['key'],
-      syncKey: map['sync_key'],
-      min: map['min'],
-      syncStatus: map['sync_status'],
-      dateTime: DateTime.parse(map['dateTime']),
+      id: map['id'] as int?,
+      uniqueId: map['uniqueId'] as String?,
+      sId: map['sId'] as String?,
+      stdId: map['stdId'] as String?,
+      tId: map['tId'] as String?,
+      tempCode: map['temp_code'] as String?,
+      tempNum: map['temp_num'] as String?,
+      subName: map['sub_name'] as String?,
+      subCode: map['sub_code'] as String?,
+      tId2: map['t_id'] as String?,
+      tName: map['t_name'] as String?,
+      room: map['room'] as String?,
+      campus: map['campus'] as String?,
+      section: map['section'] as String?,
+      startTime: map['start_time'] as String?,
+      endTime: map['end_time'] as String?,
+      day: map['day'] as String?,
+      key: map['key'] as String?,
+      syncKey: map['sync_key'] as String?,
+      min: map['min'] as int?,
+      syncStatus: map['sync_status'] as int?,
+      dateTime: map['dateTime'] != null ? DateTime.parse(map['dateTime']) : null,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': _id,
+      'uniqueId': _uniqueId,
+      'sId': _sId,
+      'stdId': _stdId,
+      'tId': _tId,
+      'temp_code': _tempCode,
+      'temp_num': _tempNum,
+      'sub_name': _subName,
+      'sub_code': _subCode,
+      't_id': _tId2,
+      't_name': _tName,
+      'room': _room,
+      'campus': _campus,
+      'section': _section,
+      'start_time': _startTime,
+      'end_time': _endTime,
+      'day': _day,
+      'key': _key,
+      'sync_key': _syncKey,
+      'min': _min,
+      'sync_status': _syncStatus,
+      'dateTime': _dateTime?.toIso8601String(),
+    };
+  }
+
+  // Create a ScheduleItem object from a JSON map
+  factory ScheduleItem.fromJson(Map<String, dynamic> json) {
+    return ScheduleItem(
+      id: json['id'],
+      uniqueId: json['uniqueId'],
+      sId: json['sId'],
+      stdId: json['stdId'],
+      tId: json['tId'],
+      tempCode: json['temp_code'],
+      tempNum: json['temp_num'],
+      subName: json['sub_name'],
+      subCode: json['sub_code'],
+      tId2: json['t_id'],
+      tName: json['t_name'],
+      room: json['room'],
+      campus: json['campus'],
+      section: json['section'],
+      startTime: json['start_time'],
+      endTime: json['end_time'],
+      day: json['day'],
+      key: json['key'],
+      syncKey: json['sync_key'],
+      min: json['min'],
+      syncStatus: json['sync_status'],
+      dateTime: json['dateTime'] != null ? DateTime.parse(json['dateTime']) : null,
+    );
+  }
+
 }

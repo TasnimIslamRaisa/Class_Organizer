@@ -89,15 +89,88 @@ class _SessionListPageState extends State<SessionListPage> {
     connectionSubscription?.cancel();
   }
 
+  // Future<void> _loadSessionsData() async {
+  //   if (await InternetConnectionChecker().hasConnection) {
+  //     setState(() {
+  //       _isLoading = true;
+  //     });
+  //
+  //     DatabaseReference sessionRef = _databaseRef.child('sessions');
+  //
+  //     sessionRef.once().then((DatabaseEvent event) {
+  //       final dataSnapshot = event.snapshot;
+  //
+  //       if (dataSnapshot.exists) {
+  //         final Map<dynamic, dynamic> sessionsData = dataSnapshot.value as Map<dynamic, dynamic>;
+  //
+  //         setState(() {
+  //           sessions = sessionsData.entries.map((entry) {
+  //             Map<String, dynamic> sessionMap = {
+  //               'id': entry.value['id'] ?? null,
+  //               'uId': entry.value['uId'] ?? null,
+  //               'aYname': entry.value['aYname'] ?? null,
+  //               'uniqueId': entry.value['uniqueId'] ?? null,
+  //               'sYear': entry.value['sYear'] ?? null,
+  //               'sMonth': entry.value['sMonth'] ?? null,
+  //               'eYear': entry.value['eYear'] ?? null,
+  //               'eMonth': entry.value['eMonth'] ?? null,
+  //               'aStatus': entry.value['aStatus'] ?? 0,
+  //               'sId': entry.value['sId'] ?? null,
+  //               'syncStatus': entry.value['syncStatus'] ?? null,
+  //               'syncKey': entry.value['syncKey'] ?? null,
+  //             };
+  //             return AYear.fromMap(sessionMap);
+  //           }).toList();
+  //           _isLoading = false;
+  //         });
+  //       } else {
+  //         print('No sessions data available.');
+  //         setState(() {
+  //           _isLoading = false;
+  //         });
+  //       }
+  //     }).catchError((error) {
+  //       print('Failed to load sessions data: $error');
+  //       setState(() {
+  //         _isLoading = false;
+  //       });
+  //     });
+  //   } else {
+  //     setState(() {
+  //       _isLoading = true;
+  //     });
+  //     showSnackBarMsg(context, "You are in Offline mode now, Please, connect to the Internet!");
+  //
+  //     try {
+  //       final String response = await rootBundle.loadString('assets/sessions.json');
+  //       final data = json.decode(response) as List<dynamic>;
+  //
+  //       setState(() {
+  //         sessions = data.map((json) => AYear.fromJson(json)).toList();
+  //         _isLoading = false;
+  //       });
+  //     } catch (error) {
+  //       print('Failed to load local sessions data: $error');
+  //       setState(() {
+  //         _isLoading = false;
+  //       });
+  //     }
+  //   }
+  // }
+
   Future<void> _loadSessionsData() async {
     if (await InternetConnectionChecker().hasConnection) {
       setState(() {
         _isLoading = true;
       });
 
+      // Reference to the sessions node in Firebase
       DatabaseReference sessionRef = _databaseRef.child('sessions');
 
-      sessionRef.once().then((DatabaseEvent event) {
+      // Query sessions that match the current school's sId
+      Query query = sessionRef.orderByChild('sId').equalTo(school?.sId);
+
+      query.once().then((DatabaseEvent event) {
         final dataSnapshot = event.snapshot;
 
         if (dataSnapshot.exists) {
@@ -124,7 +197,7 @@ class _SessionListPageState extends State<SessionListPage> {
             _isLoading = false;
           });
         } else {
-          print('No sessions data available.');
+          print('No sessions data available for the current school.');
           setState(() {
             _isLoading = false;
           });
@@ -136,6 +209,7 @@ class _SessionListPageState extends State<SessionListPage> {
         });
       });
     } else {
+      // Handle offline mode
       setState(() {
         _isLoading = true;
       });
@@ -157,6 +231,7 @@ class _SessionListPageState extends State<SessionListPage> {
       }
     }
   }
+
 
   Future<void> _loadUserData() async {
     Logout logout = Logout();
