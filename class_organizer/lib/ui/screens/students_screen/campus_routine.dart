@@ -1,4 +1,6 @@
+import 'package:class_organizer/student/routine/mine_routines.dart';
 import 'package:flutter/material.dart';
+import '../../../student/school/routine/campus_routines.dart';
 import '../../widgets/drawer_widget.dart';
 
 class CampusRoutine extends StatefulWidget {
@@ -63,33 +65,27 @@ class _CampusRoutineState extends State<CampusRoutine> with SingleTickerProvider
       drawer: const DrawerWidget(),
       body: TabBarView(
         controller: _tabController,
-        children: const [
+        children: [
           // Fragment for 'Campus'
           Center(
-            child: Text(
-              'Campus',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
+            child: CampusRoutines(),
           ),
           // Fragment for 'Self'
           Center(
-            child: Text(
-              'Mine',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
+            child: MineRoutines(),
           ),
         ],
       ),
       // Floating Action Button with custom positioning
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Add action for FAB
-        },
-        backgroundColor: Colors.blue,
-        shape: const CircleBorder(), // Fully circular shape
-        child: const Icon(Icons.add),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     // Add action for FAB
+      //   },
+      //   backgroundColor: Colors.blue,
+      //   shape: const CircleBorder(), // Fully circular shape
+      //   child: const Icon(Icons.add),
+      // ),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
