@@ -1,4 +1,5 @@
 import 'package:class_organizer/ui/screens/students_screen/academic_calender_screen.dart';
+import 'package:class_organizer/ui/screens/students_screen/notes_screen.dart';
 import 'package:class_organizer/web/black_box.dart';
 import 'package:class_organizer/web/black_box_online.dart';
 import 'package:flutter/material.dart';
@@ -133,6 +134,10 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             title: const Text('N O T E S & T A S K S'),
             onTap: () {
               Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => NotesScreen()),
+              );
             },
           ),
           ListTile(

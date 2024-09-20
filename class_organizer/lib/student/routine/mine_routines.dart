@@ -24,15 +24,13 @@ import '../../../models/user.dart';
 import '../../../preference/logout.dart';
 import '../../../utility/unique.dart';
 import '../../../web/internet_connectivity.dart';
-import '../schedule/schedule_screen.dart';
-import '../schedule/schedules_screen.dart';
 
-class RoutinesListPage extends StatefulWidget {
+class MineRoutines extends StatefulWidget {
   @override
-  _RoutinesListPageState createState() => _RoutinesListPageState();
+  _MineRoutinesState createState() => _MineRoutinesState();
 }
 
-class _RoutinesListPageState extends State<RoutinesListPage> {
+class _MineRoutinesState extends State<MineRoutines> {
   final TextEditingController _routineNameController = TextEditingController();
   final TextEditingController _routineDetailsController = TextEditingController();
   List<Routine> routines = [];
@@ -293,7 +291,7 @@ class _RoutinesListPageState extends State<RoutinesListPage> {
     if (routineName.isNotEmpty && routineDetails.isNotEmpty) {
       Routine newRoutine = Routine(
         id: null,
-        sId: school?.sId,
+        sId: _user?.uniqueid,
         uId: _user?.uniqueid,
         stdId: null,
         tempName: routineName,
@@ -493,7 +491,7 @@ class _RoutinesListPageState extends State<RoutinesListPage> {
       DatabaseReference routinesRef = _databaseRef.child('routines');
 
       // Query routines that match the current school's sId
-      Query query = routinesRef.orderByChild('sId').equalTo(school?.sId);
+      Query query = routinesRef.orderByChild('sId').equalTo(_user?.uniqueid);
 
       query.once().then((DatabaseEvent event) {
         final dataSnapshot = event.snapshot;
@@ -558,15 +556,6 @@ class _RoutinesListPageState extends State<RoutinesListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Routines'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
       body: ListView.builder(
         itemCount: routines.length,
         itemBuilder: (context, index) {
@@ -652,18 +641,20 @@ class _RoutinesListPageState extends State<RoutinesListPage> {
           );
         },
       ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          _showRoutineForm(context); // Call a form for adding a new routine
+          _showRoutineForm(context);
           await _loadRoutinesData();
           setState(() {
-            // You can add any additional functionality here for the floating action button
+
           });
         },
-        child: Icon(Icons.add),
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.blue,
+        shape: const CircleBorder(), // Fully circular shape
+        child: const Icon(Icons.add),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat
     );
   }
 

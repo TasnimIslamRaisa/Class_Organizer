@@ -24,15 +24,13 @@ import '../../../models/user.dart';
 import '../../../preference/logout.dart';
 import '../../../utility/unique.dart';
 import '../../../web/internet_connectivity.dart';
-import '../schedule/schedule_screen.dart';
-import '../schedule/schedules_screen.dart';
 
-class RoutinesListPage extends StatefulWidget {
+class CampusRoutines extends StatefulWidget {
   @override
-  _RoutinesListPageState createState() => _RoutinesListPageState();
+  _CampusRoutinesState createState() => _CampusRoutinesState();
 }
 
-class _RoutinesListPageState extends State<RoutinesListPage> {
+class _CampusRoutinesState extends State<CampusRoutines> {
   final TextEditingController _routineNameController = TextEditingController();
   final TextEditingController _routineDetailsController = TextEditingController();
   List<Routine> routines = [];
@@ -558,15 +556,6 @@ class _RoutinesListPageState extends State<RoutinesListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Routines'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
       body: ListView.builder(
         itemCount: routines.length,
         itemBuilder: (context, index) {
@@ -652,18 +641,18 @@ class _RoutinesListPageState extends State<RoutinesListPage> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          _showRoutineForm(context); // Call a form for adding a new routine
-          await _loadRoutinesData();
-          setState(() {
-            // You can add any additional functionality here for the floating action button
-          });
-        },
-        child: Icon(Icons.add),
-        backgroundColor: Colors.teal,
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () async {
+      //     _showRoutineForm(context); // Call a form for adding a new routine
+      //     await _loadRoutinesData();
+      //     setState(() {
+      //
+      //     });
+      //   },
+      //   child: Icon(Icons.add),
+      //   backgroundColor: Colors.teal,
+      // ),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
