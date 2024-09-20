@@ -1,3 +1,4 @@
+import 'package:class_organizer/utility/scanner.dart';
 import 'package:class_organizer/utility/scanner_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -87,7 +88,7 @@ class ClassManagerScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (contex) => ScannerScreen()),
+                  MaterialPageRoute(builder: (contex) => Scanner()),
                 );
               },
             ),
