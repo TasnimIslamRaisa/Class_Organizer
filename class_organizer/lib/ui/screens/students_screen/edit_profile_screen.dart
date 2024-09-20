@@ -77,6 +77,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+    final isLightMode = brightness == Brightness.light;
     return Scaffold(
       appBar: ProfileAppBar(
         title: 'Edit Profile',
@@ -145,7 +147,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(16),
                       filled: true,
-                      fillColor: Colors.grey[200],
+                      //isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600]
+                      fillColor: isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -158,7 +161,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(16),
                       filled: true,
-                      fillColor: Colors.grey[200],
+                      fillColor: isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -170,7 +173,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       labelText: 'Department',
                       border: InputBorder.none,
                       filled: true,
-                      fillColor: Colors.grey[200],
+                      fillColor: isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
                     ),
                     items: const [
                       DropdownMenuItem(value: 'CSE', child: Text('CSE')),
@@ -192,7 +195,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       labelText: 'Semester',
                       border: InputBorder.none,
                       filled: true,
-                      fillColor: Colors.grey[200],
+                      fillColor: isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
                     ),
                     items: const [
                       DropdownMenuItem(value: '1st', child: Text('1st')),
@@ -220,7 +223,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(16),
                       filled: true,
-                      fillColor: Colors.grey[200],
+                      fillColor: isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -232,7 +235,47 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(16),
                       filled: true,
-                      fillColor: Colors.grey[200],
+                      fillColor: isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    decoration: InputDecoration(
+                      labelText: 'Address',
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.all(16),
+                      filled: true,
+                      fillColor: isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    decoration: InputDecoration(
+                      labelText: 'Id',
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.all(16),
+                      filled: true,
+                      fillColor: isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    decoration: InputDecoration(
+                      labelText: 'Gender',
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.all(16),
+                      filled: true,
+                      fillColor: isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    decoration: InputDecoration(
+                      labelText: 'Phone Number',
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.all(16),
+                      filled: true,
+                      fillColor: isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -242,47 +285,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(16),
                       filled: true,
-                      fillColor: Colors.grey[200],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Edit',
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.all(16),
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Edit',
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.all(16),
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Edit',
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.all(16),
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Edit',
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.all(16),
-                      filled: true,
-                      fillColor: Colors.grey[200],
+                      fillColor: isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
                     ),
                   ),
                   const SizedBox(height: 24),
