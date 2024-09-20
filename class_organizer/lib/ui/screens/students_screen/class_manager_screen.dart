@@ -83,7 +83,7 @@ class ClassManagerScreen extends StatelessWidget {
             ),
             SpeedDialChild(
               child: const Icon(Icons.edit),
-              label: 'Edit Class',
+              label: 'Scanner',
               onTap: () {
                 Navigator.push(
                   context,
