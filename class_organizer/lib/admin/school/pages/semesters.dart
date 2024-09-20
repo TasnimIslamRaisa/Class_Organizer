@@ -1,6 +1,10 @@
-import 'package:flutter/material.dart';
+import 'dart:math';
 
+import 'package:class_organizer/admin/school/pages/semester_course_structure.dart';
+import 'package:class_organizer/utility/unique.dart';
+import 'package:flutter/material.dart';
 import '../../../models/major.dart';
+import '../../../models/semester.dart';
 
 class SemestersPage extends StatefulWidget {
   final Major department;
@@ -12,33 +16,63 @@ class SemestersPage extends StatefulWidget {
 }
 
 class _SemestersPageState extends State<SemestersPage> {
-  final List<Map<String, dynamic>> semesters = [
-    {'name': 'Semester 1', 'sId': 'sem1@example.com', 'uniqueId': '123456789'},
-    {'name': 'Semester 2', 'sId': 'sem2@example.com', 'uniqueId': '987654321'},
-    {'name': 'Semester 3', 'sId': 'sem3@example.com', 'uniqueId': '123456289'},
-    {'name': 'Semester 4', 'sId': 'sem4@example.com', 'uniqueId': '987655321'},
-  ];
+
+  late Major department;
+
+  List<Semester> semesters = [];
 
   @override
   void initState() {
     super.initState();
+    generateSemesters();
+    setState(() {
+      department = widget.department;
+    });
     print(widget.department.mName);
+  }
+
+  void generateSemesters() {
+    final random = Random(); // Used to generate random values if needed
+    for (int i = 1; i <= 12; i++) {
+      Semester semester = Semester(
+        id: i,
+        semName: i,
+        uniqueId: 'SEM_${widget.department.uniqueId}_$i',
+        // sId: 'S${random.nextInt(10000)}',
+        sId: widget.department.sId??"",
+        departmentId: widget.department.uniqueId??"",
+        numSec: 10,
+        numCourses: 0,
+        uId: 'U${random.nextInt(1000)}',
+      );
+
+      semesters.add(semester);
+    }
+    setState(() {
+
+    });
   }
 
   void editSemester(int index) {
     // Handle editing a semester
-    print('Editing ${semesters[index]['name']}');
+    print('Editing ${semesters[index].sId}');
     // You can add a TextField or dialog to actually edit the details.
   }
 
   void duplicateSemester(int index) {
     // Duplicate the semester and add to the list
     setState(() {
-      semesters.add({
-        'name': '${semesters[index]['name']} (Duplicate)',
-        'email': semesters[index]['email'],
-        'phone': semesters[index]['phone'],
-      });
+      final semesterToDuplicate = semesters[index];
+      semesters.add(Semester(
+        semName: semesters.length + 1,
+        id: semesters.length + 1, // Increment ID for new semester
+        uniqueId: '${semesterToDuplicate.uniqueId} (Duplicate)',
+        sId: semesterToDuplicate.sId,
+        departmentId: semesterToDuplicate.departmentId,
+        numSec: semesterToDuplicate.numSec,
+        numCourses: semesterToDuplicate.numCourses,
+        uId: semesterToDuplicate.uId,
+      ));
     });
   }
 
@@ -54,14 +88,16 @@ class _SemestersPageState extends State<SemestersPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('${semester['name']} Details'),
+          title: Text('${semester.sId} Details'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Name: ${semester['name']}'),
-              Text('sId: ${semester['sId']}'),
-              Text('Unique ID: ${semester['uniqueId']}'),
+              Text('Name: ${semester.uniqueId}'),
+              Text('sId: ${semester.sId}'),
+              Text('Unique ID: ${semester.uniqueId}'),
+              Text('Number of Sections: ${semester.numSec}'),
+              Text('Number of Courses: ${semester.numCourses}'),
             ],
           ),
           actions: [
@@ -93,11 +129,11 @@ class _SemestersPageState extends State<SemestersPage> {
         itemCount: semesters.length,
         itemBuilder: (context, index) {
           return Dismissible(
-            key: Key(semesters[index]['name']),
+            key: Key(semesters[index].uniqueId),
             onDismissed: (direction) {
               deleteSemester(index);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${semesters[index]['name']} deleted')),
+                SnackBar(content: Text('${semesters[index].uniqueId} deleted')),
               );
             },
             background: Container(
@@ -113,9 +149,18 @@ class _SemestersPageState extends State<SemestersPage> {
               child: Icon(Icons.delete, color: Colors.white),
             ),
             child: ListTile(
-              title: Text(semesters[index]['name']),
+              title: Text("SEM - ${semesters[index].semName}"),
               onTap: () {
                 showSemesterDetails(index);
+                Future.delayed(const Duration(seconds: 0), () {
+                  Navigator.pop(context);
+                  if (mounted) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SemesterCourseStructure(semester: semesters[index],department: widget.department,)),
+                    );
+                  }
+                });
               },
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -123,15 +168,8 @@ class _SemestersPageState extends State<SemestersPage> {
                   IconButton(
                     icon: Icon(Icons.email, color: Colors.teal),
                     onPressed: () {
-                      final email = semesters[index]['email'];
+                      final email = semesters[index].sId;
                       print('Emailing $email');
-                    },
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.phone, color: Colors.teal),
-                    onPressed: () {
-                      final phone = semesters[index]['phone'];
-                      print('Calling $phone');
                     },
                   ),
                   PopupMenuButton<String>(
@@ -168,11 +206,16 @@ class _SemestersPageState extends State<SemestersPage> {
         onPressed: () {
           // Handle add semester action
           setState(() {
-            semesters.add({
-              'name': 'New Semester',
-              'email': 'newsemester@example.com',
-              'phone': '111111111',
-            });
+            semesters.add(Semester(
+              semName: semesters.length + 1,
+              id: semesters.length + 1, // Increment ID for new semester
+              uniqueId: Unique().generateUniqueID(),
+              sId: widget.department.sId??"",
+              departmentId: widget.department.uniqueId??"",
+              numSec: 10,
+              numCourses: 0,
+              uId: widget.department.deanId??"",
+            ));
           });
         },
         child: Icon(Icons.add),
