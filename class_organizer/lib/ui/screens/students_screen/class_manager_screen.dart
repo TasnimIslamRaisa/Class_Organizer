@@ -5,6 +5,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
 import '../../../models/class_model.dart';
 import '../../../utility/profile_app_bar.dart';
+import '../../../utility/scanner_code.dart';
 import '../../widgets/drawer_widget.dart';
 import '../controller/class_routine_controller.dart';
 import '../seven_days_content/monday_content.dart';
@@ -83,12 +84,12 @@ class ClassManagerScreen extends StatelessWidget {
               },
             ),
             SpeedDialChild(
-              child: const Icon(Icons.edit),
+              child: const Icon(Icons.qr_code_scanner),
               label: 'Scanner',
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (contex) => Scanner()),
+                  MaterialPageRoute(builder: (contex) => ScannerCode()),
                 );
               },
             ),
