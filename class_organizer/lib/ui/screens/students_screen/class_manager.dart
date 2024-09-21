@@ -647,189 +647,244 @@ class _ClassManagerPageState extends State<ClassManagerPage> {
         title: const Text('Class Manager'),
         backgroundColor: Colors.lightBlue, // Changed to sky blue
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: DropdownSearch<Major>(
-                      items: departments,  // Assuming you have a list of faculties
-                      dropdownDecoratorProps: DropDownDecoratorProps(
-                        dropdownSearchDecoration: InputDecoration(
-                          labelText: 'Select Department/Faculty',
-                          prefixIcon: Icon(Icons.person),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                        ),
-                      ),
-                      onChanged: (Major? selectedDepartment) {
-                        setState(() {
-                          _selectedDepartment = selectedDepartment;
-                          department = selectedDepartment!;
-                        });
-                      },
-                      selectedItem: _selectedDepartment,
-                      popupProps: PopupProps.menu(
-                        showSearchBox: true,
-                        itemBuilder: (context, item, isSelected) => ListTile(
-                          title: Text(item.mName ?? 'Unknown Department'),
-                        ),
-                      ),
-                      dropdownBuilder: (context, selectedItem) {
-                        return Text(
-                          selectedItem?.mName ?? "No Department Selected",
-                          style: TextStyle(fontSize: 14),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              // Semester and Section inputs
-              Row(
-                children: [
-                  // Semester dropdown
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                        color: Colors.white, // Changed to white
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.lightBlue),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Semester'),
-                          DropdownButton<int>(
-                            value: selectedSemester,
-                            onChanged: (int? newValue) {
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: DropdownSearch<Major>(
+                            items: departments,  // Assuming you have a list of faculties
+                            dropdownDecoratorProps: DropDownDecoratorProps(
+                              dropdownSearchDecoration: InputDecoration(
+                                labelText: 'Select Department/Faculty',
+                                prefixIcon: Icon(Icons.person),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                            ),
+                            onChanged: (Major? selectedDepartment) {
                               setState(() {
-                                selectedSemester = newValue!;
+                                _selectedDepartment = selectedDepartment;
+                                department = selectedDepartment!;
                               });
                             },
-                            items: List.generate(12, (index) {
-                              return DropdownMenuItem<int>(
-                                value: index + 1, // Semesters 1-8
-                                child: Text('Semester ${index + 1}'),
+                            selectedItem: _selectedDepartment,
+                            popupProps: PopupProps.menu(
+                              showSearchBox: true,
+                              itemBuilder: (context, item, isSelected) => ListTile(
+                                title: Text(item.mName ?? 'Unknown Department'),
+                              ),
+                            ),
+                            dropdownBuilder: (context, selectedItem) {
+                              return Text(
+                                selectedItem?.mName ?? "No Department Selected",
+                                style: TextStyle(fontSize: 14),
                               );
-                            }),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  // Section dropdown
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                        color: Colors.white, // Changed to white
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.lightGreen),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Section'),
-                          DropdownButton<String>(
-                            value: selectedSection,
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectedSection = newValue!;
-                              });
                             },
-                            items: List.generate(20, (index) {
-                              if (index % 2 == 0) {
-                                // Even indices for letters
-                                String sectionLetter = String.fromCharCode(65 + index ~/ 2); // A-J
-                                return DropdownMenuItem(
-                                  value: sectionLetter,
-                                  child: Text(sectionLetter),
-                                );
-                              } else {
-                                // Odd indices for numbers
-                                String sectionNumber = ((index + 1) ~/ 2).toString(); // 1-10
-                                return DropdownMenuItem(
-                                  value: sectionNumber,
-                                  child: Text(sectionNumber),
-                                );
-                              }
-                            }),
-        
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-        
-              // Display selected courses below the Semester and Section containers
-              if (courseStructures.isNotEmpty)
-                Column(
-                  children: courseStructures.map((course) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey.shade400),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
+                    const SizedBox(height: 20),
+                    // Semester and Section inputs
+                    Row(
+                      children: [
+                        // Semester dropdown
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.all(16.0),
+                            decoration: BoxDecoration(
+                              color: Colors.white, // Changed to white
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.lightBlue),
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Course: ${course.subName}'), // Access subName directly from the model
-                                const SizedBox(height: 4),
-                                Text('Section: ${course.section}'), // Access section directly from the model
-                                const SizedBox(height: 4),
-                                Text('Semester: ${course.semester}'), // Access semester directly from the model
+                                const Text('Semester'),
+                                DropdownButton<int>(
+                                  value: selectedSemester,
+                                  onChanged: (int? newValue) {
+                                    setState(() {
+                                      selectedSemester = newValue!;
+                                    });
+                                  },
+                                  items: List.generate(12, (index) {
+                                    return DropdownMenuItem<int>(
+                                      value: index + 1, // Semesters 1-8
+                                      child: Text('Semester ${index + 1}'),
+                                    );
+                                  }),
+                                ),
                               ],
                             ),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.close, color: Colors.black),
-                            onPressed: () {
-                              _removeCourse(course); // Remove the selected course
-                            },
+                        ),
+                        const SizedBox(width: 10),
+                        // Section dropdown
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.all(16.0),
+                            decoration: BoxDecoration(
+                              color: Colors.white, // Changed to white
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.lightGreen),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Section'),
+                                DropdownButton<String>(
+                                  value: selectedSection,
+                                  onChanged: (String? newValue) {
+                                    setState(() {
+                                      selectedSection = newValue!;
+                                    });
+                                  },
+                                  items: List.generate(20, (index) {
+                                    if (index % 2 == 0) {
+                                      // Even indices for letters
+                                      String sectionLetter = String.fromCharCode(65 + index ~/ 2); // A-J
+                                      return DropdownMenuItem(
+                                        value: sectionLetter,
+                                        child: Text(sectionLetter),
+                                      );
+                                    } else {
+                                      // Odd indices for numbers
+                                      String sectionNumber = ((index + 1) ~/ 2).toString(); // 1-10
+                                      return DropdownMenuItem(
+                                        value: sectionNumber,
+                                        child: Text(sectionNumber),
+                                      );
+                                    }
+                                  }),
+              
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+              
+                    // Display selected courses below the Semester and Section containers
+                    if (courseStructures.isNotEmpty)
+                      Column(
+                        children: courseStructures.map((course) {
+                          return Container(
+                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.grey.shade400),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('Course: ${course.subName}'), // Access subName directly from the model
+                                      const SizedBox(height: 4),
+                                      Text('Section: ${course.section}'), // Access section directly from the model
+                                      const SizedBox(height: 4),
+                                      Text('Semester: ${course.semester}'), // Access semester directly from the model
+                                    ],
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.close, color: Colors.black),
+                                  onPressed: () {
+                                    _removeCourse(course); // Remove the selected course
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
+              
+              
+                    const SizedBox(height: 20),
+
+                    // Padding(
+                    //   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    //   child: Row(
+                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //     children: [
+                    //       Expanded(
+                    //         child: ElevatedButton(
+                    //           onPressed: _addNewCourse,
+                    //           child: const Text('ADD NEW COURSE'),
+                    //         ),
+                    //       ),
+                    //       const SizedBox(width: 16), // Space between buttons
+                    //       Expanded(
+                    //         child: ElevatedButton(
+                    //           onPressed: _saveData,
+                    //           child: const Text('SAVE'),
+                    //           style: ElevatedButton.styleFrom(
+                    //             backgroundColor: Colors.blue,
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
+                    // Add new course button
+                    // ElevatedButton(
+                    //   onPressed: _addNewCourse,
+                    //   child: const Text('ADD NEW COURSE'),
+                    // ),
+                    //
+                    // // Save button to persist the courses
+                    // ElevatedButton(
+                    //   onPressed: _saveData, // Save the updated list of courses
+                    //   child: const Text('SAVE'),
+                    //   style: ElevatedButton.styleFrom(
+                    //     backgroundColor: Colors.blue, // Button color
+                    //   ),
+                    // ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+                              
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: _addNewCourse,
+                              child: const Text('ADD NEW COURSE'),
+                            ),
+                          ),
+                          const SizedBox(width: 16), // Space between buttons
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: _saveData,
+                              child: const Text('SAVE STRUCTURE'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                    );
-                  }).toList(),
-                ),
-        
-        
-              const SizedBox(height: 20),
-        
-              // Add new course button
-              ElevatedButton(
-                onPressed: _addNewCourse,
-                child: const Text('ADD NEW COURSE'),
-              ),
-        
-              // Save button to persist the courses
-              ElevatedButton(
-                onPressed: _saveData, // Save the updated list of courses
-                child: const Text('SAVE'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue, // Button color
-                ),
-              ),
-            ],
-          ),
-        ),
+                    ),
+        ],
       ),
     );
   }
