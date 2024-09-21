@@ -124,4 +124,10 @@ class Room {
       syncKey: json['syncKey'],
     );
   }
+
+  @override
+  String toString() {
+    return _roomName ?? '';
+  }
+
 }

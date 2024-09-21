@@ -1,10 +1,20 @@
 import 'dart:convert';
+import 'package:class_organizer/admin/school/pages/departments.dart';
+import 'package:class_organizer/admin/school/pages/routines.dart';
+import 'package:class_organizer/admin/school/pages/sessions.dart';
+import 'package:class_organizer/test/test.dart';
+import 'package:class_organizer/ui/screens/students_screen/campus_routine.dart';
+import 'package:class_organizer/ui/screens/students_screen/class_manager.dart';
+import 'package:class_organizer/ui/screens/students_screen/edit_profile_screen.dart';
+import 'package:class_organizer/ui/screens/students_screen/events_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/user.dart';
 import '../../preference/logout.dart';
+import '../../test/test_v1.dart';
 import '../../ui/screens/auth/SignInScreen.dart';
+import '../../ui/screens/students_screen/academic_calender_screen.dart';
 import '../../ui/screens/students_screen/settings_screen.dart';
 import '../../web/black_box_online.dart';
 
@@ -122,13 +132,15 @@ class _DrawerWidgetState extends State<t_DrawerWidget> {
             title: const Text('PROFILE'),
             onTap: () {
               Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfileScreen()));
             },
           ),
           ListTile(
             leading: const Icon(Icons.bloodtype),
-            title: const Text('BLOODBANK'),
+            title: const Text('Course Structure'),
             onTap: () {
               Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => ClassManagerPage()));
             },
           ),
           ListTile(
@@ -143,7 +155,9 @@ class _DrawerWidgetState extends State<t_DrawerWidget> {
             title: const Text('ROUTINES'),
             onTap: () {
               Navigator.pop(context);
-              _showRoutineForm(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => CampusRoutine()));
+
+              // _showRoutineForm(context);
             },
           ),
           ListTile(
@@ -151,7 +165,9 @@ class _DrawerWidgetState extends State<t_DrawerWidget> {
             title: const Text('SESSION'),
             onTap: () {
               Navigator.pop(context);
-              _showSessionForm(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => SessionListPage()));
+
+              // _showSessionForm(context);
             },
           ),
           ListTile(
@@ -159,7 +175,9 @@ class _DrawerWidgetState extends State<t_DrawerWidget> {
             title: const Text('DEPARTMENT'),
             onTap: () {
               Navigator.pop(context);
-              _showDepartmentForm(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => DepartmentListPage()));
+
+              // _showDepartmentForm(context);
             },
           ),
           ListTile(
@@ -182,6 +200,8 @@ class _DrawerWidgetState extends State<t_DrawerWidget> {
             title: const Text('ACADEMIC - C A L E N D A R'),
             onTap: () {
               Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => AcademicCalender()));
+
             },
           ),
           ListTile(
@@ -189,6 +209,8 @@ class _DrawerWidgetState extends State<t_DrawerWidget> {
             title: const Text('N O T I C E & E V E N T S'),
             onTap: () {
               Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => EventsScreen()));
+
             },
           ),
           ListTile(
@@ -196,6 +218,8 @@ class _DrawerWidgetState extends State<t_DrawerWidget> {
             title: const Text('C L U B - M A N A G E M E N T'),
             onTap: () {
               Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => EventsScreen()));
+
             },
           ),
           ListTile(

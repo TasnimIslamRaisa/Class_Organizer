@@ -1,4 +1,5 @@
 import 'package:class_organizer/teacher/panel/t_drawer_Widget.dart';
+import 'package:class_organizer/teacher/panel/teacher_companion.dart';
 import 'package:class_organizer/ui/screens/students_screen/campus_routine.dart';
 import 'package:class_organizer/ui/screens/students_screen/class_manager_screen.dart';
 import 'package:class_organizer/ui/screens/students_screen/edit_profile_screen.dart';
@@ -41,7 +42,7 @@ class _TeacherPanelState extends State<TeacherPanel> {
           });
         },
         children: [
-          const StudentCompanionScreen(),
+          const TeacherCompanion(),
           ClassManagerScreen(),
           const CampusRoutine(),
           const AcademicCalender(),

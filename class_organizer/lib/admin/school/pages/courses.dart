@@ -765,8 +765,10 @@ class _CoursesListPageState extends State<CoursesListPage> {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
         controller: controller,
-        keyboardType: TextInputType.number,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly], // Restrict to digits only
+        keyboardType: TextInputType.numberWithOptions(decimal: true),
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
+        ],
         decoration: InputDecoration(
           border: const UnderlineInputBorder(),
           labelText: labelText,
@@ -775,7 +777,6 @@ class _CoursesListPageState extends State<CoursesListPage> {
       ),
     );
   }
-
 
   Widget _buildForm(BuildContext context, String title, List<Widget> fields) {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;

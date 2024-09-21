@@ -1,3 +1,8 @@
+import 'package:class_organizer/admin/school/pages/routines.dart';
+import 'package:class_organizer/admin/school/school_setup.dart';
+import 'package:class_organizer/ui/screens/students_screen/academic_calender_screen.dart';
+import 'package:class_organizer/ui/screens/students_screen/events_screen.dart';
+import 'package:class_organizer/ui/screens/students_screen/notes_screen.dart';
 import 'package:class_organizer/web/black_box.dart';
 import 'package:class_organizer/web/black_box_online.dart';
 import 'package:flutter/material.dart';
@@ -123,9 +128,11 @@ class _DrawerWidgetAdminState extends State<DrawerWidgetAdmin> {
           ),
           ListTile(
             leading: const Icon(Icons.bloodtype),
-            title: const Text('B L O O D B A N K'),
+            title: const Text('School'),
             onTap: () {
               Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const SchoolSetup()));
+
             },
           ),
           ListTile(
@@ -133,6 +140,8 @@ class _DrawerWidgetAdminState extends State<DrawerWidgetAdmin> {
             title: const Text('N O T E S & T A S K S'),
             onTap: () {
               Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) =>  NotesScreen()));
+
             },
           ),
           ListTile(
@@ -140,6 +149,8 @@ class _DrawerWidgetAdminState extends State<DrawerWidgetAdmin> {
             title: const Text('R O U T I N E S'),
             onTap: () {
               Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) =>  RoutinesListPage()));
+
             },
           ),
           ListTile(
@@ -154,6 +165,8 @@ class _DrawerWidgetAdminState extends State<DrawerWidgetAdmin> {
             title: const Text('ACADEMIC - C A L E N D A R'),
             onTap: () {
               Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const AcademicCalender()));
+
             },
           ),
           ListTile(
@@ -161,6 +174,8 @@ class _DrawerWidgetAdminState extends State<DrawerWidgetAdmin> {
             title: const Text('N O T I C E & E V E N T S'),
             onTap: () {
               Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const EventsScreen()));
+
             },
           ),
           ListTile(

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 import '../../utility/profile_app_bar_admin.dart';
 import '../widgets/drawer_widget_admin.dart';
+import 'admin_comopanion.dart';
 class AdminPanel extends StatefulWidget {
   const AdminPanel({super.key});
 
@@ -38,7 +39,7 @@ class _AdminPanelState extends State<AdminPanel> {
           });
         },
         children:  [
-          StudentCompanionScreen(),
+          AdminComopanion(),
           ClassManagerScreen(),
           CampusRoutine(),
           AcademicCalender(),

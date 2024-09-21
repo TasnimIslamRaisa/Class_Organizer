@@ -157,4 +157,61 @@ class Teacher {
       syncKey: map['syncKey'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': _id,
+      'sId': _sId,
+      'uniqueId': _uniqueId,
+      'designation': _designation,
+      'tName': _tName,
+      'tPhone': _tPhone,
+      'tPass': _tPass,
+      'tEmail': _tEmail,
+      'tAddress': _tAddress,
+      'aStatus': _aStatus,
+      'tMajor': _tMajor,
+      'tBal': _tBal,
+      'tLogo': _tLogo,
+      'tId': _tId,
+      'uType': _uType,
+      'proPic': _proPic != null ? _proPic!.toList() : null, // Uint8List needs to be converted to List<int>
+      'nidBirth': _nidBirth,
+      'uId': _uId,
+      'syncStatus': _syncStatus,
+      'syncKey': _syncKey,
+    };
+  }
+
+  // Parse a Map (from JSON) to create a Teacher object
+  factory Teacher.fromJson(Map<String, dynamic> json) {
+    return Teacher(
+      id: json['id'],
+      sId: json['sId'],
+      uniqueId: json['uniqueId'],
+      designation: json['designation'],
+      tName: json['tName'],
+      tPhone: json['tPhone'],
+      tPass: json['tPass'],
+      tEmail: json['tEmail'],
+      tAddress: json['tAddress'],
+      aStatus: json['aStatus'],
+      tMajor: json['tMajor'],
+      tBal: json['tBal'],
+      tLogo: json['tLogo'],
+      tId: json['tId'],
+      uType: json['uType'],
+      proPic: json['proPic'] != null ? Uint8List.fromList(List<int>.from(json['proPic'])) : null,
+      nidBirth: json['nidBirth'],
+      uId: json['uId'],
+      syncStatus: json['syncStatus'],
+      syncKey: json['syncKey'],
+    );
+  }
+
+  @override
+  String toString() {
+    return _tName ?? "";
+  }
+
 }

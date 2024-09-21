@@ -1,5 +1,18 @@
+import 'dart:convert';
+
 import 'package:class_organizer/models/schedule_item.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../../models/rooms.dart';
+import '../../../../models/school.dart';
+import '../../../../models/subject.dart';
+import '../../../../models/teacher.dart';
+import '../../../../models/user.dart';
+import '../../../../preference/logout.dart';
 
 class AddScheduleScreen extends StatefulWidget {
   final void Function(ScheduleItem) onAddClass;
@@ -21,6 +34,258 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
   final _roomController = TextEditingController();
 
   String selectedDay = 'Everyday';
+
+  final _databaseRef = FirebaseDatabase.instance.ref();
+  List<Subject> availableSubjects = [];
+  List<Room> rooms = [];
+  List<Teacher> teachers = [];
+  Subject? selectedSubject;
+  School? school;
+  String? userName;
+  String? userPhone;
+  String? userEmail;
+  User? _user, _user_data;
+  String? sid;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+    _loadCoursesData();
+    _loadRoomsData();
+    _loadTeachersData();
+  }
+  Future<void> _loadUserData() async {
+    Logout logout = Logout();
+    User? user = await logout.getUserDetails(key: 'user_data');
+
+    Map<String, dynamic>? userMap = await logout.getUser(key: 'user_logged_in');
+    Map<String, dynamic>? schoolMap = await logout.getSchool(key: 'school_data');
+
+    if (userMap != null) {
+      User user_data = User.fromMap(userMap);
+      setState(() {
+        _user_data = user_data;
+      });
+    } else {
+      print("User map is null");
+    }
+
+    if (schoolMap != null) {
+      School schoolData = School.fromMap(schoolMap);
+      setState(() {
+        _user = user;
+        school = schoolData;
+        sid = school?.sId;
+        print(schoolData.sId);
+      });
+    } else {
+      print("School data is null");
+    }
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userDataString = prefs.getString('user_logged_in');
+
+    if (userDataString != null) {
+      Map<String, dynamic> userData = jsonDecode(userDataString);
+      setState(() {
+        userName = userData['uname'];
+        userPhone = userData['phone'];
+        userEmail = userData['email'];
+      });
+    }
+  }
+
+  Future<void> _loadCoursesData() async {
+    if (await InternetConnectionChecker().hasConnection) {
+
+
+      // Reference to the subjects node in Firebase
+      DatabaseReference coursesRef = _databaseRef.child('subjects');
+
+      // Query subjects based on the current school's sId
+      Query query = coursesRef.orderByChild('sId').equalTo(school?.sId);
+
+      query.once().then((DatabaseEvent event) {
+        final dataSnapshot = event.snapshot;
+
+        if (dataSnapshot.exists) {
+          final Map<dynamic, dynamic> coursesData = dataSnapshot.value as Map<dynamic, dynamic>;
+
+          setState(() {
+            availableSubjects = coursesData.entries.map((entry) {
+              Map<String, dynamic> subjectMap = {
+                'id': entry.value['id'] ?? null,
+                'subName': entry.value['subName'] ?? '',
+                'uniqueId': entry.value['uniqueId'] ?? null,
+                'sync_key': entry.value['sync_key'] ?? null,
+                'sync_status': entry.value['sync_status'] ?? null,
+                'subCode': entry.value['subCode'] ?? '',
+                'credit': entry.value['credit'] ?? 0,
+                'subFee': entry.value['subFee'] ?? 0,
+                'depId': entry.value['depId'] ?? null,
+                'typeId': entry.value['typeId'] ?? null,
+                'status': entry.value['status'] ?? null,
+                'semester': entry.value['semester'] ?? null,
+                'program': entry.value['program'] ?? null,
+                'sId': entry.value['sId'] ?? null,
+              };
+              return Subject.fromMap(subjectMap);
+            }).toList();
+
+          });
+        } else {
+          print('No courses data available for the current school.');
+
+        }
+      }).catchError((error) {
+        print('Failed to load courses data: $error');
+
+      });
+    } else {
+      // Handle offline mode
+
+      showSnackBarMsg(context, "You are in Offline mode now, Please, connect to the Internet!");
+
+      try {
+        final String response = await rootBundle.loadString('assets/subjects.json');
+        final data = json.decode(response) as List<dynamic>;
+
+        setState(() {
+          availableSubjects = data.map((json) => Subject.fromJson(json)).toList();
+        });
+      } catch (error) {
+        print('Failed to load local subjects data: $error');
+      }
+    }
+  }
+
+  Future<void> _loadRoomsData() async {
+    if (await InternetConnectionChecker().hasConnection) {
+
+      // Reference to the rooms node in Firebase
+      DatabaseReference roomsRef = _databaseRef.child('rooms');
+
+      // Query rooms that match the current school's sId
+      Query query = roomsRef.orderByChild('sId').equalTo(school?.sId);
+
+      query.once().then((DatabaseEvent event) {
+        final dataSnapshot = event.snapshot;
+
+        if (dataSnapshot.exists) {
+          final Map<dynamic, dynamic> roomsData = dataSnapshot.value as Map<dynamic, dynamic>;
+
+          setState(() {
+            rooms = roomsData.entries.map((entry) {
+              final Map<String, dynamic> roomMap = {
+                'id': entry.value['id'],
+                'userid': entry.value['userid'],
+                'campus_id': entry.value['campus_id'],
+                'room_name': entry.value['room_name'],
+                'instructor_id': entry.value['instructor_id'],
+                'room_code': entry.value['room_code'],
+                'sId': entry.value['sId'],
+                'status': entry.value['status'],
+                'theory_lab': entry.value['theory_lab'],
+                'sync_status': entry.value['sync_status'],
+                'sync_key': entry.value['sync_key'],
+              };
+              return Room.fromMap(roomMap);
+            }).toList();
+
+          });
+        } else {
+          print('No Rooms data available for the current school.');
+
+        }
+      }).catchError((error) {
+        print('Failed to load rooms data: $error');
+
+      });
+    } else {
+      // Handle offline mode
+
+      showSnackBarMsg(context, "You are in Offline mode now, Please, connect Internet!");
+
+      final String response = await rootBundle.loadString('assets/rooms.json');
+      final data = json.decode(response) as List<dynamic>;
+      setState(() {
+        rooms = data.map((json) => Room.fromJson(json)).toList();
+      });
+    }
+  }
+
+  Future<void> _loadTeachersData() async {
+    if (await InternetConnectionChecker().hasConnection) {
+
+      // Reference to the teachers node in Firebase
+      DatabaseReference teachersRef = _databaseRef.child('teachers');
+
+      // Query teachers that match the current school's sId
+      Query query = teachersRef.orderByChild('sId').equalTo(school?.sId);
+
+      query.once().then((DatabaseEvent event) {
+        final dataSnapshot = event.snapshot;
+
+        if (dataSnapshot.exists) {
+          final Map<dynamic, dynamic> teachersData = dataSnapshot.value as Map<dynamic, dynamic>;
+
+          setState(() {
+            // Convert the teachers data into a list of Teacher objects
+            teachers = teachersData.entries.map((entry) {
+              Map<String, dynamic> teacherMap = {
+                'id': entry.value['id'] ?? null,
+                'sId': entry.value['sId'] ?? null,
+                'uniqueId': entry.value['uniqueId'] ?? null,
+                'designation': entry.value['designation'] ?? null,
+                'tName': entry.value['tName'] ?? null,
+                'tPhone': entry.value['tPhone'] ?? null,
+                'tPass': entry.value['tPass'] ?? null,
+                'tEmail': entry.value['tEmail'] ?? null,
+                'tAddress': entry.value['tAddress'] ?? null,
+                'aStatus': entry.value['aStatus'] ?? 0,
+                'tMajor': entry.value['tMajor'] ?? null,
+                'tBal': entry.value['tBal'] ?? null,
+                'tLogo': entry.value['tLogo'] ?? null,
+                'tId': entry.value['tId'] ?? null,
+                'uType': entry.value['uType'] ?? null,
+                'proPic': entry.value['proPic'] != null ? Uint8List.fromList(List<int>.from(entry.value['proPic'])) : null,
+                'nidBirth': entry.value['nidBirth'] ?? null,
+                'uId': entry.value['uId'] ?? null,
+                'syncStatus': entry.value['syncStatus'] ?? 0,
+                'syncKey': entry.value['syncKey'] ?? null,
+              };
+              return Teacher.fromJson(teacherMap);
+            }).toList();
+
+          });
+        } else {
+          print('No teachers data available for the current school.');
+
+        }
+      }).catchError((error) {
+        print('Failed to load teachers data: $error');
+
+      });
+    } else {
+
+      showSnackBarMsg(context, "You are in Offline mode now, Please, connect to the Internet!");
+
+      final String response = await rootBundle.loadString('assets/teachers.json');
+      final data = json.decode(response) as List<dynamic>;
+      setState(() {
+        teachers = data.map((json) => Teacher.fromJson(json)).toList();
+      });
+    }
+  }
+
+  void showSnackBarMsg(BuildContext context, String message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      duration: const Duration(seconds: 2),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
 
   // Time picker for better time input
   Future<void> _selectTime(BuildContext context, TextEditingController controller) async {
@@ -94,47 +359,212 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
                 },
               ),
               const SizedBox(height: 8),
-              TextFormField(
-                controller: _subNameController,
-                decoration: const InputDecoration(
-                  labelText: 'Subject Name',
-                  prefixIcon: Icon(Icons.book),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a subject name';
+
+
+              // TextFormField(
+              //   controller: _subNameController,
+              //   decoration: const InputDecoration(
+              //     labelText: 'Subject Name',
+              //     prefixIcon: Icon(Icons.book),
+              //   ),
+              //   validator: (value) {
+              //     if (value == null || value.isEmpty) {
+              //       return 'Please enter a subject name';
+              //     }
+              //     return null;
+              //   },
+              // ),
+
+              Autocomplete<Subject>(
+                optionsBuilder: (TextEditingValue textEditingValue) {
+                  if (textEditingValue.text.isEmpty) {
+                    return const Iterable<Subject>.empty();
                   }
-                  return null;
+                  return availableSubjects.where((subject) =>
+                      subject.subName!.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+                },
+                displayStringForOption: (Subject subject) => subject.subName ?? '',
+                onSelected: (Subject selected) {
+                  setState(() {
+                    selectedSubject = selected;
+                    _subNameController.text = selected.subName ?? '';
+                    _subCodeController.text = selected.subCode ?? '';
+                  });
+                },
+                fieldViewBuilder: (BuildContext context, TextEditingController textEditingController, FocusNode focusNode, VoidCallback onFieldSubmitted) {
+                  return TextFormField(
+                    controller: textEditingController,
+                    focusNode: focusNode,
+                    decoration: const InputDecoration(
+                      labelText: 'Subject Name',
+                      prefixIcon: Icon(Icons.book),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please select a subject';
+                      }
+                      return null;
+                    },
+                  );
+                },
+                optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<Subject> onSelected, Iterable<Subject> options) {
+                  return Align(
+                    alignment: Alignment.topLeft,
+                    child: Material(
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        color: Colors.white,
+                        child: ListView.builder(
+                          padding: EdgeInsets.zero,
+                          itemCount: options.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            final Subject option = options.elementAt(index);
+                            return ListTile(
+                              title: Text(option.subName ?? ''),
+                              onTap: () {
+                                onSelected(option);
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  );
                 },
               ),
+
+
+
               const SizedBox(height: 8),
-              TextFormField(
-                controller: _subCodeController,
-                decoration: const InputDecoration(
-                  labelText: 'Subject Code',
-                  prefixIcon: Icon(Icons.code),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a subject code';
+
+
+
+              // TextFormField(
+              //   controller: _subCodeController,
+              //   decoration: const InputDecoration(
+              //     labelText: 'Subject Code',
+              //     prefixIcon: Icon(Icons.code),
+              //   ),
+              //   validator: (value) {
+              //     if (value == null || value.isEmpty) {
+              //       return 'Please enter a subject code';
+              //     }
+              //     return null;
+              //   },
+              // ),
+
+
+              Autocomplete<Subject>(
+                optionsBuilder: (TextEditingValue textEditingValue) {
+                  if (textEditingValue.text.isEmpty) {
+                    return const Iterable<Subject>.empty();
                   }
-                  return null;
+                  return availableSubjects.where((subject) =>
+                      subject.subCode!.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+                },
+                displayStringForOption: (Subject subject) => subject.subCode ?? '',
+                onSelected: (Subject selected) {
+                  setState(() {
+                    selectedSubject = selected;
+                    _subNameController.text = selected.subName ?? '';
+                    _subCodeController.text = selected.subCode ?? '';
+                  });
+                },
+                fieldViewBuilder: (BuildContext context, TextEditingController textEditingController, FocusNode focusNode, VoidCallback onFieldSubmitted) {
+                  return TextFormField(
+                    controller: textEditingController,
+                    focusNode: focusNode,
+                    decoration: const InputDecoration(
+                      labelText: 'Subject Code',
+                      prefixIcon: Icon(Icons.code),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please select a subject code';
+                      }
+                      return null;
+                    },
+                  );
+                },
+                optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<Subject> onSelected, Iterable<Subject> options) {
+                  return Align(
+                    alignment: Alignment.topLeft,
+                    child: Material(
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        color: Colors.white,
+                        child: ListView.builder(
+                          padding: EdgeInsets.zero,
+                          itemCount: options.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            final Subject option = options.elementAt(index);
+                            return ListTile(
+                              title: Text(option.subCode ?? ''),
+                              onTap: () {
+                                onSelected(option);
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  );
                 },
               ),
+
+
               const SizedBox(height: 8),
-              TextFormField(
-                controller: _teacherController,
-                decoration: const InputDecoration(
-                  labelText: 'Teacher Name',
-                  prefixIcon: Icon(Icons.person),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter the teacher\'s name';
-                  }
-                  return null;
-                },
-              ),
+
+
+              // TextFormField(
+              //   controller: _teacherController,
+              //   decoration: const InputDecoration(
+              //     labelText: 'Teacher Name',
+              //     prefixIcon: Icon(Icons.person),
+              //   ),
+              //   validator: (value) {
+              //     if (value == null || value.isEmpty) {
+              //       return 'Please enter the teacher\'s name';
+              //     }
+              //     return null;
+              //   },
+              // ),
+
+            Autocomplete<Teacher>(
+              optionsBuilder: (TextEditingValue textEditingValue) {
+                if (textEditingValue.text.isEmpty) {
+                  return const Iterable<Teacher>.empty();
+                }
+                // Assuming `availableTeachers` is the list of all teachers
+                return teachers.where((Teacher teacher) =>
+                teacher.tName!.toLowerCase().contains(textEditingValue.text.toLowerCase()) ||
+                    teacher.tEmail!.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+              },
+              displayStringForOption: (Teacher teacher) => teacher.tName ?? '',
+              onSelected: (Teacher selectedTeacher) {
+                _teacherController.text = selectedTeacher.tName!;
+                // Do something with the selected teacher, e.g., save the ID
+              },
+              fieldViewBuilder: (BuildContext context, TextEditingController textEditingController, FocusNode focusNode, VoidCallback onFieldSubmitted) {
+                return TextFormField(
+                  controller: textEditingController,
+                  focusNode: focusNode,
+                  decoration: const InputDecoration(
+                    labelText: 'Teacher Name',
+                    prefixIcon: Icon(Icons.person),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the teacher\'s name';
+                    }
+                    return null;
+                  },
+                );
+              },
+            ),
+
+
+
               const SizedBox(height: 8),
               TextFormField(
                 controller: _sectionController,
@@ -182,19 +612,80 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
                 },
               ),
               const SizedBox(height: 8),
-              TextFormField(
-                controller: _roomController,
-                decoration: const InputDecoration(
-                  labelText: 'Room',
-                  prefixIcon: Icon(Icons.room),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter the room';
+
+
+              // TextFormField(
+              //   controller: _roomController,
+              //   decoration: const InputDecoration(
+              //     labelText: 'Room',
+              //     prefixIcon: Icon(Icons.room),
+              //   ),
+              //   validator: (value) {
+              //     if (value == null || value.isEmpty) {
+              //       return 'Please enter the room';
+              //     }
+              //     return null;
+              //   },
+              // ),
+
+              Autocomplete<Room>(
+                optionsBuilder: (TextEditingValue textEditingValue) {
+                  if (textEditingValue.text.isEmpty) {
+                    return const Iterable<Room>.empty();
                   }
-                  return null;
+                  return rooms.where((room) =>
+                  room.roomName!.toLowerCase().contains(textEditingValue.text.toLowerCase()) ||
+                      room.roomCode!.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+                },
+                displayStringForOption: (Room room) => room.roomName ?? '',
+                onSelected: (Room selectedRoom) {
+                  setState(() {
+                    _roomController.text = selectedRoom.roomName ?? '';
+                  });
+                },
+                fieldViewBuilder: (BuildContext context, TextEditingController textEditingController, FocusNode focusNode, VoidCallback onFieldSubmitted) {
+                  return TextFormField(
+                    controller: textEditingController,
+                    focusNode: focusNode,
+                    decoration: const InputDecoration(
+                      labelText: 'Room',
+                      prefixIcon: Icon(Icons.room),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please select a room';
+                      }
+                      return null;
+                    },
+                  );
+                },
+                optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<Room> onSelected, Iterable<Room> options) {
+                  return Align(
+                    alignment: Alignment.topLeft,
+                    child: Material(
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        color: Colors.white,
+                        child: ListView.builder(
+                          padding: EdgeInsets.zero,
+                          itemCount: options.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            final Room option = options.elementAt(index);
+                            return ListTile(
+                              title: Text('${option.roomName} (${option.roomCode})'),
+                              onTap: () {
+                                onSelected(option);
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  );
                 },
               ),
+
+
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () => _submitForm(context),
