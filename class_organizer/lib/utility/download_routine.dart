@@ -16,16 +16,16 @@ import '../preference/logout.dart';
 import '../ui/screens/controller/schedule_controller.dart';
 import '../web/internet_connectivity.dart';
 
-class DownloadPage extends StatefulWidget {
+class DownloadRoutine extends StatefulWidget {
   final String scannedCode;
 
-  DownloadPage({required this.scannedCode});
+  DownloadRoutine({required this.scannedCode});
 
   @override
-  _DownloadPageState createState() => _DownloadPageState();
+  _DownloadRoutineState createState() => _DownloadRoutineState();
 }
 
-class _DownloadPageState extends State<DownloadPage> {
+class _DownloadRoutineState extends State<DownloadRoutine> {
   Routine? routine;
   bool isLoading = true;
 
@@ -270,24 +270,138 @@ class _DownloadPageState extends State<DownloadPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Download Routine'),
+        title: Text('Routine and Schedule'),
       ),
       body: Center(
         child: isLoading
             ? CircularProgressIndicator() // Show loading indicator while fetching data
             : routine != null
             ? Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'Routine Details',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            // Top Routine Card
+            Card(
+              color: Colors.redAccent,
+              margin: EdgeInsets.all(8),
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Save this Routine on Schedule List!',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      'Routine Name: ${routine?.tempName ?? ''}',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    Text(
+                      'Routine Details: ${routine?.tempDetails ?? ''}',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    SizedBox(height: 10),
+                    Container(
+                      height: 50, // Increased the height for better visibility
+                      decoration: BoxDecoration(
+                        color: Colors.blueAccent, // Background color for the container
+                        borderRadius: BorderRadius.circular(12), // Rounded corners
+                        border: Border.all(
+                          color: Colors.white, // Border color
+                          width: 2, // Border width
+                        ),
+                      ),
+                      child: Center(
+                        child: (schedules.isNotEmpty)
+                            ? ElevatedButton(
+                          onPressed: () {
+                            // Add your save all functionality here
+                          },
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white, backgroundColor: Colors.orange, // Text color of the button
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8), // Rounded corners for button
+                            ),
+                          ),
+                          child: Text(
+                            'Save All Schedules',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        )
+                            : Text(
+                          'Empty Schedules',
+                          style: TextStyle(
+                            color: Colors.white, // Text color for empty message
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    )
+
+
+
+                  ],
+                ),
+              ),
             ),
-            const SizedBox(height: 20),
-            Text('Name: ${routine?.tempName}', style: TextStyle(fontSize: 18)),
-            Text('Code: ${routine?.tempCode}', style: TextStyle(fontSize: 18)),
-            Text('Details: ${routine?.tempDetails}', style: TextStyle(fontSize: 18)),
-            Text('Number: ${routine?.tempNum}', style: TextStyle(fontSize: 18)),
+            // Search Bar
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                decoration: InputDecoration(
+                  labelText: 'Search...',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.search),
+                ),
+                onChanged: (value) {
+                  // Add search functionality based on the schedules list here
+                  // You can filter scheduleItems based on the search query
+                },
+              ),
+            ),
+            // Schedule Items List
+            Expanded(
+              child: schedules.isEmpty
+                  ? Center(child: Text('No schedules available!'))
+                  : ListView.builder(
+                itemCount: schedules.length,
+                itemBuilder: (context, index) {
+                  final schedule = schedules[index];
+                  return Card(
+                    margin: EdgeInsets.all(8),
+                    child: ListTile(
+                      title: Text(
+                        schedule.subName ?? "",
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Teacher: ${schedule.tName}'),
+                          Text('Room: ${schedule.room}'),
+                          Text('Time: ${schedule.startTime} - ${schedule.endTime}'),
+                        ],
+                      ),
+                      trailing: IconButton(
+                        icon: Icon(Icons.details),
+                        onPressed: () {
+                          // Add functionality to view detailed schedule information
+                        },
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           ],
         )
             : Text(
@@ -295,6 +409,7 @@ class _DownloadPageState extends State<DownloadPage> {
           style: TextStyle(fontSize: 18),
         ),
       ),
+
       floatingActionButton: Stack(
         children: <Widget>[
           // First Floating Action Button (left)
