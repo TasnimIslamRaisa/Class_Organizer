@@ -42,7 +42,8 @@ class _ScannerState extends State<Scanner> {
               child: (scannedCode.isNotEmpty)
                   ? ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
+                  // Navigator.pop(context);
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (context) =>

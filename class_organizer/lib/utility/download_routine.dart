@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:class_organizer/utility/unique.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 import '../admin/school/schedule/weekly_schedules.dart';
 import '../models/routine.dart';
 import '../models/schedule_item.dart';
@@ -46,6 +48,7 @@ class _DownloadRoutineState extends State<DownloadRoutine> {
   final _formKey = GlobalKey<FormState>();
   String? sid;
   School? school;
+  String? tidCode ;
 
   @override
   void initState() {
@@ -53,6 +56,12 @@ class _DownloadRoutineState extends State<DownloadRoutine> {
 
     if(widget.scannedCode!=''){
       _retrieveRoutine(widget.scannedCode);
+    }
+
+    if(routine!=null){
+      loadSchedules(routine!);
+    }else{
+      print("empty routine");
     }
 
     _loadUserData();
@@ -78,7 +87,7 @@ class _DownloadRoutineState extends State<DownloadRoutine> {
       if (status == InternetConnectionStatus.connected) {
         isConnected = true;
         print('Connected to the internet');
-        // loadSchedules(routine);
+        // loadSchedules(routine!);
       } else {
         isConnected = false;
         print('Disconnected from the internet');
@@ -136,19 +145,19 @@ class _DownloadRoutineState extends State<DownloadRoutine> {
   }
 
   Future<void> loadSchedules(Routine routine) async {
-    if (await InternetConnectionChecker().hasConnection) {
-      setState(() {
-        _isLoading = true;
-      });
+    try {
+      if (await InternetConnectionChecker().hasConnection) {
+        setState(() {
+          _isLoading = true;
+        });
 
-      // Reference to the schedules node in Firebase
-      DatabaseReference schedulesRef = _databaseRef.child('schedules');
+        // Reference to the schedules node in Firebase
+        DatabaseReference schedulesRef = _databaseRef.child('schedules');
 
-      // Query schedules that match the given tempCode from the routine
-      Query query = schedulesRef.orderByChild('temp_code').equalTo(routine.tempCode);
+        // Query schedules that match the given tempCode from the routine
+        Query query = schedulesRef.orderByChild('temp_code').equalTo(routine.tempCode);
 
-      query.once().then((DatabaseEvent event) {
-        final dataSnapshot = event.snapshot;
+        DataSnapshot dataSnapshot = await query.get();
 
         if (dataSnapshot.exists) {
           final Map<dynamic, dynamic> schedulesData = dataSnapshot.value as Map<dynamic, dynamic>;
@@ -177,7 +186,9 @@ class _DownloadRoutineState extends State<DownloadRoutine> {
               'sync_key': entry.value['sync_key'] ?? '',
               'min': entry.value['min'] ?? 0,
               'sync_status': entry.value['sync_status'] ?? 0,
-              'dateTime': entry.value['dateTime'] != null ? DateTime.parse(entry.value['dateTime']) : null,
+              'dateTime': entry.value['dateTime'] != null
+                  ? DateTime.parse(entry.value['dateTime'])
+                  : null,
             };
             return ScheduleItem.fromMap(scheduleMap);
           }).toList();
@@ -186,6 +197,7 @@ class _DownloadRoutineState extends State<DownloadRoutine> {
           scheduleController.setSchedules(fetchedSchedules);
 
           setState(() {
+            schedules = fetchedSchedules;
             _isLoading = false;
           });
         } else {
@@ -194,20 +206,21 @@ class _DownloadRoutineState extends State<DownloadRoutine> {
             _isLoading = false;
           });
         }
-      }).catchError((error) {
-        print('Failed to load schedules: $error');
+      } else {
+        // Handle offline mode
         setState(() {
           _isLoading = false;
         });
-      });
-    } else {
-      // Handle offline mode
+        showSnackBarMsg(context, "You are offline. Please connect to the internet.");
+      }
+    } catch (error) {
+      print('Failed to load schedules: $error');
       setState(() {
         _isLoading = false;
       });
-      showSnackBarMsg(context, "You are offline. Please connect to the internet.");
     }
   }
+
 
   void showSnackBarMsg(BuildContext context, String message) {
     final snackBar = SnackBar(
@@ -234,6 +247,8 @@ class _DownloadRoutineState extends State<DownloadRoutine> {
 
         setState(() {
           routine = Routine.fromMap(Map<String, dynamic>.from(routineMap));
+          tidCode = routine?.tempCode;
+          print(tidCode);
           isLoading = false;
         });
       } else {
@@ -248,6 +263,9 @@ class _DownloadRoutineState extends State<DownloadRoutine> {
 
           setState(() {
             routine = Routine.fromMap(Map<String, dynamic>.from(routineMap));
+            tidCode = routine?.tempCode;
+            print(tidCode);
+            loadSchedules(routine!);
             isLoading = false;
           });
         } else {
@@ -265,6 +283,71 @@ class _DownloadRoutineState extends State<DownloadRoutine> {
       });
     }
   }
+
+  void saveNewRoutine(Routine routine) async {
+    await _loadUserData();
+    String uniqueId = Unique().generateUniqueID();
+    var uuid = Uuid();
+
+    if (routine != null) {
+      routine.tId = tidCode;
+      routine.stdId = routine.tempNum;
+      routine.sId = _user?.uniqueid;
+      routine.uId = _user?.uniqueid;
+      routine.uniqueId = uniqueId;
+      routine.tempCode = uuid.v4();
+      routine.tempNum = Unique().generateHexCode();
+
+      if (await InternetConnectionChecker().hasConnection) {
+        DatabaseReference routinesRef = FirebaseDatabase.instance.ref("routines");
+        Query query = routinesRef.orderByChild('tId').equalTo(tidCode);
+
+        DataSnapshot snapshot = await query.get();
+
+        if (snapshot.exists) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Routine with these Schedules already exists!')),
+          );
+          return; // Exit the function if routine already exists
+        } else {
+          // Proceed with saving the routine if it doesn't exist
+          if (routine.uniqueId != null && routine.uniqueId!.isNotEmpty) {
+            final DatabaseReference routineRef = FirebaseDatabase.instance
+                .ref("routines")
+                .child(routine.uniqueId!);
+
+            routineRef.set(routine.toMap()).then((_) {
+              setState(() {
+                saveSchedules(routine);
+              });
+              // Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Routine added')),
+              );
+            }).catchError((error) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Failed to add routine: $error')),
+              );
+              print("Error adding routine: $error");
+            });
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Invalid unique ID')),
+            );
+          }
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No internet connection')),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please fill all fields')),
+      );
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -318,8 +401,11 @@ class _DownloadRoutineState extends State<DownloadRoutine> {
                       child: Center(
                         child: (schedules.isNotEmpty)
                             ? ElevatedButton(
-                          onPressed: () {
-                            // Add your save all functionality here
+                          onPressed: () async {
+
+                              if(schedules!=null){
+                                saveNewRoutine(routine!);
+                              }
                           },
                           style: ElevatedButton.styleFrom(
                             foregroundColor: Colors.white, backgroundColor: Colors.orange, // Text color of the button
@@ -337,7 +423,7 @@ class _DownloadRoutineState extends State<DownloadRoutine> {
                           ),
                         )
                             : Text(
-                          'Empty Schedules',
+                          'Load Schedules',
                           style: TextStyle(
                             color: Colors.white, // Text color for empty message
                             fontSize: 16,
@@ -418,12 +504,12 @@ class _DownloadRoutineState extends State<DownloadRoutine> {
             bottom: 20,
             child: FloatingActionButton(
               onPressed: () async {
-
+                  saveNewRoutine(routine!);
                 setState(() {
 
                 });
               },
-              child: Icon(Icons.cloud_download_rounded),
+              child: Icon(Icons.save_outlined),
               backgroundColor: Colors.teal,
             ),
           ),
@@ -453,7 +539,7 @@ class _DownloadRoutineState extends State<DownloadRoutine> {
                   // Add any additional functionality here for the second floating action button
                 });
               },
-              child: Icon(Icons.check_box),
+              child: Icon(Icons.navigate_next_outlined),
               backgroundColor: Colors.purple,
             ),
           ),
@@ -461,5 +547,64 @@ class _DownloadRoutineState extends State<DownloadRoutine> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
+  }
+
+  void saveSchedules(Routine routine) async {
+
+    if(schedules.isNotEmpty){
+      await _loadUserData();
+      for(ScheduleItem newSchedule in schedules){
+        String uniqueId = Unique().generateUniqueID();
+        var uuid = Uuid();
+
+        if (newSchedule.subName!.isNotEmpty && newSchedule.subCode!.isNotEmpty) {
+
+          newSchedule.uniqueId = uniqueId;
+          newSchedule.id = null;
+          newSchedule.sId = school?.sId;
+          newSchedule.tempCode = routine.tempCode;
+          newSchedule.tempNum = routine.tempNum;
+          newSchedule.stdId = null;
+          newSchedule.tId = _user?.uniqueid;
+
+
+          if (await InternetConnectionChecker().hasConnection) {
+            if (newSchedule.uniqueId != null && newSchedule.uniqueId!.isNotEmpty) {
+              final DatabaseReference _database = FirebaseDatabase.instance
+                  .ref("schedules")
+                  .child(newSchedule.uniqueId!);
+
+              _database.set(newSchedule.toMap()).then((_) {
+                setState(() {
+                  schedules.add(newSchedule);
+                  scheduleController.addSchedule(newSchedule);
+                });
+
+              }).catchError((error) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Failed to add routine: $error')),
+                );
+                print("Error adding routine: $error");
+              });
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Invalid unique ID')),
+              );
+            }
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('No internet connection')),
+            );
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Please fill all fields')),
+          );
+        }
+      }
+    }else{
+      showSnackBarMsg(context, "Schedules List is Empty!");
+    }
+
   }
 }
