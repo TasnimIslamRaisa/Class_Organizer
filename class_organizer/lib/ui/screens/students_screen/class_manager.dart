@@ -859,31 +859,31 @@ class _ClassManagerPageState extends State<ClassManagerPage> {
               ),
             ),
           ),
-                              
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: _addNewCourse,
-                              child: const Text('ADD NEW COURSE'),
-                            ),
-                          ),
-                          const SizedBox(width: 16), // Space between buttons
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: _saveData,
-                              child: const Text('SAVE STRUCTURE'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _addNewCourse,
+                    child: const Text('ADD NEW COURSE'),
+                  ),
+                ),
+                const SizedBox(width: 16), // Space between buttons
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _saveData,
+                    child: const Text('SAVE STRUCTURE'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
                     ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

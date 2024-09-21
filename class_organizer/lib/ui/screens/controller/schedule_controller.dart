@@ -27,6 +27,12 @@ class ScheduleController extends GetxController {
     schedules.addAll(scheduleList); // Add all new schedules
   }
 
+  // Set all schedules at once
+  void setAllSchedule(List<ScheduleItem> scheduleList) {
+    schedules.clear();  // Clear the current schedules
+    schedules.addAll(scheduleList);  // Add the new schedules
+  }
+
   List<ScheduleItem> getSchedulesForDay(String day) {
     return schedules.where((schedule) => schedule.day == day).toList();
   }

@@ -1,3 +1,4 @@
+import 'package:class_organizer/models/schedule_item.dart';
 import 'package:flutter/material.dart';
 import '../../../models/class_model.dart';
 import '../../widgets/slidable_widget.dart';
@@ -6,7 +7,7 @@ class MondayContent extends StatelessWidget {
   final List<Class> classes;
   final void Function(Class) onDeleteClass;
 
-  const MondayContent({super.key, required this.classes, required this.onDeleteClass});
+  const MondayContent({super.key, required this.classes, required this.onDeleteClass, });
 
   @override
   Widget build(BuildContext context) {

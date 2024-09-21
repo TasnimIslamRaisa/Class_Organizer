@@ -106,7 +106,7 @@ class SlidableClassItem extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          classItem.startTime,
+                          '${classItem.startTime} - ${classItem.endTime}',
                           style: const TextStyle(fontSize: 14),
                         ),
                         const SizedBox(width: 10),

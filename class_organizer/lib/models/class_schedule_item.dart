@@ -116,6 +116,7 @@ class ClassScheduleItem {
   set syncStatus(int? syncStatus) => _syncStatus = syncStatus;
   set dateTime(DateTime? dateTime) => _dateTime = dateTime;
 
+  // Convert to Map for storage or JSON serialization
   Map<String, dynamic> toMap() {
     return {
       'id': _id,
@@ -143,6 +144,7 @@ class ClassScheduleItem {
     };
   }
 
+  // Factory method for creating a ClassScheduleItem from a Map
   static ClassScheduleItem fromMap(Map<String, dynamic> map) {
     return ClassScheduleItem(
       id: map['id'],
@@ -166,10 +168,11 @@ class ClassScheduleItem {
       syncKey: map['sync_key'],
       min: map['min'],
       syncStatus: map['sync_status'],
-      dateTime: DateTime.parse(map['dateTime']),
+      dateTime: map['dateTime'] != null ? DateTime.parse(map['dateTime']) : null,
     );
   }
 
+  // Convert to JSON format
   Map<String, dynamic> toJson() {
     return {
       'id': _id,
@@ -197,7 +200,7 @@ class ClassScheduleItem {
     };
   }
 
-  // Create a ScheduleItem object from a JSON map
+  // Factory method for creating a ClassScheduleItem from JSON
   factory ClassScheduleItem.fromJson(Map<String, dynamic> json) {
     return ClassScheduleItem(
       id: json['id'],
@@ -224,5 +227,4 @@ class ClassScheduleItem {
       dateTime: json['dateTime'] != null ? DateTime.parse(json['dateTime']) : null,
     );
   }
-
 }

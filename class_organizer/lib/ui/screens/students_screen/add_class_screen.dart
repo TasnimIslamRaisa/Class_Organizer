@@ -52,6 +52,7 @@ class _AddClassBottomSheetState extends State<AddClassBottomSheet> {
     );
 
     widget.onAddClass(newClass);
+    Navigator.pop(context); // Close the bottom sheet
 
     // Clear input fields after submission
     _courseNameController.clear();
@@ -62,12 +63,12 @@ class _AddClassBottomSheetState extends State<AddClassBottomSheet> {
     _endingtimeController.clear();
     _classroomController.clear();
 
-    Navigator.pop(context); // Close the bottom sheet
+
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
         left: 16,
@@ -183,6 +184,7 @@ class _AddClassBottomSheetState extends State<AddClassBottomSheet> {
           ),
         ),
       ),
+
     );
   }
 

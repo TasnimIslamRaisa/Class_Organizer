@@ -89,7 +89,7 @@ class ClassManagerScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (contex) => ScannerCode()),
+                  MaterialPageRoute(builder: (context) => ScannerCode()),
                 );
               },
             ),
@@ -108,10 +108,11 @@ class ClassManagerScreen extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       builder: (context) {
+        print("Showing bottom sheet");
         return AddClassBottomSheet(
           onAddClass: (Class newClass) {
             _addClass(newClass);  // Add class when the bottom sheet is closed
-            Navigator.pop(context);  // Close bottom sheet
+            //Navigator.pop(context);  // Close bottom sheet
           },
         );
       },
