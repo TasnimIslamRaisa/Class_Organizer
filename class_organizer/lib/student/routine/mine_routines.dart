@@ -24,6 +24,7 @@ import '../../../models/user.dart';
 import '../../../preference/logout.dart';
 import '../../../utility/unique.dart';
 import '../../../web/internet_connectivity.dart';
+import '../../admin/school/save_routine_mine.dart';
 
 class MineRoutines extends StatefulWidget {
   @override
@@ -877,7 +878,19 @@ class _MineRoutinesState extends State<MineRoutines> {
     }
   }
 
-  void setMineRoutine(int index) {}
+  void setMineRoutine(int index) {
+    Future.delayed(const Duration(seconds: 0), () {
+      // Navigator.pop(context);
+      if (mounted) {
+        Navigator.push(
+          context,
+          // MaterialPageRoute(builder: (context) => SchedulesPage(routine: routines[index],)),
+          // MaterialPageRoute(builder: (context) => MonthlySchedules(routine: routines[index],)),
+          MaterialPageRoute(builder: (context) => SaveRoutineMine(routine: routines[index],)),
+        );
+      }
+    });
+  }
 
   void synchronizeRoutinesAndSchedule() async {
     if (await InternetConnectionChecker().hasConnection) {

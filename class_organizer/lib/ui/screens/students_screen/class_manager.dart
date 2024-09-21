@@ -604,7 +604,6 @@ class _ClassManagerPageState extends State<ClassManagerPage> {
 
 
 
-  // Function to remove a selected course
   Future<void> _removeCourse(CourseStructure course) async {
     if(await InternetConnectionChecker().hasConnection){
       await _deleteCourse(course);

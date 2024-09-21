@@ -1,10 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:barcode_widget/barcode_widget.dart';
-import 'package:class_organizer/admin/school/pages/schedules.dart';
-import 'package:class_organizer/admin/school/schedule/monthly_schedules.dart';
-import 'package:class_organizer/admin/school/schedule/schedule_7_screen.dart';
-import 'package:class_organizer/admin/school/schedule/schedule_v1_screen.dart';
 import 'package:class_organizer/admin/school/schedule/weekly_schedules.dart';
 import 'package:class_organizer/models/routine.dart';
 import 'package:dropdown_search/dropdown_search.dart';

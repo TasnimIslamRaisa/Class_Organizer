@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:class_organizer/admin/school/pages/schedules.dart';
+import 'package:class_organizer/admin/school/save_routine_mine.dart';
 import 'package:class_organizer/admin/school/schedule/monthly_schedules.dart';
 import 'package:class_organizer/admin/school/schedule/schedule_7_screen.dart';
 import 'package:class_organizer/admin/school/schedule/schedule_v1_screen.dart';
@@ -14,6 +15,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../admin/school/schedule/weekly_campus_schedules.dart';
 import '../../../models/major.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -632,7 +634,7 @@ class _CampusRoutinesState extends State<CampusRoutines> {
                       context,
                       // MaterialPageRoute(builder: (context) => SchedulesPage(routine: routines[index],)),
                       // MaterialPageRoute(builder: (context) => MonthlySchedules(routine: routines[index],)),
-                      MaterialPageRoute(builder: (context) => WeeklySchedules(routine: routines[index],)),
+                      MaterialPageRoute(builder: (context) => WeeklyCampusSchedules(routine: routines[index],)),
                     );
                   }
                 });
@@ -875,7 +877,19 @@ class _CampusRoutinesState extends State<CampusRoutines> {
     }
   }
 
-  void setMineRoutine(int index) {}
+  void setMineRoutine(int index) {
+    Future.delayed(const Duration(seconds: 0), () {
+      // Navigator.pop(context);
+      if (mounted) {
+        Navigator.push(
+          context,
+          // MaterialPageRoute(builder: (context) => SchedulesPage(routine: routines[index],)),
+          // MaterialPageRoute(builder: (context) => MonthlySchedules(routine: routines[index],)),
+          MaterialPageRoute(builder: (context) => SaveRoutineMine(routine: routines[index],)),
+        );
+      }
+    });
+  }
 
   void synchronizeRoutinesAndSchedule() async {
     if (await InternetConnectionChecker().hasConnection) {
