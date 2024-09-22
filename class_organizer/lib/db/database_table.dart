@@ -502,20 +502,32 @@ class DatabaseTable {
   ''';
 
   static const SCHEDULE = '''
-    CREATE TABLE IF NOT EXISTS schedule (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      scheduleId INTEGER,
-      uniqueId TEXT,
-      taskCode TEXT,
-      time TEXT,
-      day TEXT,
-      taskName TEXT,
-      taskDetails TEXT,
-      taskLocation TEXT,
-      sync_status INTEGER,
-      sync_key TEXT
-    );
-  ''';
+  CREATE TABLE IF NOT EXISTS schedule (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    uniqueId TEXT,
+    sId TEXT,
+    stdId TEXT,
+    tId TEXT,
+    temp_code TEXT,
+    temp_num TEXT,
+    sub_name TEXT,
+    sub_code TEXT,
+    t_id TEXT,
+    t_name TEXT,
+    room TEXT,
+    campus TEXT,
+    section TEXT,
+    start_time TEXT,
+    end_time TEXT,
+    day TEXT,
+    key TEXT,
+    sync_key TEXT,
+    min INTEGER,
+    sync_status INTEGER,
+    dateTime TEXT
+  );
+''';
+
 
   static const TASK = '''
     CREATE TABLE IF NOT EXISTS task (

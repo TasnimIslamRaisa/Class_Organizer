@@ -1,11 +1,12 @@
+import 'package:class_organizer/models/schedule_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import '../../../models/class_model.dart';
 import '../../../utility/confirmationDialog.dart';
 
 class SlidableClassItem extends StatelessWidget {
-  final Class classItem;
-  final void Function(Class) onDeleteClass;
+  final ScheduleItem classItem;
+  final void Function(ScheduleItem) onDeleteClass;
 
   const SlidableClassItem({
     Key? key,
@@ -19,7 +20,7 @@ class SlidableClassItem extends StatelessWidget {
     final isLightMode = brightness == Brightness.light;
 
     return Slidable(
-      key: Key(classItem.courseCode),
+      key: classItem.subCode != null ? Key(classItem.subCode!) : null,
       startActionPane: ActionPane(
         motion: const StretchMotion(),
         children: [
@@ -68,7 +69,7 @@ class SlidableClassItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      classItem.courseName,
+                      classItem.subName??"",
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -76,7 +77,7 @@ class SlidableClassItem extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      classItem.courseCode,
+                      classItem.subCode??"",
                       style: const TextStyle(
                         fontSize: 14,
                         color: Colors.black54,
@@ -86,7 +87,7 @@ class SlidableClassItem extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          'Teacher Initial: ${classItem.teacherInitial}',
+                          'Teacher Initial: ${classItem.tName}',
                           style: const TextStyle(fontSize: 14),
                         ),
                         const SizedBox(width: 10),
@@ -117,7 +118,7 @@ class SlidableClassItem extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          classItem.roomNumber,
+                          classItem.room??"",
                           style: const TextStyle(fontSize: 14),
                         ),
                       ],

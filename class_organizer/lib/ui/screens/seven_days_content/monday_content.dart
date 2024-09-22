@@ -4,8 +4,8 @@ import '../../../models/class_model.dart';
 import '../../widgets/slidable_widget.dart';
 
 class MondayContent extends StatelessWidget {
-  final List<Class> classes;
-  final void Function(Class) onDeleteClass;
+  final List<ScheduleItem> classes;
+  final void Function(ScheduleItem) onDeleteClass;
 
   const MondayContent({super.key, required this.classes, required this.onDeleteClass, });
 

@@ -1,4 +1,5 @@
 import 'package:sqflite/sqflite.dart';
+import '../models/schedule_item.dart';
 import 'database_manager.dart';
 import '../models/user.dart';
 import '../models/u_data.dart';
@@ -254,4 +255,28 @@ Future<int> deleteSchoolBySid(String sid) async {
     List<Map<String, dynamic>> result = await db.rawQuery(sql);
     return result;
   }
+
+  Future<int> insertSchedule(ScheduleItem schedule) async {
+    final db = await await DatabaseManager().database;
+    return await db.insert(
+      'schedule',
+      schedule.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<List<ScheduleItem>> getAllSchedules() async {
+    final db = await DatabaseManager().database;
+    final List<Map<String, dynamic>> maps = await db.query('schedule');
+
+    return List.generate(maps.length, (i) {
+      return ScheduleItem.fromMap(maps[i]);
+    });
+  }
+
+  Future<void> deleteSchedule(String uniqueId) async {
+    final db = await DatabaseManager().database;
+    await db.delete('schedule', where: 'uniqueId = ?', whereArgs: [uniqueId]);
+  }
+
 }

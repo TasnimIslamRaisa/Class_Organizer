@@ -5,8 +5,8 @@ import '../../../models/class_model.dart';
 import '../../../utility/confirmationDialog.dart';
 
 class FridayContent extends StatelessWidget {
-  final List<Class> classes;
-  final void Function(Class) onDeleteClass;
+  final List<ScheduleItem> classes;
+  final void Function(ScheduleItem) onDeleteClass;
 
   const FridayContent({super.key, required this.classes, required this.onDeleteClass,});
   @override
@@ -19,7 +19,7 @@ class FridayContent extends StatelessWidget {
           itemBuilder: (context, index) {
             final classItem = classes[index];
             return Slidable(
-              key: Key(classItem.courseCode),
+              key: Key(classItem.subCode!),
               startActionPane: ActionPane(
                 motion: const StretchMotion(),
                 children: [
@@ -58,7 +58,7 @@ class FridayContent extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              classItem.courseName,
+                              classItem.subName??"",
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -66,7 +66,7 @@ class FridayContent extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              classItem.courseCode,
+                              classItem.subCode??"",
                               style: const TextStyle(
                                 fontSize: 14,
                                 color: Colors.black54,
@@ -76,7 +76,7 @@ class FridayContent extends StatelessWidget {
                             Row(
                               children: [
                                 Text(
-                                  'Teacher Initial: ${classItem.teacherInitial}',
+                                  'Teacher Initial: ${classItem.tName}',
                                   style: const TextStyle(fontSize: 14),
                                 ),
                                 const SizedBox(width: 10),
@@ -96,7 +96,7 @@ class FridayContent extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  classItem.startTime,
+                                  classItem.startTime??"",
                                   style: const TextStyle(fontSize: 14),
                                 ),
                                 const SizedBox(width: 10),
@@ -107,7 +107,7 @@ class FridayContent extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  classItem.roomNumber,
+                                  classItem.room??"",
                                   style: const TextStyle(fontSize: 14),
                                 ),
                               ],
