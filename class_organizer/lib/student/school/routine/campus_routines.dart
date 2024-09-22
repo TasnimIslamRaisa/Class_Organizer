@@ -485,9 +485,6 @@ class _CampusRoutinesState extends State<CampusRoutines> {
 
   Future<void> _loadRoutinesData() async {
     if (await InternetConnectionChecker().hasConnection) {
-      setState(() {
-        _isLoading = true;
-      });
 
       // Reference to the routines node in Firebase
       DatabaseReference routinesRef = _databaseRef.child('routines');

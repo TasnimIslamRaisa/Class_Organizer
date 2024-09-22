@@ -3,6 +3,8 @@ import 'package:class_organizer/admin/school/pages/departments.dart';
 import 'package:class_organizer/admin/school/pages/routines.dart';
 import 'package:class_organizer/admin/school/pages/sessions.dart';
 import 'package:class_organizer/test/test.dart';
+import 'package:class_organizer/test/test_v2.dart';
+import 'package:class_organizer/test/test_v3.dart';
 import 'package:class_organizer/ui/screens/students_screen/campus_routine.dart';
 import 'package:class_organizer/ui/screens/students_screen/class_manager.dart';
 import 'package:class_organizer/ui/screens/students_screen/edit_profile_screen.dart';
@@ -193,6 +195,7 @@ class _DrawerWidgetState extends State<t_DrawerWidget> {
             title: const Text('B U S - S C H E D U L E S'),
             onTap: () {
               Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => FlashcardRoutineSystem()));
             },
           ),
           ListTile(

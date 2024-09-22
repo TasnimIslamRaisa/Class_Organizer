@@ -418,7 +418,7 @@ class _ClassManagerScreenState extends State<ClassManagerScreen> {
   }
 
   Future<void> getSchedulesOffline() async {
-    List<ScheduleItem> fetchedSchedules = await DatabaseHelper().getAllSchedules();
+    List<ScheduleItem> fetchedSchedules = await DatabaseHelper().getAllSchedulesByUniqueId(_user!.uniqueid!);
     // Pass the fetched schedules to the ScheduleController
     classController.setSchedules(fetchedSchedules);
   }

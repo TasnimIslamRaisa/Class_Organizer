@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:class_organizer/web/black_box_online.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,11 +15,10 @@ import '../../../models/user.dart';
 import '../../../preference/logout.dart';
 import '../../../style/app_color.dart';
 import '../../../utility/auto_function_caller.dart';
-import '../../../utility/card/flash_card_routine.dart';
-import '../../../web/black_box.dart';
 import '../../../web/black_box_online_e.dart';
 import '../../../web/internet_connectivity.dart';
-import '../controller/schedule_controller.dart';
+import '../../ui/screens/controller/schedule_controller.dart';
+
 
 class StudentCompanionScreen extends StatefulWidget {
   const StudentCompanionScreen({super.key});
@@ -51,10 +49,6 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
   Teacher? teacher;
 
   final AutoFunctionCaller _functionCaller = AutoFunctionCaller();
-  PageController _pageController1 = PageController();
-  PageController _pageController2 = PageController();
-  int _currentIndex1 = 0;
-  int _currentIndex2 = 0;
 
   @override
   void initState() {
@@ -67,7 +61,6 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
     // First load user data
     await _loadUserData();
 
-    getSchedules();
     _startAutomaticUpdates();
     // Then load teacher data
     // _loadTeacherData();
@@ -75,7 +68,7 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
 
   void _startAutomaticUpdates() {
     _functionCaller.startTimer(
-      interval: Duration(seconds: 10),
+      interval: Duration(seconds: 60),
       functionToCall: getSchedules,
     );
   }
@@ -155,18 +148,6 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
       duration: const Duration(seconds: 2),
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
-  void _onSwipe1(int index) {
-    setState(() {
-      _currentIndex1 = index;
-    });
-  }
-
-  void _onSwipe2(int index) {
-    setState(() {
-      _currentIndex2 = index;
-    });
   }
 
   @override
@@ -270,106 +251,72 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
 
             // ListView Builder
             Expanded(
-              child: Column(
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: PageView.builder(
-                      controller: _pageController1,
-                      onPageChanged: _onSwipe1,
-                      itemCount: schedules.length,
-                      itemBuilder: (context, index) {
-                        return FlashcardRoutine(
-                          flashcard: schedules[index],
-                        );
-                      },
+              child: ListView.builder(
+                itemCount: items.length,
+                itemBuilder: (context, index) {
+                  final item = items[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12.0),
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: isLightMode ? Colors.blueGrey[50] : Colors.blueGrey[600],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              item['title']!,
+                              style: const TextStyle(
+                                color: AppColors.textColor,
+                                fontSize: 16,
+                              ),
+                            ),
+                            Text(
+                              item['date']!,
+                              style: const TextStyle(
+                                color: AppColors.textColor,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                        subtitle: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 80,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.grey.withOpacity(0.2),
+                              ),
+                              child: Icon(
+                                item['icon'] == 'thumb_up'
+                                    ? Icons.thumb_up
+                                    : Icons.laptop_chromebook_sharp,
+                                color: Colors.grey,
+                                size: 40,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              item['text']!,
+                              style: const TextStyle(
+                                color: AppColors.textColor,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                  Divider(
-                    thickness: 2,
-                    color: Colors.grey,
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: PageView.builder(
-                      controller: _pageController2,
-                      onPageChanged: _onSwipe2,
-                      itemCount: nextDaySchedules.length,
-                      itemBuilder: (context, index) {
-                        return FlashcardRoutine(
-                          flashcard: nextDaySchedules[index],
-                        );
-                      },
-                    ),
-                  ),
-                ],
+                  );
+                },
               ),
-              // child: ListView.builder(
-              //   itemCount: items.length,
-              //   itemBuilder: (context, index) {
-              //     final item = items[index];
-              //     return Padding(
-              //       padding: const EdgeInsets.only(bottom: 12.0),
-              //       child: Container(
-              //         padding: const EdgeInsets.all(12),
-              //         decoration: BoxDecoration(
-              //           color: isLightMode ? Colors.blueGrey[50] : Colors.blueGrey[600],
-              //           borderRadius: BorderRadius.circular(8),
-              //         ),
-              //         child: ListTile(
-              //           contentPadding: EdgeInsets.zero,
-              //           title: Row(
-              //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //             children: [
-              //               Text(
-              //                 item['title']!,
-              //                 style: const TextStyle(
-              //                   color: AppColors.textColor,
-              //                   fontSize: 16,
-              //                 ),
-              //               ),
-              //               Text(
-              //                 item['date']!,
-              //                 style: const TextStyle(
-              //                   color: AppColors.textColor,
-              //                   fontSize: 16,
-              //                 ),
-              //               ),
-              //             ],
-              //           ),
-              //           subtitle: Column(
-              //             mainAxisAlignment: MainAxisAlignment.center,
-              //             children: [
-              //               Container(
-              //                 width: 80,
-              //                 height: 80,
-              //                 decoration: BoxDecoration(
-              //                   shape: BoxShape.circle,
-              //                   color: Colors.grey.withOpacity(0.2),
-              //                 ),
-              //                 child: Icon(
-              //                   item['icon'] == 'thumb_up'
-              //                       ? Icons.thumb_up
-              //                       : Icons.laptop_chromebook_sharp,
-              //                   color: Colors.grey,
-              //                   size: 40,
-              //                 ),
-              //               ),
-              //               const SizedBox(height: 8),
-              //               Text(
-              //                 item['text']!,
-              //                 style: const TextStyle(
-              //                   color: AppColors.textColor,
-              //                   fontSize: 18,
-              //                 ),
-              //               ),
-              //             ],
-              //           ),
-              //         ),
-              //       ),
-              //     );
-              //   },
-              // ),
             ),
           ],
         ),
