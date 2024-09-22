@@ -58,7 +58,14 @@ class _EditTeacherProfileState extends State<EditTeacherProfile> {
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    // First load user data
+    await _loadUserData();
+
+    // Then load teacher data
     _loadTeacherData();
   }
 
@@ -408,39 +415,55 @@ class _EditTeacherProfileState extends State<EditTeacherProfile> {
     );
   }
 
-  void _loadTeacherData() {
-    getTeacherDataByUniqueId(_user?.userid??"");
+  Future<void> _loadTeacherData() async {
+    _loadUserData();
+    Teacher? teacherr = await getTeacherByUniqueId(_user?.uniqueid??"");
+    if(teacherr==null){
+      saveNewTeacher();
+    }
+
   }
 
-  Future<void> getTeacherDataByUniqueId(String uniqueId) async {
+  Future<Teacher?> getTeacherByUniqueId(String uniqueId) async {
+    print("farhad ${uniqueId}");
     final DatabaseReference dbRef = FirebaseDatabase.instance.ref("teachers");
 
     try {
-      DatabaseEvent event = await dbRef.child(uniqueId).once();
+      // Querying the teachers node by uniqueId
+      DatabaseEvent event = await dbRef.orderByChild('uniqueId').equalTo(uniqueId).once();
 
       // Check if the snapshot has data
       if (event.snapshot.value != null) {
-        // Extract teacher data as a map
-        Map<dynamic, dynamic> teacherData = event.snapshot.value as Map<dynamic, dynamic>;
+        // The result will be a map of teachers with unique keys
+        Map<dynamic, dynamic> teacherMap = event.snapshot.value as Map<dynamic, dynamic>;
 
-        Teacher teacherd = Teacher.fromMap(Map<String, dynamic>.from(teacherData));
+        // Check if we got at least one result
+        if (teacherMap.isNotEmpty) {
+          // Get the first teacher entry from the map
+          var teacherData = teacherMap.values.first;
 
-        setState(() {
-          // Set the teacher state with the retrieved data
-          this.teacher = teacherd;
-        });
+          // Convert the map to a Teacher object
+          Teacher teacher = Teacher.fromMap(Map<String, dynamic>.from(teacherData));
 
-        if(this.teacher!=null){
-          saveNewTeacher();
+          return teacher;
+        } else {
+          print('No teacher found with this uniqueId');
+          return null;
         }
-
       } else {
-        print('No teacher found with this uniqueId');
+        print('No teacher data found in the database');
+        return null;
       }
     } catch (e) {
       print('Error fetching teacher: $e');
+      return null;
     }
   }
+
+
+
+
+
 
 
   void saveNewTeacher() async {
@@ -449,15 +472,13 @@ class _EditTeacherProfileState extends State<EditTeacherProfile> {
     String teacherPhone = _user?.phone??"";
     String teacherAddress = "Address";
 
-    await _loadUserData();
     String uniqueId = Unique().generateUniqueID();
-    var uuid = Uuid();
 
     if (teacherName.isNotEmpty && teacherEmail.isNotEmpty && teacherPhone.isNotEmpty) {
       Teacher newTeacher = Teacher(
         id: null,
         sId: school?.sId,
-        uniqueId: _user?.userid??"",
+        uniqueId: _user?.uniqueid??"",
         tName: teacherName,
         tEmail: teacherEmail,
         tPhone: teacherPhone,
@@ -478,7 +499,6 @@ class _EditTeacherProfileState extends State<EditTeacherProfile> {
               teacher = newTeacher;
             });
 
-            Navigator.of(context).pop();
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Teacher added')),
             );

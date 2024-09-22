@@ -133,30 +133,56 @@ class Teacher {
     };
   }
 
+  // static Teacher fromMap(Map<String, dynamic> map) {
+  //   return Teacher(
+  //     id: map['id'],
+  //     sId: map['sId'],
+  //     uniqueId: map['uniqueId'],
+  //     designation: map['designation'],
+  //     tName: map['tName'],
+  //     tPhone: map['tPhone'],
+  //     tPass: map['tPass'],
+  //     tEmail: map['tEmail'],
+  //     tAddress: map['tAddress'],
+  //     aStatus: map['aStatus'],
+  //     tMajor: map['tMajor'],
+  //     tBal: map['tBal'],
+  //     tLogo: map['tLogo'],
+  //     tId: map['tId'],
+  //     uType: map['uType'],
+  //     proPic: map['proPic'],
+  //     nidBirth: map['nidBirth'],
+  //     uId: map['uId'],
+  //     syncStatus: map['syncStatus'],
+  //     syncKey: map['syncKey'],
+  //   );
+  // }
+
   static Teacher fromMap(Map<String, dynamic> map) {
     return Teacher(
       id: map['id'],
-      sId: map['sId'],
-      uniqueId: map['uniqueId'],
-      designation: map['designation'],
-      tName: map['tName'],
-      tPhone: map['tPhone'],
-      tPass: map['tPass'],
-      tEmail: map['tEmail'],
-      tAddress: map['tAddress'],
-      aStatus: map['aStatus'],
-      tMajor: map['tMajor'],
-      tBal: map['tBal'],
-      tLogo: map['tLogo'],
-      tId: map['tId'],
-      uType: map['uType'],
-      proPic: map['proPic'],
-      nidBirth: map['nidBirth'],
-      uId: map['uId'],
-      syncStatus: map['syncStatus'],
-      syncKey: map['syncKey'],
+      sId: map['sId'] ?? '',          // Defaulting to empty string if null
+      uniqueId: map['uniqueId'] ?? '', // Defaulting to empty string if null
+      designation: map['designation'] ?? '',
+      tName: map['tName'] ?? '',
+      tPhone: map['tPhone'] ?? '',
+      tPass: map['tPass'] ?? '',
+      tEmail: map['tEmail'] ?? '',
+      tAddress: map['tAddress'] ?? '',
+      aStatus: map['aStatus'] ?? 0,    // Defaulting to 0 if null
+      tMajor: map['tMajor'] ?? '',
+      tBal: map['tBal'] ?? '',
+      tLogo: map['tLogo'] ?? '',
+      tId: map['tId'] ?? '',
+      uType: map['uType'] ?? 0,        // Defaulting to 0 if null
+      nidBirth: map['nidBirth'] ?? '',
+      uId: map['uId'] ?? '',
+      syncStatus: map['syncStatus'] ?? 0,
+      syncKey: map['syncKey'] ?? '',
     );
   }
+
+
 
   Map<String, dynamic> toJson() {
     return {

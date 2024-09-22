@@ -869,13 +869,13 @@ class _TeachersListPageState extends State<TeachersListPage> {
         if (firebaseUser != null) {
 
           local.User newUser = local.User(
-            uniqueid: uniqueId,
+            uniqueid: newTeacher.uniqueId,
             sid: newTeacher.sId,
             uname: newTeacher.tName,
             phone: newTeacher.tPhone??"",
             pass: newTeacher.tPass??"",
             email: newTeacher.tEmail,
-            userid: newTeacher.uniqueId,
+            userid: uniqueId,
             utype: uType,
             status: 1,
           );
