@@ -28,7 +28,7 @@ class ScheduleCards extends StatelessWidget {
                 Text(
                   scheduleItem.subName??"",
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 17,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
