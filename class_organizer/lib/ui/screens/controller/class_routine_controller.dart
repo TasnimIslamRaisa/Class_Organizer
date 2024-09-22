@@ -157,6 +157,12 @@ class ClassController extends GetxController {
     await prefs.setString('classList', classListJson);
   }
 
+  Future<void> clearClasses() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('classList'); // This removes the 'classList' from SharedPreferences
+  }
+
+
   void addClass(ScheduleItem newClass) {
     if (classes[newClass.day] == null) {
       classes[newClass.day??"Everyday"] = [];
@@ -184,6 +190,8 @@ class ClassController extends GetxController {
   }
 
   void setSchedules(List<ScheduleItem> scheduleList) {
+    clearClasses();
+
     for (var schedule in scheduleList) {
       if (classes[schedule.day] == null) {
         classes[schedule.day ?? "Everyday"] = [];

@@ -7,6 +7,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import '../admin/school/schedule/weekly_schedules.dart';
@@ -290,6 +291,7 @@ class _DownloadRoutineState extends State<DownloadRoutine> {
     var uuid = Uuid();
 
     if (routine != null) {
+      routine.tempName = DateFormat('EEE, MMM d').format(DateTime.now());
       routine.tId = tidCode;
       routine.stdId = routine.tempNum;
       routine.sId = _user?.uniqueid;

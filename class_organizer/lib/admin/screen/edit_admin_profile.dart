@@ -2,21 +2,24 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../Home_Screen.dart';
-import '../../widgets/drawer_widget.dart';
-import '../../../utility/profile_app_bar.dart';
-import '../../widgets/background_widget.dart';
-import '../students_screen/settings_screen.dart';
-import 'class_manager.dart';
 
-class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({super.key});
+import '../../ui/Home_Screen.dart';
+import '../../ui/screens/students_screen/settings_screen.dart';
+import '../../ui/widgets/background_widget.dart';
+import '../../ui/widgets/drawer_widget.dart';
+import '../../utility/profile_app_bar.dart';
+import '../../utility/profile_app_bar_admin.dart';
+import '../widgets/drawer_widget_admin.dart';
+
+
+class EditAdminProfile extends StatefulWidget {
+  const EditAdminProfile({super.key});
 
   @override
-  _EditProfileScreenState createState() => _EditProfileScreenState();
+  _EditAdminProfileState createState() => _EditAdminProfileState();
 }
 
-class _EditProfileScreenState extends State<EditProfileScreen> {
+class _EditAdminProfileState extends State<EditAdminProfile> {
   TextEditingController nameController = TextEditingController();
   TextEditingController universityController = TextEditingController();
   TextEditingController cgpaController = TextEditingController();
@@ -45,7 +48,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Future<void> _saveUserData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    
+
     Map<String, dynamic> updatedUserData = {
       'uname': nameController.text,
       'university': universityController.text,
@@ -80,13 +83,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final brightness = Theme.of(context).brightness;
     final isLightMode = brightness == Brightness.light;
     return Scaffold(
-      appBar: ProfileAppBar(
-        title: 'Edit Student Profile',
+      appBar: ProfileAppBarAdmin(
+        title: 'Edit Admin Profile',
         actionIcon: Icons.more_vert,
         onActionPressed: () {},
         appBarbgColor: Colors.cyan,
       ),
-      drawer: const DrawerWidget(),
+      drawer: const DrawerWidgetAdmin(),
       body: BackgroundWidget(
         child: SingleChildScrollView(
           child: SafeArea(
@@ -138,7 +141,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-          
+
                   // Name TextField
                   TextField(
                     controller: nameController,
@@ -152,7 +155,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-          
+
                   // University TextField
                   TextField(
                     controller: universityController,
@@ -165,7 +168,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-          
+
                   // Department Dropdown
                   DropdownButtonFormField<String>(
                     value: selectedDepartment,
@@ -187,7 +190,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-          
+
                   // Semester Dropdown
                   DropdownButtonFormField<String>(
                     value: selectedSemester,
@@ -214,7 +217,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-          
+
                   // CGPA TextField
                   TextField(
                     controller: cgpaController,
@@ -323,7 +326,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               shape: const CircleBorder(),
               onPressed: () {
                 Navigator.push(
-                  context, 
+                  context,
                   MaterialPageRoute(builder: (contex) => const SettingScreen()),
                 );
               },
@@ -548,7 +551,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 //               foregroundColor: Colors.white,
 //               shape: const CircleBorder(),
 //               onPressed: () {
-//                 Navigator.push(context, 
+//                 Navigator.push(context,
 //                     MaterialPageRoute(builder: (contex)=>const SettingScreen())
 //                 );
 //               },

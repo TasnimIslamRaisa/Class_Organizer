@@ -238,6 +238,7 @@ class _ClassManagerScreenState extends State<ClassManagerScreen> {
             return ScheduleItem.fromMap(scheduleMap);
           }).toList();
 
+          saveSchedulesOffline(fetchedSchedules);
           // Pass the fetched schedules to the ScheduleController
           classController.setSchedules(fetchedSchedules);
 
@@ -250,6 +251,7 @@ class _ClassManagerScreenState extends State<ClassManagerScreen> {
     } else {
       // Handle offline mode
       showSnackBarMsg(context, "You are offline. Please connect to the internet.");
+      getSchedulesOffline();
     }
   }
 
@@ -404,6 +406,21 @@ class _ClassManagerScreenState extends State<ClassManagerScreen> {
         );
       },
     );
+  }
+
+  Future<void> saveSchedulesOffline(List<ScheduleItem> fetchedSchedules) async {
+    deleteSchedules();
+    await DatabaseHelper().setSchedulesList(fetchedSchedules);
+  }
+
+  Future<void> deleteSchedules() async {
+    await DatabaseHelper().deleteSchedules(_user?.uniqueid??"");
+  }
+
+  Future<void> getSchedulesOffline() async {
+    List<ScheduleItem> fetchedSchedules = await DatabaseHelper().getAllSchedules();
+    // Pass the fetched schedules to the ScheduleController
+    classController.setSchedules(fetchedSchedules);
   }
 }
 

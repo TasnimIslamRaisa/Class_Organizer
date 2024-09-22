@@ -274,9 +274,35 @@ Future<int> deleteSchoolBySid(String sid) async {
     });
   }
 
+  Future<void> setSchedulesList(List<ScheduleItem> schedules) async {
+    final db = await DatabaseManager().database;
+
+    // Begin a transaction for bulk insertions
+    await db.transaction((txn) async {
+      for (var schedule in schedules) {
+        await txn.insert(
+          'schedule',
+          schedule.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+    });
+  }
+
+
   Future<void> deleteSchedule(String uniqueId) async {
     final db = await DatabaseManager().database;
     await db.delete('schedule', where: 'uniqueId = ?', whereArgs: [uniqueId]);
   }
+
+  Future<void> deleteSchedules(String uniqueId) async {
+    final db = await DatabaseManager().database;
+    await db.delete(
+        'schedule',
+        where: 'tempCode = ? AND tempNum = ?',
+        whereArgs: [uniqueId, uniqueId]
+    );
+  }
+
 
 }

@@ -370,11 +370,50 @@ class _MineRoutinesState extends State<MineRoutines> {
     });
   }
 
+  Future<void> deleteRoutineAndSchedules(Routine routine) async {
+    try {
+      DatabaseReference scheduleRef = _databaseRef.child('routines').child(routine.uniqueId!);
 
+      await scheduleRef.remove();
+
+      deleteSchedules(routine);
+
+      showSnackBarMsg(context, 'Schedule with key ${routine.tempName} deleted successfully.');
+    } catch (error) {
+      // Handle the error (e.g., show a snack bar with error message)
+      print('Error deleting schedule: $error');
+      showSnackBarMsg(context, "Failed to delete schedule. Please try again.");
+    }
+  }
 
   void deleteRoutine(int index) {
+    deleteRoutineAndSchedules(routines[index]);
     setState(() {
       routines.removeAt(index);
+    });
+  }
+  Future<void> deleteSchedules(Routine routine) async {
+    final dbRef = FirebaseDatabase.instance.ref('schedules');
+
+    // Query the schedules where temp_code matches routine.tempCode
+    Query query = dbRef.orderByChild('temp_code').equalTo(routine.tempCode);
+
+    // Execute the query and process the snapshot
+    query.once().then((DatabaseEvent event) {
+      DataSnapshot snapshot = event.snapshot;
+
+      if (snapshot.value != null) {
+        Map<dynamic, dynamic> schedules = snapshot.value as Map<dynamic, dynamic>;
+
+        // Iterate through the schedules and remove them
+        schedules.forEach((key, value) {
+          dbRef.child(key).remove();
+        });
+      } else {
+        print('No schedules found with temp_code: ${routine.tempCode}');
+      }
+    }).catchError((error) {
+      print('Error deleting schedules: $error');
     });
   }
 
@@ -909,6 +948,7 @@ class _MineRoutinesState extends State<MineRoutines> {
       );
     }
   }
+
 
 
 }

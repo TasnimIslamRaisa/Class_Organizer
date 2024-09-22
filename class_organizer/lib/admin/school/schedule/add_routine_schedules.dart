@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:class_organizer/admin/school/schedule/add_routine_schedules.dart';
 import 'package:class_organizer/admin/school/schedule/screen/add_schedule_screen.dart';
 import 'package:class_organizer/admin/school/schedule/single_day_schedule.dart';
 import 'package:class_organizer/models/schedule_item.dart';
@@ -17,6 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../models/class_model.dart';
+import '../../../models/course_structure.dart';
 import '../../../models/routine.dart';
 import '../../../models/school.dart';
 import '../../../models/user.dart';
@@ -26,17 +26,17 @@ import '../../../ui/screens/controller/schedule_controller.dart';
 import '../../../ui/screens/students_screen/add_class_screen.dart';
 import '../../../utility/unique.dart';
 import '../../../web/internet_connectivity.dart';
-import '../../models/course_structure.dart';
 
-class SaveRoutineMine extends StatefulWidget {
+class AddRoutineSchedules extends StatefulWidget {
   final Routine routine;
-  SaveRoutineMine({required this.routine});
+  final List<ScheduleItem> schedules;
+  AddRoutineSchedules({required this.routine, required this.schedules});
 
   @override
-  _SaveRoutineMineState createState() => _SaveRoutineMineState();
+  _AddRoutineSchedulesState createState() => _AddRoutineSchedulesState();
 }
 
-class _SaveRoutineMineState extends State<SaveRoutineMine> {
+class _AddRoutineSchedulesState extends State<AddRoutineSchedules> {
   late List<String> tabTitles;
   late List<DateTime> dateList;
 
@@ -199,7 +199,7 @@ class _SaveRoutineMineState extends State<SaveRoutineMine> {
 
                   _showStructureForm(context);
 
-                    _loadCourseStructures();
+                  _loadCourseStructures();
 
                 },
                 child: Icon(Icons.copy_all),
@@ -214,7 +214,7 @@ class _SaveRoutineMineState extends State<SaveRoutineMine> {
               child: FloatingActionButton(
                 heroTag: 'uniqueTag2',
                 onPressed: () async {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => AddRoutineSchedules(routine: widget.routine, schedules: schedules,)));
+
                   setState(() {
                     // Add any additional functionality here for the second floating action button
                   });
@@ -632,7 +632,6 @@ class _SaveRoutineMineState extends State<SaveRoutineMine> {
     newRoutine = routine;
 
     if (newRoutine != null) {
-      newRoutine.tempName = DateFormat('EEE, MMM d').format(DateTime.now());
       newRoutine.tId = tidCode;
       newRoutine.stdId = newRoutine.tempNum;
       newRoutine.sId = _user?.uniqueid;

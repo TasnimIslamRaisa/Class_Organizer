@@ -11,18 +11,18 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../db/database_helper.dart';
 import '../../../models/major.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 import '../../../models/school.dart';
-import '../../../models/subject.dart';
-import '../../../models/user.dart';
+import '../../../models/user.dart' as local;
 import '../../../preference/logout.dart';
 import '../../../utility/unique.dart';
 import '../../../web/internet_connectivity.dart';
-import '../schedule/schedule_screen.dart';
-import '../schedule/schedules_screen.dart';
+
 
 class TeachersListPage extends StatefulWidget {
   @override
@@ -36,6 +36,7 @@ class _TeachersListPageState extends State<TeachersListPage> {
   final TextEditingController _teacherAddressController = TextEditingController();
   List<Teacher> teachers = [];
 
+  final _auth = FirebaseAuth.instance;
   final _databaseRef = FirebaseDatabase.instance.ref();
   // final DatabaseReference _database = FirebaseDatabase.instance.ref().child('routines');
   bool _isLoading = true;
@@ -46,7 +47,7 @@ class _TeachersListPageState extends State<TeachersListPage> {
   String? userName;
   String? userPhone;
   String? userEmail;
-  User? _user, _user_data;
+  local.User? _user, _user_data;
   final _formKey = GlobalKey<FormState>();
   String? sid;
   School? school;
@@ -165,13 +166,13 @@ class _TeachersListPageState extends State<TeachersListPage> {
 
   Future<void> _loadUserData() async {
     Logout logout = Logout();
-    User? user = await logout.getUserDetails(key: 'user_data');
+    local.User? user = await logout.getUserDetails(key: 'user_data');
 
     Map<String, dynamic>? userMap = await logout.getUser(key: 'user_logged_in');
     Map<String, dynamic>? schoolMap = await logout.getSchool(key: 'school_data');
 
     if (userMap != null) {
-      User user_data = User.fromMap(userMap);
+      local.User user_data = local.User.fromMap(userMap);
       setState(() {
         _user_data = user_data;
       });
@@ -242,44 +243,48 @@ class _TeachersListPageState extends State<TeachersListPage> {
         tAddress: teacherAddress,
         tMajor: _selectedDepartment?.mName,
         aStatus: 1,
-        uId: _user?.uniqueid,
+        uId: uuid.v4(),
         tPass: teacherPhone,
       );
 
-      if (await InternetConnectionChecker().hasConnection) {
-        if (newTeacher.uniqueId != null && newTeacher.uniqueId!.isNotEmpty) {
-          final DatabaseReference _database = FirebaseDatabase.instance
-              .ref("teachers")
-              .child(newTeacher.uniqueId!);
+        saveTeacherAsUser(newTeacher);
+          if (await InternetConnectionChecker().hasConnection) {
+            if (newTeacher.uniqueId != null && newTeacher.uniqueId!.isNotEmpty) {
+              final DatabaseReference _database = FirebaseDatabase.instance
+                  .ref("teachers")
+                  .child(newTeacher.uniqueId!);
 
-          _database.set(newTeacher.toJson()).then((_) {
-            setState(() {
-              teachers.add(newTeacher);
-            });
-            _teacherNameController.clear();
-            _teacherEmailController.clear();
-            _teacherPhoneController.clear();
-            _teacherAddressController.clear();
-            Navigator.of(context).pop();
+              _database.set(newTeacher.toJson()).then((_) {
+                setState(() {
+                  teachers.add(newTeacher);
+                });
+                _teacherNameController.clear();
+                _teacherEmailController.clear();
+                _teacherPhoneController.clear();
+                _teacherAddressController.clear();
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Teacher added')),
+                );
+              }).catchError((error) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Failed to add teacher: $error')),
+                );
+                print("Error adding teacher: $error");
+              });
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Invalid unique ID')),
+              );
+            }
+          } else {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Teacher added')),
+              SnackBar(content: Text('No internet connection')),
             );
-          }).catchError((error) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Failed to add teacher: $error')),
-            );
-            print("Error adding teacher: $error");
-          });
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Invalid unique ID')),
-          );
-        }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No internet connection')),
-        );
-      }
+          }
+
+
+
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Please fill all fields')),
@@ -822,5 +827,143 @@ class _TeachersListPageState extends State<TeachersListPage> {
     }
   }
 
+  saveTeacherAsUser(Teacher newTeacher) {
+    registerUser("2", newTeacher);
+  }
+
+  Future<void> registerUser(String selectedRole, Teacher newTeacher) async {
+    int uType = 2;
+    var uuid = Uuid();
+
+    String uniqueId = Unique().generateUniqueID();
+
+
+
+    if(await InternetConnectionChecker().hasConnection){
+
+      try {
+
+        List<String> signInMethods = await _auth.fetchSignInMethodsForEmail(newTeacher.tEmail??"");
+
+        if (signInMethods.isNotEmpty) {
+          showSnackBarMsg(context, 'Email is already registered.');
+          return;
+        }
+
+        DatabaseReference usersRef = _databaseRef.child("users");
+        DatabaseEvent event = await usersRef.orderByChild("phone").equalTo(newTeacher.tPhone).once();
+        DataSnapshot snapshot = event.snapshot;
+
+        if (snapshot.exists) {
+          showSnackBarMsg(context, 'Phone number is already registered.');
+          return;
+        }
+
+        UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+          email: newTeacher.tEmail??"",
+          password: newTeacher.tPass??"",
+        );
+
+        User? firebaseUser = userCredential.user;
+
+        if (firebaseUser != null) {
+
+          local.User newUser = local.User(
+            uniqueid: uniqueId,
+            sid: newTeacher.sId,
+            uname: newTeacher.tName,
+            phone: newTeacher.tPhone??"",
+            pass: newTeacher.tPass??"",
+            email: newTeacher.tEmail,
+            userid: newTeacher.uniqueId,
+            utype: uType,
+            status: 1,
+          );
+
+          await _databaseRef.child("users").child(newTeacher.uniqueId??"").set(newUser.toMap());
+
+          print("User successfully signed up and saved to database");
+
+          await saveUserOffline(newTeacher.uniqueId??"", newTeacher.uId??"", newTeacher);
+
+        }
+      } catch (e) {
+        showSnackBarMsg(context,"Signup failed: $e");
+      }
+
+    }else{
+      showSnackBarMsg(context, "You are in Offline Mode now, Please connect Internet");
+      await saveUserOffline(newTeacher.uniqueId??"", newTeacher.uId??"",newTeacher);
+    }
+
+
+
+
+
+
+
+    // Map<String, dynamic> requestInput = {
+    //   "email": emailController.text.trim(),
+    //   "firstName": firstNameController.text.trim(),
+    //   "lastName": lastNameController.text.trim(),
+    //   "mobile": mobileController.text.trim(),
+    //   "password": passWordController.text,
+    //   "photo": ""
+    // };
+    // NetworkResponse response =
+    //     await NetworkCaller.postRequest(Urls.registration, body: requestInput);
+    // if (response.isSuccess) {
+    //   if (mounted) {
+    //     showSnackBarMsg(context, 'Registration Successful');
+    //   }
+    //   clearfield();
+    // } else {
+    //   if (mounted) {
+    //     showSnackBarMsg(context, 'Registration Failed');
+    //   }
+    // }
+  }
+
+  Future<void> saveUserOffline(String uniqueId, String uuid,Teacher newTeacher) async {
+
+    // sqlite
+
+    local.User? existingUser = await DatabaseHelper().getUserByPhone(newTeacher.tPhone??"");
+
+    if (existingUser != null) {
+
+      if (mounted) {
+        showSnackBarMsg(context, 'User already registered');
+      }
+      return;
+    }
+
+    local.User newUser = local.User(
+      uniqueid: uniqueId,
+      sid: newTeacher.sId,
+      uname: newTeacher.tName,
+      phone: newTeacher.tPhone??"",
+      pass: newTeacher.tPass??"",
+      email: newTeacher.tEmail??"",
+      userid: newTeacher.uId??"",
+      utype: 2,
+      status: 1,
+    );
+
+    int result = await DatabaseHelper().insertUser(newUser);
+
+    if (result > 0) {
+      if (mounted) {
+        showSnackBarMsg(context, 'Registration Successful');
+
+      }
+
+    } else {
+      if (mounted) {
+        showSnackBarMsg(context, 'Registration Failed');
+      }
+    }
+
+  }
 
 }

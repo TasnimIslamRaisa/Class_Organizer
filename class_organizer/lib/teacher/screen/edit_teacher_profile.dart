@@ -1,22 +1,35 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:class_organizer/models/teacher.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../Home_Screen.dart';
-import '../../widgets/drawer_widget.dart';
-import '../../../utility/profile_app_bar.dart';
-import '../../widgets/background_widget.dart';
-import '../students_screen/settings_screen.dart';
-import 'class_manager.dart';
+import 'package:uuid/uuid.dart';
 
-class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({super.key});
+import '../../models/major.dart';
+import '../../models/school.dart';
+import '../../models/user.dart';
+import '../../preference/logout.dart';
+import '../../ui/Home_Screen.dart';
+import '../../ui/screens/students_screen/settings_screen.dart';
+import '../../ui/widgets/background_widget.dart';
+import '../../ui/widgets/drawer_widget.dart';
+import '../../utility/profile_app_bar.dart';
+import '../../utility/profile_app_bar_teacher.dart';
+import '../../utility/unique.dart';
+import '../../web/internet_connectivity.dart';
+import '../panel/t_drawer_Widget.dart';
+
+
+class EditTeacherProfile extends StatefulWidget {
+  const EditTeacherProfile({super.key});
 
   @override
-  _EditProfileScreenState createState() => _EditProfileScreenState();
+  _EditTeacherProfileState createState() => _EditTeacherProfileState();
 }
 
-class _EditProfileScreenState extends State<EditProfileScreen> {
+class _EditTeacherProfileState extends State<EditTeacherProfile> {
   TextEditingController nameController = TextEditingController();
   TextEditingController universityController = TextEditingController();
   TextEditingController cgpaController = TextEditingController();
@@ -24,28 +37,75 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   String? selectedDepartment;
   String? selectedSemester;
 
+  final _databaseRef = FirebaseDatabase.instance.ref();
+  // final DatabaseReference _database = FirebaseDatabase.instance.ref().child('routines');
+  bool isConnected = false;
+  late StreamSubscription subscription;
+  final internetChecker = InternetConnectivity();
+  StreamSubscription<InternetConnectionStatus>? connectionSubscription;
+  String? userName;
+  String? userPhone;
+  String? userEmail;
+  User? _user, _user_data;
+  final _formKey = GlobalKey<FormState>();
+  String? sid;
+  School? school;
+  Teacher? teacher; // use this object to display teacher data in textField
+
+  List<Major> departments = [];
+  Major? _selectedDepartment;
+
   @override
   void initState() {
     super.initState();
     _loadUserData();
+    _loadTeacherData();
   }
 
   Future<void> _loadUserData() async {
+    Logout logout = Logout();
+    User? user = await logout.getUserDetails(key: 'user_data');
+
+    Map<String, dynamic>? userMap = await logout.getUser(key: 'user_logged_in');
+    Map<String, dynamic>? schoolMap = await logout.getSchool(key: 'school_data');
+
+    if (userMap != null) {
+      User user_data = User.fromMap(userMap);
+      setState(() {
+        _user_data = user_data;
+      });
+    } else {
+      print("User map is null");
+    }
+
+    if (schoolMap != null) {
+      School schoolData = School.fromMap(schoolMap);
+      setState(() {
+        _user = user;
+        school = schoolData;
+        sid = school?.sId;
+        print(schoolData.sId);
+      });
+    } else {
+      print("School data is null");
+    }
+
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userDataString = prefs.getString('user_logged_in');
 
     if (userDataString != null) {
       Map<String, dynamic> userData = jsonDecode(userDataString);
-
       setState(() {
-        nameController.text = userData['uname'] ?? '';
+        userName = userData['uname'];
+        userPhone = userData['phone'];
+        userEmail = userData['email'];
       });
     }
   }
 
   Future<void> _saveUserData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    
+
     Map<String, dynamic> updatedUserData = {
       'uname': nameController.text,
       'university': universityController.text,
@@ -80,13 +140,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final brightness = Theme.of(context).brightness;
     final isLightMode = brightness == Brightness.light;
     return Scaffold(
-      appBar: ProfileAppBar(
-        title: 'Edit Student Profile',
+      appBar: ProfileAppBarTeacher(
+        title: 'Edit Teacher Profile',
         actionIcon: Icons.more_vert,
         onActionPressed: () {},
         appBarbgColor: Colors.cyan,
       ),
-      drawer: const DrawerWidget(),
+      drawer: const t_DrawerWidget(),
       body: BackgroundWidget(
         child: SingleChildScrollView(
           child: SafeArea(
@@ -138,7 +198,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-          
+
                   // Name TextField
                   TextField(
                     controller: nameController,
@@ -152,7 +212,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-          
+
                   // University TextField
                   TextField(
                     controller: universityController,
@@ -165,7 +225,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-          
+
                   // Department Dropdown
                   DropdownButtonFormField<String>(
                     value: selectedDepartment,
@@ -187,7 +247,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-          
+
                   // Semester Dropdown
                   DropdownButtonFormField<String>(
                     value: selectedSemester,
@@ -214,7 +274,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-          
+
                   // CGPA TextField
                   TextField(
                     controller: cgpaController,
@@ -323,7 +383,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               shape: const CircleBorder(),
               onPressed: () {
                 Navigator.push(
-                  context, 
+                  context,
                   MaterialPageRoute(builder: (contex) => const SettingScreen()),
                 );
               },
@@ -347,6 +407,107 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ),
     );
   }
+
+  void _loadTeacherData() {
+    getTeacherDataByUniqueId(_user?.userid??"");
+  }
+
+  Future<void> getTeacherDataByUniqueId(String uniqueId) async {
+    final DatabaseReference dbRef = FirebaseDatabase.instance.ref("teachers");
+
+    try {
+      DatabaseEvent event = await dbRef.child(uniqueId).once();
+
+      // Check if the snapshot has data
+      if (event.snapshot.value != null) {
+        // Extract teacher data as a map
+        Map<dynamic, dynamic> teacherData = event.snapshot.value as Map<dynamic, dynamic>;
+
+        Teacher teacherd = Teacher.fromMap(Map<String, dynamic>.from(teacherData));
+
+        setState(() {
+          // Set the teacher state with the retrieved data
+          this.teacher = teacherd;
+        });
+
+        if(this.teacher!=null){
+          saveNewTeacher();
+        }
+
+      } else {
+        print('No teacher found with this uniqueId');
+      }
+    } catch (e) {
+      print('Error fetching teacher: $e');
+    }
+  }
+
+
+  void saveNewTeacher() async {
+    String teacherName = _user?.uname??"";
+    String teacherEmail = _user?.email??"";
+    String teacherPhone = _user?.phone??"";
+    String teacherAddress = "Address";
+
+    await _loadUserData();
+    String uniqueId = Unique().generateUniqueID();
+    var uuid = Uuid();
+
+    if (teacherName.isNotEmpty && teacherEmail.isNotEmpty && teacherPhone.isNotEmpty) {
+      Teacher newTeacher = Teacher(
+        id: null,
+        sId: school?.sId,
+        uniqueId: _user?.userid??"",
+        tName: teacherName,
+        tEmail: teacherEmail,
+        tPhone: teacherPhone,
+        tAddress: teacherAddress,
+        aStatus: 1,
+        uId: uniqueId,
+        tPass: teacherPhone,
+      );
+
+      if (await InternetConnectionChecker().hasConnection) {
+        if (newTeacher.uniqueId != null && newTeacher.uniqueId!.isNotEmpty) {
+          final DatabaseReference _database = FirebaseDatabase.instance
+              .ref("teachers")
+              .child(newTeacher.uniqueId!);
+
+          _database.set(newTeacher.toJson()).then((_) {
+            setState(() {
+              teacher = newTeacher;
+            });
+
+            Navigator.of(context).pop();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Teacher added')),
+            );
+          }).catchError((error) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Failed to add teacher: $error')),
+            );
+            print("Error adding teacher: $error");
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Invalid unique ID')),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No internet connection')),
+        );
+      }
+
+
+
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please fill all fields')),
+      );
+    }
+  }
+
 }
 
 // import 'dart:async';
@@ -548,7 +709,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 //               foregroundColor: Colors.white,
 //               shape: const CircleBorder(),
 //               onPressed: () {
-//                 Navigator.push(context, 
+//                 Navigator.push(context,
 //                     MaterialPageRoute(builder: (contex)=>const SettingScreen())
 //                 );
 //               },
