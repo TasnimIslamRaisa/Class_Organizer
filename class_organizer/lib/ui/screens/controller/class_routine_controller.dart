@@ -157,9 +157,24 @@ class ClassController extends GetxController {
     await prefs.setString('classList', classListJson);
   }
 
-  Future<void> clearClasses() async {
+  Future<void> clearClass() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('classList'); // This removes the 'classList' from SharedPreferences
+    await prefs.remove('classList');
+  }
+
+  Future<void> clearClasses() async {
+    // Clear the local 'classes' map in memory
+    classes.clear();
+
+    // Clear from SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('classList');
+
+    // Debugging: Print to confirm the clearing of classes
+    print('Classes cleared in memory and SharedPreferences.');
+
+    // Update UI after clearing
+    update();
   }
 
 

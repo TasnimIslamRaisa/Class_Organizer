@@ -2,7 +2,6 @@ import 'package:class_organizer/ui/screens/students_screen/campus_routine.dart';
 import 'package:class_organizer/ui/screens/students_screen/class_manager_screen.dart';
 import 'package:class_organizer/ui/screens/students_screen/edit_profile_screen.dart';
 import 'package:class_organizer/ui/screens/students_screen/academic_calender_screen.dart';
-import 'package:class_organizer/ui/screens/students_screen/student_companion_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../utility/profile_app_bar_admin.dart';

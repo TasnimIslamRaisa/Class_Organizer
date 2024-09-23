@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../../preference/logout.dart';
 import '../../style/app_color.dart';
+import '../../test/test_v4.dart';
 import '../screens/auth/SignInScreen.dart';
 import '../screens/students_screen/class_manager.dart';
 import '../screens/students_screen/edit_profile_screen.dart';
@@ -152,6 +153,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             title: const Text('B U S - S C H E D U L E S'),
             onTap: () {
               Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => FlashcardRoutineSystem()));
+
             },
           ),
           ListTile(

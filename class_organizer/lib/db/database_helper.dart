@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
 import '../models/schedule_item.dart';
 import 'database_manager.dart';
@@ -274,6 +277,114 @@ Future<int> deleteSchoolBySid(String sid) async {
     });
   }
 
+  Future<List<ScheduleItem>> getAllSchedulesByUniqueId(String uniqueId) async {
+    final db = await DatabaseManager().database;
+
+    final List<Map<String, dynamic>> maps = await db.query(
+      'schedule',
+      where: 'temp_code = ? OR temp_num = ?',
+      whereArgs: [uniqueId, uniqueId],
+    );
+
+    return List.generate(maps.length, (i) {
+      return ScheduleItem.fromMap(maps[i]);
+    });
+  }
+
+  Future<List<ScheduleItem>> getSchedulesByDayAndTime(String day) async {
+    final db = await DatabaseManager().database;
+
+    // Get the current time in the format "hh:mm a"
+    final DateFormat dateFormat = DateFormat("hh:mm a");
+    final String currentTime = dateFormat.format(DateTime.now());
+
+    // SQL query to get schedules by day and ordered by time
+    String sqlQuery = '''
+    SELECT * FROM schedule
+    WHERE day = ? OR day = ?
+    ORDER BY 
+      CASE 
+        WHEN start_time >= ? THEN 1 
+        ELSE 2 
+      END,
+      start_time ASC
+  ''';
+
+    final List<Map<String, dynamic>> maps = await db.rawQuery(
+        sqlQuery,
+        [day, "Everyday", currentTime]
+    );
+
+    return List.generate(maps.length, (i) {
+      return ScheduleItem.fromMap(maps[i]);
+    });
+  }
+
+
+  Future<List<ScheduleItem>> getSchedulesByDayAndTimeId(String day, String uniqueId) async {
+    final db = await DatabaseManager().database;
+
+    // Get the current time in the format "hh:mm a"
+    final DateFormat dateFormat = DateFormat("hh:mm a");
+    final String currentTime = dateFormat.format(DateTime.now());
+
+    // SQL query to get schedules by day, time, and tempCode = uniqueId
+    String sqlQuery = '''
+    SELECT * FROM schedule
+    WHERE (day = ? OR day = ?)
+      AND temp_code = ?
+    ORDER BY 
+      CASE 
+        WHEN start_time >= ? THEN 1 
+        ELSE 2 
+      END,
+      start_time ASC
+  ''';
+
+    // Execute the query with the day, 'Everyday', uniqueId, and current time as arguments
+    final List<Map<String, dynamic>> maps = await db.rawQuery(
+        sqlQuery,
+        [day, "Everyday", uniqueId, currentTime]
+    );
+
+    // Convert the result into a list of ScheduleItem objects
+    return List.generate(maps.length, (i) {
+      return ScheduleItem.fromMap(maps[i]);
+    });
+  }
+
+  Future<List<ScheduleItem>> getTodaySchedulesById(String uniqueId) async {
+    final db = await DatabaseManager().database;
+
+    final String today = DateFormat('EEEE').format(DateTime.now());
+
+    final DateFormat dateFormat = DateFormat("hh:mm a");
+    final String currentTime = dateFormat.format(DateTime.now());
+
+    String sqlQuery = '''
+    SELECT * FROM schedule
+    WHERE (day = ? OR day = ?)
+      AND temp_code = ?
+    ORDER BY 
+      CASE 
+        WHEN start_time >= ? THEN 1 
+        ELSE 2 
+      END,
+      start_time ASC
+  ''';
+
+    final List<Map<String, dynamic>> maps = await db.rawQuery(
+        sqlQuery,
+        [today, "Everyday", uniqueId, currentTime]
+    );
+
+    // Convert the result into a list of ScheduleItem objects
+    return List.generate(maps.length, (i) {
+      return ScheduleItem.fromMap(maps[i]);
+    });
+  }
+
+
   Future<void> setSchedulesList(List<ScheduleItem> schedules) async {
     final db = await DatabaseManager().database;
 
@@ -299,7 +410,7 @@ Future<int> deleteSchoolBySid(String sid) async {
     final db = await DatabaseManager().database;
     await db.delete(
         'schedule',
-        where: 'tempCode = ? AND tempNum = ?',
+        where: 'temp_code = ? AND temp_num = ?',
         whereArgs: [uniqueId, uniqueId]
     );
   }

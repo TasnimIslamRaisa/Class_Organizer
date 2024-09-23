@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:class_organizer/models/teacher.dart';
+import 'package:class_organizer/teacher/panel/teacher_panel.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
@@ -36,6 +39,8 @@ class _EditTeacherProfileState extends State<EditTeacherProfile> {
   TextEditingController creditsController = TextEditingController();
   String? selectedDepartment;
   String? selectedSemester;
+  File? _selectedImage;
+  bool _showSaveButton = false;
 
   final _databaseRef = FirebaseDatabase.instance.ref();
   // final DatabaseReference _database = FirebaseDatabase.instance.ref().child('routines');
@@ -99,6 +104,7 @@ class _EditTeacherProfileState extends State<EditTeacherProfile> {
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userDataString = prefs.getString('user_logged_in');
+    String? imagePath = prefs.getString('profile_picture');
 
     if (userDataString != null) {
       Map<String, dynamic> userData = jsonDecode(userDataString);
@@ -106,6 +112,10 @@ class _EditTeacherProfileState extends State<EditTeacherProfile> {
         userName = userData['uname'];
         userPhone = userData['phone'];
         userEmail = userData['email'];
+        nameController.text = userData['uname'] ?? '';
+        if (imagePath != null) {
+          _selectedImage = File(imagePath);
+        }
       });
     }
   }
@@ -123,6 +133,9 @@ class _EditTeacherProfileState extends State<EditTeacherProfile> {
     };
 
     await prefs.setString('user_logged_in', jsonEncode(updatedUserData));
+    if (_selectedImage != null) {
+      await prefs.setString('profile_picture', _selectedImage!.path);
+    }
 
     // Show success dialog
     showDialog(
@@ -137,9 +150,21 @@ class _EditTeacherProfileState extends State<EditTeacherProfile> {
     // Navigate to HomeScreen after a delay
     Future.delayed(const Duration(seconds: 1), () {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(builder: (context) => const TeacherPanel()),
       );
     });
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+        _showSaveButton = true; // Show save button after image selection
+      });
+    }
   }
 
   @override
@@ -173,39 +198,78 @@ class _EditTeacherProfileState extends State<EditTeacherProfile> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: Colors.grey[300],
+                            image: _selectedImage != null
+                                ? DecorationImage(
+                              image: FileImage(_selectedImage!),
+                              fit: BoxFit.cover,
+                            )
+                                : null,
                           ),
-                          child: const Icon(
+                          child: _selectedImage == null
+                              ? const Icon(
                             Icons.person,
                             size: 80,
                             color: Colors.white,
-                          ),
+                          )
+                              : null,
                         ),
                         Positioned(
                           bottom: 0,
                           right: 0,
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.grey,
-                              border: Border.all(
-                                color: Colors.white,
-                                width: 2,
+                          child: GestureDetector(
+                            onTap: _pickImage, // Call the image picker on tap
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.grey,
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 2,
+                                ),
                               ),
-                            ),
-                            child: const Icon(
-                              Icons.camera_alt,
-                              color: Colors.white,
-                              size: 20,
+                              child: const Icon(
+                                Icons.camera_alt,
+                                color: Colors.white,
+                                size: 20,
+                              ),
                             ),
                           ),
                         ),
+                        // Positioned(
+                        //   bottom: 0,
+                        //   right: 0,
+                        //   child: Container(
+                        //     width: 40,
+                        //     height: 40,
+                        //     decoration: BoxDecoration(
+                        //       shape: BoxShape.circle,
+                        //       color: Colors.grey,
+                        //       border: Border.all(
+                        //         color: Colors.white,
+                        //         width: 2,
+                        //       ),
+                        //     ),
+                        //     child: const Icon(
+                        //       Icons.camera_alt,
+                        //       color: Colors.white,
+                        //       size: 20,
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 24),
-
+                  if (_showSaveButton)
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: _saveUserData,
+                        child: const Text('Save Picture'),
+                      ),
+                    ),
+                  const SizedBox(height: 8),
                   // Name TextField
                   TextField(
                     controller: nameController,
