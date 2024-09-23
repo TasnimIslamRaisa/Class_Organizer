@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:class_organizer/ui/screens/students_screen/class_manager_screen.dart';
 import 'package:class_organizer/web/black_box_online.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -51,6 +53,8 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
   String? sid;
   School? school;
   Teacher? teacher;
+  File? _selectedImage;
+  bool _showSaveButton = false;
 
   final AutoFunctionCaller _functionCaller = AutoFunctionCaller();
   PageController _pageController1 = PageController();
@@ -92,13 +96,16 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
     Logout logout = Logout();
     User? user = await logout.getUserDetails(key: 'user_data');
 
+
     Map<String, dynamic>? userMap = await logout.getUser(key: 'user_logged_in');
     Map<String, dynamic>? schoolMap = await logout.getSchool(key: 'school_data');
+
 
     if (userMap != null) {
       User user_data = User.fromMap(userMap);
       setState(() {
         _user_data = user_data;
+
       });
     } else {
       print("User map is null");
@@ -118,6 +125,7 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userDataString = prefs.getString('user_logged_in');
+    String? imagePath = prefs.getString('profile_picture');
 
     if (userDataString != null) {
       Map<String, dynamic> userData = jsonDecode(userDataString);
@@ -125,6 +133,9 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
         userName = userData['uname'];
         userPhone = userData['phone'];
         userEmail = userData['email'];
+        if (imagePath != null) {
+          _selectedImage = File(imagePath);
+        }
       });
     }
   }
@@ -171,6 +182,18 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
       _currentIndex2 = index;
     });
   }
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+        _showSaveButton = true; // Show save button after image selection
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -203,7 +226,18 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 // Icon
-                Container(
+                CircleAvatar(
+                  radius: 40,
+                  backgroundImage: _selectedImage != null ? FileImage(_selectedImage!) : null,
+                  child: _selectedImage == null
+                      ? Icon(
+                    Icons.person_pin_circle_sharp,
+                    size: 65,
+                    color: isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
+                  )
+                      : null,
+                ),
+                /*Container(
                   width: 65,
                   height: 65,
                   decoration: BoxDecoration(
@@ -215,7 +249,7 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
                     color: Colors.white,
                     size: 60,
                   ),
-                ),
+                ),*/
 
                 // Name and Details
                 Expanded(

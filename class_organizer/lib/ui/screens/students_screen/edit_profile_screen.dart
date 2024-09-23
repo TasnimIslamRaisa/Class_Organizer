@@ -193,9 +193,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             color: Colors.grey[300],
                             image: _selectedImage != null
                                 ? DecorationImage(
-                                    image: FileImage(_selectedImage!),
-                                    fit: BoxFit.cover,
-                                  )
+                              image: FileImage(_selectedImage!),
+                              fit: BoxFit.cover,
+                            )
                                 : null,
                           ),
                           child: _selectedImage == null

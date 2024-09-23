@@ -7,7 +7,6 @@ import '../controller/theme_controller.dart';
 
 class SettingScreen extends StatelessWidget {
   const SettingScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
     // Access the ThemeController
@@ -24,7 +23,10 @@ class SettingScreen extends StatelessWidget {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
+              color: Theme
+                  .of(context)
+                  .colorScheme
+                  .surface,
               borderRadius: BorderRadius.circular(12),
             ),
             padding: const EdgeInsets.all(16),
@@ -71,8 +73,7 @@ class SettingScreen extends StatelessWidget {
                   Get.to(SetPasswordScreen());
                 },
                   icon: Icon(Icons.arrow_forward_ios_outlined,size: 26,color: Colors.grey.shade700,),
-                )
-
+                ),
               ],
             ),
           ),
