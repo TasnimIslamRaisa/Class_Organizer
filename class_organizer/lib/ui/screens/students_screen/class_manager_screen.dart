@@ -59,6 +59,7 @@ class _ClassManagerScreenState extends State<ClassManagerScreen> {
   void initState() {
     super.initState();
     _loadUserData();
+    // classController.clearClasses();
     loadSchedules();
     startListening();
     checkConnection();
@@ -197,6 +198,7 @@ class _ClassManagerScreenState extends State<ClassManagerScreen> {
   }
 
   Future<void> loadSchedules() async {
+
     if (await InternetConnectionChecker().hasConnection) {
 
       DatabaseReference schedulesRef = _databaseRef.child('schedules');
@@ -237,7 +239,8 @@ class _ClassManagerScreenState extends State<ClassManagerScreen> {
             };
             return ScheduleItem.fromMap(scheduleMap);
           }).toList();
-
+          schedules.clear();
+          schedules = fetchedSchedules;
           saveSchedulesOffline(fetchedSchedules);
           classController.clearClasses();
           // Pass the fetched schedules to the ScheduleController
@@ -421,6 +424,8 @@ class _ClassManagerScreenState extends State<ClassManagerScreen> {
   Future<void> getSchedulesOffline() async {
     List<ScheduleItem> fetchedSchedules = await DatabaseHelper().getAllSchedulesByUniqueId(_user!.uniqueid!);
     classController.clearClasses();
+    schedules.clear();
+    schedules = fetchedSchedules;
     // Pass the fetched schedules to the ScheduleController
     classController.setSchedules(fetchedSchedules);
   }
