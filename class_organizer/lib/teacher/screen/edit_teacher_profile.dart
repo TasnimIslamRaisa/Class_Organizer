@@ -112,6 +112,7 @@ class _EditTeacherProfileState extends State<EditTeacherProfile> {
         userName = userData['uname'];
         userPhone = userData['phone'];
         userEmail = userData['email'];
+        nameController.text = userData['uname'] ?? '';
         if (imagePath != null) {
           _selectedImage = File(imagePath);
         }
