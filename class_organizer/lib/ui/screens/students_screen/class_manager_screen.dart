@@ -239,6 +239,7 @@ class _ClassManagerScreenState extends State<ClassManagerScreen> {
           }).toList();
 
           saveSchedulesOffline(fetchedSchedules);
+          classController.clearClasses();
           // Pass the fetched schedules to the ScheduleController
           classController.setSchedules(fetchedSchedules);
 
@@ -419,6 +420,7 @@ class _ClassManagerScreenState extends State<ClassManagerScreen> {
 
   Future<void> getSchedulesOffline() async {
     List<ScheduleItem> fetchedSchedules = await DatabaseHelper().getAllSchedulesByUniqueId(_user!.uniqueid!);
+    classController.clearClasses();
     // Pass the fetched schedules to the ScheduleController
     classController.setSchedules(fetchedSchedules);
   }
