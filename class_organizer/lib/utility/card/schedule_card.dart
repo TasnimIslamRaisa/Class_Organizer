@@ -26,10 +26,9 @@ class ScheduleCards extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  scheduleItem.subName??"",
+                  scheduleItem.subCode??"",
                   style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
                     color: Colors.black,
                   ),
                 ),
@@ -63,9 +62,10 @@ class ScheduleCards extends StatelessWidget {
 
             // Subtitle (e.g., "320_1")
             Text(
-              scheduleItem.subCode??"",
+              scheduleItem.subName??"",
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),
             ),
