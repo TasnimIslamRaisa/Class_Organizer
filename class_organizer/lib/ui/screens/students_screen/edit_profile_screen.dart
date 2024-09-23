@@ -1,9 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../models/major.dart';
+import '../../../models/school.dart';
+import '../../../models/teacher.dart';
+import '../../../models/user.dart';
+import '../../../preference/logout.dart';
+import '../../../utility/unique.dart';
+import '../../../web/internet_connectivity.dart';
 import '../../Home_Screen.dart';
 import '../../widgets/drawer_widget.dart';
 import '../../../utility/profile_app_bar.dart';
@@ -25,26 +34,77 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   TextEditingController creditsController = TextEditingController();
   String? selectedDepartment;
   String? selectedSemester;
-  File? _selectedImage; // For storing the selected image
-  bool _showSaveButton = false; // Controls whether the Save button is shown
+  File? _selectedImage;
+  bool _showSaveButton = false;
+
+  final _databaseRef = FirebaseDatabase.instance.ref();
+  // final DatabaseReference _database = FirebaseDatabase.instance.ref().child('routines');
+  bool isConnected = false;
+  late StreamSubscription subscription;
+  final internetChecker = InternetConnectivity();
+  StreamSubscription<InternetConnectionStatus>? connectionSubscription;
+  String? userName;
+  String? userPhone;
+  String? userEmail;
+  User? _user, _user_data;
+  final _formKey = GlobalKey<FormState>();
+  String? sid;
+  School? school;
+  Teacher? teacher; // use this object to display teacher data in textField
+
+  List<Major> departments = [];
+  Major? _selectedDepartment;
 
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    _initializeData();
   }
+  Future<void> _initializeData() async {
+    // First load user data
+    await _loadUserData();
 
+    // Then load teacher data
+    // _loadTeacherData();
+  }
   Future<void> _loadUserData() async {
+    Logout logout = Logout();
+    User? user = await logout.getUserDetails(key: 'user_data');
+
+    Map<String, dynamic>? userMap = await logout.getUser(key: 'user_logged_in');
+    Map<String, dynamic>? schoolMap = await logout.getSchool(key: 'school_data');
+
+    if (userMap != null) {
+      User user_data = User.fromMap(userMap);
+      setState(() {
+        _user_data = user_data;
+      });
+    } else {
+      print("User map is null");
+    }
+
+    if (schoolMap != null) {
+      School schoolData = School.fromMap(schoolMap);
+      setState(() {
+        _user = user;
+        school = schoolData;
+        sid = school?.sId;
+        print(schoolData.sId);
+      });
+    } else {
+      print("School data is null");
+    }
+
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userDataString = prefs.getString('user_logged_in');
-    String? imagePath =
-        prefs.getString('profile_picture'); // Load saved image path
+    String? imagePath = prefs.getString('profile_picture');
 
     if (userDataString != null) {
       Map<String, dynamic> userData = jsonDecode(userDataString);
-
       setState(() {
-        nameController.text = userData['uname'] ?? '';
+        userName = userData['uname'];
+        userPhone = userData['phone'];
+        userEmail = userData['email'];
         if (imagePath != null) {
           _selectedImage = File(imagePath);
         }
@@ -65,7 +125,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     };
 
     await prefs.setString('user_logged_in', jsonEncode(updatedUserData));
-
     if (_selectedImage != null) {
       await prefs.setString('profile_picture', _selectedImage!.path);
     }
@@ -175,6 +234,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ),
                   const SizedBox(height: 24),
 
+                  // Conditionally show the Save Button if an image is selected
+                  if (_showSaveButton)
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: _saveUserData,
+                        child: const Text('Save Picture'),
+                      ),
+                    ),
+                  const SizedBox(height: 8),
                   // Name TextField
                   TextField(
                     controller: nameController,
@@ -299,14 +367,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                   ),
 
-                  // Conditionally show the Save Button if an image is selected
-                  if (_showSaveButton)
-                    Center(
-                      child: ElevatedButton(
-                        onPressed: _saveUserData,
-                        child: const Text('Save Picture'),
-                      ),
-                    ),
+                  // // Conditionally show the Save Button if an image is selected
+                  // if (_showSaveButton)
+                  //   Center(
+                  //     child: ElevatedButton(
+                  //       onPressed: _saveUserData,
+                  //       child: const Text('Save Picture'),
+                  //     ),
+                  //   ),
                   const SizedBox(height: 16),
                   TextField(
                     decoration: InputDecoration(
@@ -413,6 +481,121 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ),
     );
   }
+
+  Future<void> _loadTeacherData() async {
+    _loadUserData();
+    Teacher? teacherr = await getTeacherByUniqueId(_user?.uniqueid??"");
+    if(teacherr==null){
+      saveNewTeacher();
+    }
+
+  }
+
+  Future<Teacher?> getTeacherByUniqueId(String uniqueId) async {
+    print("farhad ${uniqueId}");
+    final DatabaseReference dbRef = FirebaseDatabase.instance.ref("teachers");
+
+    try {
+      // Querying the teachers node by uniqueId
+      DatabaseEvent event = await dbRef.orderByChild('uniqueId').equalTo(uniqueId).once();
+
+      // Check if the snapshot has data
+      if (event.snapshot.value != null) {
+        // The result will be a map of teachers with unique keys
+        Map<dynamic, dynamic> teacherMap = event.snapshot.value as Map<dynamic, dynamic>;
+
+        // Check if we got at least one result
+        if (teacherMap.isNotEmpty) {
+          // Get the first teacher entry from the map
+          var teacherData = teacherMap.values.first;
+
+          // Convert the map to a Teacher object
+          Teacher teacher = Teacher.fromMap(Map<String, dynamic>.from(teacherData));
+
+          return teacher;
+        } else {
+          print('No teacher found with this uniqueId');
+          return null;
+        }
+      } else {
+        print('No teacher data found in the database');
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching teacher: $e');
+      return null;
+    }
+  }
+
+
+
+
+
+
+
+  void saveNewTeacher() async {
+    String teacherName = _user?.uname??"";
+    String teacherEmail = _user?.email??"";
+    String teacherPhone = _user?.phone??"";
+    String teacherAddress = "Address";
+
+    String uniqueId = Unique().generateUniqueID();
+
+    if (teacherName.isNotEmpty && teacherEmail.isNotEmpty && teacherPhone.isNotEmpty) {
+      Teacher newTeacher = Teacher(
+        id: null,
+        sId: school?.sId,
+        uniqueId: _user?.uniqueid??"",
+        tName: teacherName,
+        tEmail: teacherEmail,
+        tPhone: teacherPhone,
+        tAddress: teacherAddress,
+        aStatus: 1,
+        uId: uniqueId,
+        tPass: teacherPhone,
+      );
+
+      if (await InternetConnectionChecker().hasConnection) {
+        if (newTeacher.uniqueId != null && newTeacher.uniqueId!.isNotEmpty) {
+          final DatabaseReference _database = FirebaseDatabase.instance
+              .ref("teachers")
+              .child(newTeacher.uniqueId!);
+
+          _database.set(newTeacher.toJson()).then((_) {
+            setState(() {
+              teacher = newTeacher;
+            });
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Teacher added')),
+            );
+          }).catchError((error) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Failed to add teacher: $error')),
+            );
+            print("Error adding teacher: $error");
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Invalid unique ID')),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No internet connection')),
+        );
+      }
+
+
+
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please fill all fields')),
+      );
+    }
+  }
+
+
 }
 
 // import 'dart:async';

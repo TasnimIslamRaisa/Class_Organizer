@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:class_organizer/ui/screens/students_screen/class_manager_screen.dart';
 import 'package:class_organizer/web/black_box_online.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ import '../../../utility/card/flash_card_routine.dart';
 import '../../../web/black_box.dart';
 import '../../../web/black_box_online_e.dart';
 import '../../../web/internet_connectivity.dart';
+import '../controller/class_routine_controller.dart';
 import '../controller/schedule_controller.dart';
 
 class StudentCompanionScreen extends StatefulWidget {
@@ -31,7 +33,7 @@ class StudentCompanionScreen extends StatefulWidget {
 
 class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
   String _userName = 'Tasnim';
-
+  final ClassController classController = Get.put(ClassController());
   final ScheduleController scheduleController = Get.put(ScheduleController());
   List<ScheduleItem> schedules = [];
   List<ScheduleItem> nextDaySchedules = [];
@@ -67,6 +69,7 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
     // First load user data
     await _loadUserData();
 
+    loadSchedules();
     getSchedules();
     _startAutomaticUpdates();
     // Then load teacher data
@@ -382,6 +385,8 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
     List<ScheduleItem> fetchedSchedules = await DatabaseHelper().getTodaySchedulesById(_user!.uniqueid!);
     if(fetchedSchedules.isNotEmpty){
       schedules.clear();
+    }else{
+
     }
     if (!mounted) return;
     setState(() {
@@ -395,6 +400,8 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
     List<ScheduleItem> fetchedNextSchedules = await DatabaseHelper().getSchedulesByDayAndTimeId(nextDayString,_user!.uniqueid!);
     if(fetchedNextSchedules.isNotEmpty){
       nextDaySchedules.clear();
+    }else{
+
     }
     if (!mounted) return;
     setState(() {
@@ -407,6 +414,76 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
     final DateTime newDay = now.add(Duration(days: incrementBy));
     return DateFormat('EEEE').format(newDay);
   }
+
+  Future<void> loadSchedules() async {
+
+    if (await InternetConnectionChecker().hasConnection) {
+
+      DatabaseReference schedulesRef = _databaseRef.child('schedules');
+
+      Query query = schedulesRef.orderByChild('temp_code').equalTo(_user?.uniqueid);
+
+      query.once().then((DatabaseEvent event) {
+        final dataSnapshot = event.snapshot;
+
+        if (dataSnapshot.exists) {
+          final Map<dynamic, dynamic> schedulesData = dataSnapshot.value as Map<dynamic, dynamic>;
+
+          // Convert the schedules data into a list of ScheduleItems
+          List<ScheduleItem> fetchedSchedules = schedulesData.entries.map((entry) {
+            Map<String, dynamic> scheduleMap = {
+              'id': entry.value['id'] ?? null,
+              'uniqueId': entry.value['uniqueId'] ?? '',
+              'sId': entry.value['sId'] ?? '',
+              'stdId': entry.value['stdId'] ?? '',
+              'tId': entry.value['tId'] ?? '',
+              'temp_code': entry.value['temp_code'] ?? '',
+              'temp_num': entry.value['temp_num'] ?? '',
+              'sub_name': entry.value['sub_name'] ?? '',
+              'sub_code': entry.value['sub_code'] ?? '',
+              't_id': entry.value['t_id'] ?? '',
+              't_name': entry.value['t_name'] ?? '',
+              'room': entry.value['room'] ?? '',
+              'campus': entry.value['campus'] ?? '',
+              'section': entry.value['section'] ?? '',
+              'start_time': entry.value['start_time'] ?? '',
+              'end_time': entry.value['end_time'] ?? '',
+              'day': entry.value['day'] ?? '',
+              'key': entry.value['key'] ?? '',
+              'sync_key': entry.value['sync_key'] ?? '',
+              'min': entry.value['min'] ?? 0,
+              'sync_status': entry.value['sync_status'] ?? 0,
+              'dateTime': entry.value['dateTime'] != null ? DateTime.parse(entry.value['dateTime']) : null,
+            };
+            return ScheduleItem.fromMap(scheduleMap);
+          }).toList();
+          schedules.clear();
+          schedules = fetchedSchedules;
+          saveSchedulesOffline(fetchedSchedules);
+          classController.clearClasses();
+          // Pass the fetched schedules to the ScheduleController
+          classController.setSchedules(fetchedSchedules);
+
+        } else {
+          print('No schedules available for the given routine.');
+        }
+      }).catchError((error) {
+        print('Failed to load schedules: $error');
+      });
+    } else {
+      // Handle offline mode
+      showSnackBarMsg(context, "You are offline. Please connect to the internet.");
+      // getSchedulesOffline();
+    }
+  }
+  Future<void> saveSchedulesOffline(List<ScheduleItem> fetchedSchedules) async {
+    deleteSchedules();
+    await DatabaseHelper().setSchedulesList(fetchedSchedules);
+  }
+  Future<void> deleteSchedules() async {
+    await DatabaseHelper().deleteSchedules(_user?.uniqueid??"");
+  }
+
 
   @override
   void dispose() {
