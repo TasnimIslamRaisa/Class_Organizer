@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Home_Screen.dart';
 import '../../widgets/drawer_widget.dart';
@@ -23,6 +25,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   TextEditingController creditsController = TextEditingController();
   String? selectedDepartment;
   String? selectedSemester;
+  File? _selectedImage; // For storing the selected image
+  bool _showSaveButton = false; // Controls whether the Save button is shown
 
   @override
   void initState() {
@@ -33,19 +37,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<void> _loadUserData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userDataString = prefs.getString('user_logged_in');
+    String? imagePath =
+        prefs.getString('profile_picture'); // Load saved image path
 
     if (userDataString != null) {
       Map<String, dynamic> userData = jsonDecode(userDataString);
 
       setState(() {
         nameController.text = userData['uname'] ?? '';
+        if (imagePath != null) {
+          _selectedImage = File(imagePath);
+        }
       });
     }
   }
 
   Future<void> _saveUserData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    
+
     Map<String, dynamic> updatedUserData = {
       'uname': nameController.text,
       'university': universityController.text,
@@ -56,6 +65,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     };
 
     await prefs.setString('user_logged_in', jsonEncode(updatedUserData));
+
+    if (_selectedImage != null) {
+      await prefs.setString('profile_picture', _selectedImage!.path);
+    }
 
     // Show success dialog
     showDialog(
@@ -73,6 +86,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     });
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+        _showSaveButton = true; // Show save button after image selection
+      });
+    }
   }
 
   @override
@@ -106,31 +131,42 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: Colors.grey[300],
+                            image: _selectedImage != null
+                                ? DecorationImage(
+                                    image: FileImage(_selectedImage!),
+                                    fit: BoxFit.cover,
+                                  )
+                                : null,
                           ),
-                          child: const Icon(
-                            Icons.person,
-                            size: 80,
-                            color: Colors.white,
-                          ),
+                          child: _selectedImage == null
+                              ? const Icon(
+                                  Icons.person,
+                                  size: 80,
+                                  color: Colors.white,
+                                )
+                              : null,
                         ),
                         Positioned(
                           bottom: 0,
                           right: 0,
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.grey,
-                              border: Border.all(
-                                color: Colors.white,
-                                width: 2,
+                          child: GestureDetector(
+                            onTap: _pickImage, // Call the image picker on tap
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.grey,
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 2,
+                                ),
                               ),
-                            ),
-                            child: const Icon(
-                              Icons.camera_alt,
-                              color: Colors.white,
-                              size: 20,
+                              child: const Icon(
+                                Icons.camera_alt,
+                                color: Colors.white,
+                                size: 20,
+                              ),
                             ),
                           ),
                         ),
@@ -138,7 +174,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-          
+
                   // Name TextField
                   TextField(
                     controller: nameController,
@@ -148,11 +184,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       contentPadding: const EdgeInsets.all(16),
                       filled: true,
                       //isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600]
-                      fillColor: isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
+                      fillColor: isLightMode
+                          ? Colors.blueGrey[100]
+                          : Colors.blueGrey[600],
                     ),
                   ),
                   const SizedBox(height: 16),
-          
+
                   // University TextField
                   TextField(
                     controller: universityController,
@@ -161,11 +199,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(16),
                       filled: true,
-                      fillColor: isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
+                      fillColor: isLightMode
+                          ? Colors.blueGrey[100]
+                          : Colors.blueGrey[600],
                     ),
                   ),
                   const SizedBox(height: 16),
-          
+
                   // Department Dropdown
                   DropdownButtonFormField<String>(
                     value: selectedDepartment,
@@ -173,7 +213,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       labelText: 'Department',
                       border: InputBorder.none,
                       filled: true,
-                      fillColor: isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
+                      fillColor: isLightMode
+                          ? Colors.blueGrey[100]
+                          : Colors.blueGrey[600],
                     ),
                     items: const [
                       DropdownMenuItem(value: 'CSE', child: Text('CSE')),
@@ -187,7 +229,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-          
+
                   // Semester Dropdown
                   DropdownButtonFormField<String>(
                     value: selectedSemester,
@@ -195,7 +237,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       labelText: 'Semester',
                       border: InputBorder.none,
                       filled: true,
-                      fillColor: isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
+                      fillColor: isLightMode
+                          ? Colors.blueGrey[100]
+                          : Colors.blueGrey[600],
                     ),
                     items: const [
                       DropdownMenuItem(value: '1st', child: Text('1st')),
@@ -214,7 +258,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-          
+
                   // CGPA TextField
                   TextField(
                     controller: cgpaController,
@@ -223,7 +267,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(16),
                       filled: true,
-                      fillColor: isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
+                      fillColor: isLightMode
+                          ? Colors.blueGrey[100]
+                          : Colors.blueGrey[600],
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -235,7 +281,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(16),
                       filled: true,
-                      fillColor: isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
+                      fillColor: isLightMode
+                          ? Colors.blueGrey[100]
+                          : Colors.blueGrey[600],
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -245,9 +293,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(16),
                       filled: true,
-                      fillColor: isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
+                      fillColor: isLightMode
+                          ? Colors.blueGrey[100]
+                          : Colors.blueGrey[600],
                     ),
                   ),
+
+                  // Conditionally show the Save Button if an image is selected
+                  if (_showSaveButton)
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: _saveUserData,
+                        child: const Text('Save Picture'),
+                      ),
+                    ),
                   const SizedBox(height: 16),
                   TextField(
                     decoration: InputDecoration(
@@ -255,7 +314,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(16),
                       filled: true,
-                      fillColor: isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
+                      fillColor: isLightMode
+                          ? Colors.blueGrey[100]
+                          : Colors.blueGrey[600],
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -265,7 +326,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(16),
                       filled: true,
-                      fillColor: isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
+                      fillColor: isLightMode
+                          ? Colors.blueGrey[100]
+                          : Colors.blueGrey[600],
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -275,7 +338,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(16),
                       filled: true,
-                      fillColor: isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
+                      fillColor: isLightMode
+                          ? Colors.blueGrey[100]
+                          : Colors.blueGrey[600],
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -285,7 +350,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(16),
                       filled: true,
-                      fillColor: isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
+                      fillColor: isLightMode
+                          ? Colors.blueGrey[100]
+                          : Colors.blueGrey[600],
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -310,7 +377,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
       ),
 
-
       // Floating Action Buttons for Settings and Save
       floatingActionButton: Stack(
         children: [
@@ -323,7 +389,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               shape: const CircleBorder(),
               onPressed: () {
                 Navigator.push(
-                  context, 
+                  context,
                   MaterialPageRoute(builder: (contex) => const SettingScreen()),
                 );
               },
@@ -548,7 +614,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 //               foregroundColor: Colors.white,
 //               shape: const CircleBorder(),
 //               onPressed: () {
-//                 Navigator.push(context, 
+//                 Navigator.push(context,
 //                     MaterialPageRoute(builder: (contex)=>const SettingScreen())
 //                 );
 //               },
