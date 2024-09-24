@@ -1,3 +1,4 @@
+import 'package:class_organizer/admin/school/exam/exam_routine.dart';
 import 'package:class_organizer/admin/school/pages/courses.dart';
 import 'package:class_organizer/admin/school/pages/departments.dart';
 import 'package:class_organizer/admin/school/pages/programs.dart';
@@ -215,6 +216,8 @@ class _SchoolSetupState extends State<SchoolSetup> {
       Navigator.push(context, MaterialPageRoute(builder: (context) => RoutinesListPage()));
     }else if(pageName=='faculty'){
       Navigator.push(context, MaterialPageRoute(builder: (context) => TeachersListPage()));
+    }else if(pageName=='exams'){
+      Navigator.push(context, MaterialPageRoute(builder: (context) => ExamRoutine()));
     }else{
 
     }
