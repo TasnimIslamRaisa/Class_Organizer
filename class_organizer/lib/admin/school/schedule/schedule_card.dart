@@ -28,14 +28,23 @@ class _ScheduleCardState extends State<ScheduleCard> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // Text(
+                //   widget.schedule.subName ?? 'Unknown Subject',
+                //   style: const TextStyle(
+                //     fontSize: 20,
+                //     fontWeight: FontWeight.bold,
+                //     color: Colors.black,
+                //   ),
+                // ),
                 Text(
                   widget.schedule.subName ?? 'Unknown Subject',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: Theme.of(context).colorScheme.onSurface, // Adapts to light/dark mode
                   ),
                 ),
+
                 // Container(
                 //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 //   decoration: BoxDecoration(
@@ -68,13 +77,21 @@ class _ScheduleCardState extends State<ScheduleCard> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // Text(
+                //   '${widget.schedule.subCode ?? 'Unknown'} . ${widget.schedule.section ?? ''}',
+                //   style: const TextStyle(
+                //     fontSize: 18,
+                //     color: Colors.black,
+                //   ),
+                // ),
                 Text(
                   '${widget.schedule.subCode ?? 'Unknown'} . ${widget.schedule.section ?? ''}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
-                    color: Colors.black,
+                    color: Theme.of(context).colorScheme.onSurface, // Adapts to light/dark mode
                   ),
                 ),
+
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
@@ -122,14 +139,23 @@ class _ScheduleCardState extends State<ScheduleCard> {
                         fontSize: 14,
                       ),
                     ),
+                    // Text(
+                    //   widget.schedule.tName ?? 'Unknown Teacher',
+                    //   style: const TextStyle(
+                    //     color: Colors.black,
+                    //     fontSize: 16,
+                    //     fontWeight: FontWeight.bold,
+                    //   ),
+                    // ),
                     Text(
                       widget.schedule.tName ?? 'Unknown Teacher',
-                      style: const TextStyle(
-                        color: Colors.black,
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface, // Adapts to light/dark mode
                       ),
                     ),
+
                   ],
                 ),
                 Column(
@@ -142,14 +168,23 @@ class _ScheduleCardState extends State<ScheduleCard> {
                         fontSize: 14,
                       ),
                     ),
+                    // Text(
+                    //   widget.schedule.room ?? 'Unknown Room',
+                    //   style: const TextStyle(
+                    //     color: Colors.black,
+                    //     fontSize: 16,
+                    //     fontWeight: FontWeight.bold,
+                    //   ),
+                    // ),
                     Text(
                       widget.schedule.room ?? 'Unknown Room',
-                      style: const TextStyle(
-                        color: Colors.black,
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface, // Adapts to light/dark mode
                       ),
                     ),
+
                   ],
                 ),
               ],

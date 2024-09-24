@@ -59,14 +59,23 @@ class SlidableClassItem extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // Text(
+                  //   classItem.subName ?? 'Unknown Subject',
+                  //   style: const TextStyle(
+                  //     fontSize: 20,
+                  //     fontWeight: FontWeight.bold,
+                  //     color: Colors.black,
+                  //   ),
+                  // ),
                   Text(
                     classItem.subName ?? 'Unknown Subject',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      color: Theme.of(context).colorScheme.onSurface, // Adapts to light/dark mode
                     ),
                   ),
+
                   // Container(
                   //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   //   decoration: BoxDecoration(
@@ -97,13 +106,21 @@ class SlidableClassItem extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // Text(
+                  //   '${classItem.subCode ?? 'Unknown'} . ${classItem.section ?? ''}',
+                  //   style: const TextStyle(
+                  //     fontSize: 18,
+                  //     color: Colors.black,
+                  //   ),
+                  // ),
                   Text(
                     '${classItem.subCode ?? 'Unknown'} . ${classItem.section ?? ''}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
-                      color: Colors.black,
+                      color: Theme.of(context).colorScheme.onBackground, // or onSurface
                     ),
                   ),
+
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
@@ -152,14 +169,23 @@ class SlidableClassItem extends StatelessWidget {
                           fontSize: 14,
                         ),
                       ),
+                      // Text(
+                      //   classItem.tName ?? 'Unknown Teacher',
+                      //   style: const TextStyle(
+                      //     color: Colors.black,
+                      //     fontSize: 16,
+                      //     fontWeight: FontWeight.bold,
+                      //   ),
+                      // ),
                       Text(
                         classItem.tName ?? 'Unknown Teacher',
-                        style: const TextStyle(
-                          color: Colors.black,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onBackground, // or onSurface
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+
                     ],
                   ),
                   Column(
@@ -172,14 +198,23 @@ class SlidableClassItem extends StatelessWidget {
                           fontSize: 14,
                         ),
                       ),
+                      // Text(
+                      //   classItem.room ?? 'Unknown Room',
+                      //   style: const TextStyle(
+                      //     color: Colors.black,
+                      //     fontSize: 16,
+                      //     fontWeight: FontWeight.bold,
+                      //   ),
+                      // ),
                       Text(
                         classItem.room ?? 'Unknown Room',
-                        style: const TextStyle(
-                          color: Colors.black,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onBackground, // or onSurface
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+
                     ],
                   ),
                 ],

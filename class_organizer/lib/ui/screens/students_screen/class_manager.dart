@@ -701,14 +701,22 @@ class _ClassManagerPageState extends State<ClassManagerPage> {
                           child: Container(
                             padding: const EdgeInsets.all(16.0),
                             decoration: BoxDecoration(
-                              color: Colors.white, // Changed to white
+                              color: Theme.of(context).colorScheme.background, // Use background color from theme
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.lightBlue),
+                              border: Border.all(color: Theme.of(context).colorScheme.primary), // Use primary color from theme
                             ),
+
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text('Semester'),
+                                Text(
+                                  'Semester',
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.onBackground, // or onSurface
+                                    fontSize: 16, // Adjust the font size as needed
+                                    fontWeight: FontWeight.bold, // Adjust the font weight if needed
+                                  ),
+                                ),
                                 DropdownButton<int>(
                                   value: selectedSemester,
                                   onChanged: (int? newValue) {
@@ -733,14 +741,23 @@ class _ClassManagerPageState extends State<ClassManagerPage> {
                           child: Container(
                             padding: const EdgeInsets.all(16.0),
                             decoration: BoxDecoration(
-                              color: Colors.white, // Changed to white
+                              color: Theme.of(context).colorScheme.background, // Use the theme's background color
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.lightGreen),
+                              border: Border.all(color: Theme.of(context).colorScheme.primary), // Use the theme's primary color
                             ),
+
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text('Section'),
+                                Text(
+                                  'Section',
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.onBackground, // or onSurface
+                                    fontSize: 16, // Adjust the font size as needed
+                                    fontWeight: FontWeight.bold, // Adjust the font weight if needed
+                                  ),
+                                ),
+
                                 DropdownButton<String>(
                                   value: selectedSection,
                                   onChanged: (String? newValue) {
@@ -793,11 +810,26 @@ class _ClassManagerPageState extends State<ClassManagerPage> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text('Course: ${course.subName}'), // Access subName directly from the model
+                                      Text(
+                                        'Course: ${course.subName}',
+                                        style: TextStyle(
+                                          color: Theme.of(context).colorScheme.onBackground, // or onSurface
+                                        ),
+                                      ),
                                       const SizedBox(height: 4),
-                                      Text('Section: ${course.section}'), // Access section directly from the model
+                                      Text(
+                                        'Section: ${course.section}',
+                                        style: TextStyle(
+                                          color: Theme.of(context).colorScheme.onBackground, // or onSurface
+                                        ),
+                                      ),
                                       const SizedBox(height: 4),
-                                      Text('Semester: ${course.semester}'), // Access semester directly from the model
+                                      Text(
+                                        'Semester: ${course.semester}',
+                                        style: TextStyle(
+                                          color: Theme.of(context).colorScheme.onBackground, // or onSurface
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),

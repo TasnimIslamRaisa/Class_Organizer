@@ -25,11 +25,17 @@ class ScheduleCards extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // Text(
+                //   scheduleItem.subCode??"",
+                //   style: TextStyle(
+                //     fontSize: 18,
+                //     color: Colors.black,
+                //   ),
+                // ),
                 Text(
-                  scheduleItem.subCode??"",
-                  style: TextStyle(
+                  scheduleItem.subCode ?? "",
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontSize: 18,
-                    color: Colors.black,
                   ),
                 ),
                 Container(
@@ -61,14 +67,23 @@ class ScheduleCards extends StatelessWidget {
             SizedBox(height: 8),
 
             // Subtitle (e.g., "320_1")
+            // Text(
+            //   scheduleItem.subName??"",
+            //   style: TextStyle(
+            //     fontSize: 17,
+            //     fontWeight: FontWeight.bold,
+            //     color: Colors.black,
+            //   ),
+            // ),
             Text(
-              scheduleItem.subName??"",
+              scheduleItem.subName ?? "",
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: Theme.of(context).colorScheme.onSurface, // Adapts to light/dark mode
               ),
             ),
+
             Divider(
               thickness: 1,
               color: Colors.redAccent,
@@ -89,14 +104,33 @@ class ScheduleCards extends StatelessWidget {
                         fontSize: 14,
                       ),
                     ),
+                    // Text(
+                    //   scheduleItem.tName??"",
+                    //   style: TextStyle(
+                    //     color: Colors.black,
+                    //     fontSize: 16,
+                    //     fontWeight: FontWeight.bold,
+                    //   ),
+                    // ),
                     Text(
-                      scheduleItem.tName??"",
+                      scheduleItem.tName ?? "",
                       style: TextStyle(
-                        color: Colors.black,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface, // Adapts to light/dark mode
                       ),
                     ),
+                    // Text(
+                    //   scheduleItem.tName ?? "",
+                    //   style: TextStyle(
+                    //     fontSize: 16,
+                    //     fontWeight: FontWeight.bold,
+                    //     color: Theme.of(context).brightness == Brightness.dark
+                    //         ? Colors.white // Use white in dark mode
+                    //         : Colors.black, // Use black in light mode
+                    //   ),
+                    // ),
+
                   ],
                 ),
                 Column(
@@ -109,14 +143,23 @@ class ScheduleCards extends StatelessWidget {
                         fontSize: 14,
                       ),
                     ),
+                    // Text(
+                    //   scheduleItem.room??"",
+                    //   style: TextStyle(
+                    //     color: Colors.black,
+                    //     fontSize: 16,
+                    //     fontWeight: FontWeight.bold,
+                    //   ),
+                    // ),
                     Text(
-                      scheduleItem.room??"",
+                      scheduleItem.room ?? "",
                       style: TextStyle(
-                        color: Colors.black,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface, // Theme-aware color
                       ),
                     ),
+
                   ],
                 ),
               ],
