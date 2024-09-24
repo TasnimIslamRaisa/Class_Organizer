@@ -16,10 +16,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../admin/school/schedule/weekly_campus_schedules.dart';
+import '../../../db/database_helper.dart';
 import '../../../models/major.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:firebase_database/firebase_database.dart';
 
+import '../../../models/schedule_item.dart';
 import '../../../models/school.dart';
 import '../../../models/subject.dart';
 import '../../../models/user.dart';
@@ -54,6 +56,7 @@ class _CampusRoutinesState extends State<CampusRoutines> {
 
   List<Major> departments = [];
   Major? _selectedDepartment;
+  List<ScheduleItem> schedules = [];
 
   @override
   void initState() {
@@ -346,8 +349,13 @@ class _CampusRoutinesState extends State<CampusRoutines> {
 
 
 
-  void editRoutine(int index) {
+  Future<void> editRoutine(int index) async {
     print('Editing ${routines[index].tempName}');
+
+    await loadSchedules(routines[index]);
+
+
+
   }
 
   void duplicateRoutine(int index) {
@@ -601,7 +609,7 @@ class _CampusRoutinesState extends State<CampusRoutines> {
                     case 'Save as Mine':
                       setMineRoutine(index);
                       break;
-                    case 'Edit':
+                    case 'Save All Schedules':
                       editRoutine(index);
                       break;
                     case 'Duplicate':
@@ -613,7 +621,7 @@ class _CampusRoutinesState extends State<CampusRoutines> {
                   }
                 },
                 itemBuilder: (BuildContext context) {
-                  return ['Copy','Share','Save as Mine','Edit', 'Duplicate', 'Delete'].map((String choice) {
+                  return ['Copy','Share','Save as Mine','Save All Schedules', 'Duplicate', 'Delete'].map((String choice) {
                     return PopupMenuItem<String>(
                       value: choice,
                       child: Text(choice),
@@ -906,5 +914,164 @@ class _CampusRoutinesState extends State<CampusRoutines> {
     }
   }
 
+  Future<void> loadSchedules(Routine routine) async {
+    if (await InternetConnectionChecker().hasConnection) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      // Reference to the schedules node in Firebase
+      DatabaseReference schedulesRef = _databaseRef.child('schedules');
+
+      // Query schedules that match the given tempCode from the routine
+      Query query = schedulesRef.orderByChild('temp_code').equalTo(routine.tempCode);
+
+      query.once().then((DatabaseEvent event) {
+        final dataSnapshot = event.snapshot;
+
+        if (dataSnapshot.exists) {
+          final Map<dynamic, dynamic> schedulesData = dataSnapshot.value as Map<dynamic, dynamic>;
+
+          // Convert the schedules data into a list of ScheduleItems
+          List<ScheduleItem> fetchedSchedules = schedulesData.entries.map((entry) {
+            Map<String, dynamic> scheduleMap = {
+              'id': entry.value['id'] ?? null,
+              'uniqueId': entry.value['uniqueId'] ?? '',
+              'sId': entry.value['sId'] ?? '',
+              'stdId': entry.value['stdId'] ?? '',
+              'tId': entry.value['tId'] ?? '',
+              'temp_code': entry.value['temp_code'] ?? '',
+              'temp_num': entry.value['temp_num'] ?? '',
+              'sub_name': entry.value['sub_name'] ?? '',
+              'sub_code': entry.value['sub_code'] ?? '',
+              't_id': entry.value['t_id'] ?? '',
+              't_name': entry.value['t_name'] ?? '',
+              'room': entry.value['room'] ?? '',
+              'campus': entry.value['campus'] ?? '',
+              'section': entry.value['section'] ?? '',
+              'start_time': entry.value['start_time'] ?? '',
+              'end_time': entry.value['end_time'] ?? '',
+              'day': entry.value['day'] ?? '',
+              'key': entry.value['key'] ?? '',
+              'sync_key': entry.value['sync_key'] ?? '',
+              'min': entry.value['min'] ?? 0,
+              'sync_status': entry.value['sync_status'] ?? 0,
+              'dateTime': entry.value['dateTime'] != null ? DateTime.parse(entry.value['dateTime']) : null,
+            };
+            return ScheduleItem.fromMap(scheduleMap);
+          }).toList();
+
+          setState(() {
+            schedules = fetchedSchedules;
+          });
+
+          if(schedules.isNotEmpty){
+            for(ScheduleItem scheduleItem in schedules){
+              saveNewSchedule(scheduleItem);
+            }
+          }
+
+          setState(() {
+            _isLoading = false;
+          });
+        } else {
+          print('No schedules available for the given routine.');
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }).catchError((error) {
+        print('Failed to load schedules: $error');
+        setState(() {
+          _isLoading = false;
+        });
+      });
+    } else {
+      // Handle offline mode
+      setState(() {
+        _isLoading = false;
+      });
+      showSnackBarMsg(context, "You are offline. Please connect to the internet.");
+    }
+  }
+
+  void saveNewSchedule(ScheduleItem newSchedule) async {
+
+    await _loadUserData();
+    String uniqueId = Unique().generateUniqueID();
+    var uuid = Uuid();
+
+    if (newSchedule.subName!.isNotEmpty && newSchedule.subCode!.isNotEmpty) {
+
+      newSchedule.uniqueId = uniqueId;
+      newSchedule.id = null;
+      newSchedule.sId = school?.sId;
+      newSchedule.tempCode = _user?.uniqueid;
+      newSchedule.tempNum = _user?.uniqueid;
+      newSchedule.stdId = _user?.uniqueid;
+      newSchedule.tId = _user?.uniqueid;
+
+
+      if (await InternetConnectionChecker().hasConnection) {
+        if (newSchedule.uniqueId != null && newSchedule.uniqueId!.isNotEmpty) {
+          final DatabaseReference _database = FirebaseDatabase.instance
+              .ref("schedules")
+              .child(newSchedule.uniqueId!);
+
+          _database.set(newSchedule.toMap()).then((_) {
+            saveScheduleOffline(newSchedule);
+          }).catchError((error) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Failed to add routine: $error')),
+            );
+            print("Error adding routine: $error");
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Invalid unique ID')),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No internet connection')),
+        );
+      }
+
+
+
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please fill all fields')),
+      );
+    }
+  }
+
+  Future<void> saveScheduleOffline(ScheduleItem schedule) async {
+
+    // sqlite
+
+    int result = await DatabaseHelper().insertSchedule(schedule);
+
+    if (mounted) {
+      setState(() {});
+    }
+
+    if (result > 0) {
+      if (mounted) {
+
+        Future.delayed(const Duration(seconds: 3), () {
+          if (mounted) {
+            showSnackBarMsg(context, 'Schedule Saved Successful in Offline');
+          }
+        });
+
+      }
+    } else {
+      if (mounted) {
+        showSnackBarMsg(context, 'Registration Failed');
+      }
+    }
+
+  }
 
 }
