@@ -526,7 +526,7 @@ class AdminLoginState extends State<AdminLogin> {
                 // await Logout().saveUser(user.toMap(), key: "user_logged_in");
                 // await Logout().saveUserDetails(user,key: "user_data");
 
-                print('user sid: ${user.phone}');
+                print('user sid: ${user.sid}');
 
                 if (mounted) {
                   checkOnlineSchool(user);
@@ -616,7 +616,8 @@ void showSnackBarMsg(BuildContext context, String message) {
   }
 
     Future<void> checkOnlineSchool(local.User user) async {
-    if(user.sid == null){
+    // print("sid user : ${user.sid}");
+    if(user.sid!.isEmpty){
       await Logout().saveUser(user.toMap(), key: "user_logged_in");
       await Logout().saveUserDetails(user,key: "user_data");
       Navigator.pushReplacement(
