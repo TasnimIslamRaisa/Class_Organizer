@@ -147,7 +147,6 @@ class _FlashcardRoutineState extends State<FlashcardRoutine>
     );
   }
 
-
   @override
   void dispose() {
     _controller.dispose();

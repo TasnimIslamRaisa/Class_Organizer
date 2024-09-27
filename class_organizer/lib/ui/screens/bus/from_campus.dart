@@ -10,11 +10,9 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-
 import '../../../models/major.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:firebase_database/firebase_database.dart';
-
 import '../../../models/school.dart';
 import '../../../models/subject.dart';
 import '../../../models/user.dart';
