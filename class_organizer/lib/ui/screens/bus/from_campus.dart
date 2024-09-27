@@ -413,94 +413,36 @@ class _FromCampusState extends State<FromCampus> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView.builder(
-        itemCount: schedules.length,
-        itemBuilder: (context, index) {
-          return Dismissible(
-            key: Key(schedules[index].uniqueId ?? schedules[index].busNo.toString()),
-            onDismissed: (direction) {
-              deleteBusSchedule(index); // Update to handle BusSchedule deletion
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Bus No. ${schedules[index].busNo} deleted')),
-              );
-            },
-            background: Container(
-              color: Colors.red,
-              alignment: Alignment.centerLeft,
-              padding: EdgeInsets.only(left: 20.0),
-              child: Icon(Icons.delete, color: Colors.white),
-            ),
-            secondaryBackground: Container(
-              color: Colors.red,
-              alignment: Alignment.centerRight,
-              padding: EdgeInsets.only(right: 20.0),
-              child: Icon(Icons.delete, color: Colors.white),
-            ),
-            child: ListTile(
-              leading: Icon(Icons.directions_bus, color: Colors.blueAccent), // Icon for bus
-              title: Text('Bus No. ${schedules[index].busNo ?? 'N/A'}'), // Bus number
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('From: ${schedules[index].fromLocation ?? 'N/A'}'), // From location
-                  Text('To: ${schedules[index].toLocation ?? 'N/A'}'),     // To location
-                  SizedBox(height: 4), // Spacing between texts
-                  Text('Starting Time: ${schedules[index].startingTime ?? 'N/A'}'), // Starting time
-                ],
-              ),
-              trailing: PopupMenuButton<String>(
-                onSelected: (value) {
-                  switch (value) {
-                    case 'Edit':
-                      editBusSchedule(index);
-                      break;
-                    case 'Duplicate':
-                      duplicateBusSchedule(index);
-                      break;
-                    case 'Delete':
-                      deleteBusSchedule(index);
-                      break;
-                  }
-                },
-                itemBuilder: (BuildContext context) {
-                  return ['Edit', 'Duplicate', 'Delete']
-                      .map((String choice) {
-                    return PopupMenuItem<String>(
-                      value: choice,
-                      child: Text(choice),
-                    );
-                  }).toList();
-                },
-                icon: Icon(Icons.more_vert, color: Colors.teal), // Trailing icon
-              ),
-              onTap: () {
-                showBusScheduleDetails(index); // Update to show BusSchedule details
-                Future.delayed(const Duration(seconds: 1), () {
-                  Navigator.pop(context);
-                  if (mounted) {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(builder: (context) => BusScheduleDetailsPage(schedule: schedules[index])),
-                    // );
-                  }
-                });
-              },
-            ),
-          );
-        },
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DataTable(
+            columns: [
+              DataColumn(label: Text('Time')),
+              DataColumn(label: Text('Route')),
+              DataColumn(label: Text('Shuttle No')),
+              DataColumn(label: Text('Remarks')),
+            ],
+            rows: schedules.map((schedule) {
+              return DataRow(cells: [
+                DataCell(Text(schedule.startingTime ?? 'N/A')), // Time
+                DataCell(Text('${schedule.fromLocation} to ${schedule.toLocation}')), // Route
+                DataCell(Text('Shuttle-${schedule.busNo ?? 'N/A'}')), // Shuttle No.
+                DataCell(Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(schedule.remarks ?? ''),
+                    if (schedule.driverPhone != null && schedule.driverPhone!.isNotEmpty)
+                      Text(schedule.driverPhone!, style: TextStyle(fontWeight: FontWeight.bold)),
+                  ],
+                )), // Remarks and Driver's name if available
+              ]);
+            }).toList(),
+          ),
+        ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          _showBusScheduleForm(context); // Call a form for adding a new BusSchedule
-          await _loadBusSchedulesData(); // Load BusSchedules after adding
-          setState(() {
-            // Additional functionality for the floating action button can go here
-          });
-        },
-        child: Icon(Icons.add),
-        backgroundColor: Colors.teal,
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
