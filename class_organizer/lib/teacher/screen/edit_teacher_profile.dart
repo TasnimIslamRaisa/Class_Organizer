@@ -484,6 +484,10 @@ class _EditTeacherProfileState extends State<EditTeacherProfile> {
     Teacher? teacherr = await getTeacherByUniqueId(_user?.uniqueid??"");
     if(teacherr==null){
       saveNewTeacher();
+    }else{
+      setState(() {
+        teacher = teacherr;
+      });
     }
 
   }

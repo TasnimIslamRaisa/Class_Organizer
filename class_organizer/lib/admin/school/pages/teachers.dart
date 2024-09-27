@@ -565,7 +565,7 @@ class _TeachersListPageState extends State<TeachersListPage> {
       builder: (BuildContext context) {
         return _buildForm(
           context,
-          'Create Routines',
+          'Create Teacher',
           [
             DropdownSearch<Major>(
               items: departments,  // Assuming you have a list of faculties
