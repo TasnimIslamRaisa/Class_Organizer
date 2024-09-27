@@ -124,7 +124,7 @@ class SlidableClassItem extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.redAccent,
+                      color: Colors.blue[800],
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
@@ -149,9 +149,9 @@ class SlidableClassItem extends StatelessWidget {
               ),
               // Subtitle (subCode and section)
 
-              const Divider(
+              Divider(
                 thickness: 1,
-                color: Colors.redAccent,
+                color: Colors.blue[900],
               ),
               const SizedBox(height: 8),
 
@@ -229,10 +229,10 @@ class SlidableClassItem extends StatelessWidget {
                     onPressed: () {
                       // Add your detail view logic here
                     },
-                    child: const Text(
+                    child: Text(
                       "DETAILS",
                       style: TextStyle(
-                        color: Colors.redAccent,
+                        color: Colors.blue[800],
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
