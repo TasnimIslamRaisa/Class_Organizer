@@ -12,6 +12,7 @@ import '../../preference/logout.dart';
 import '../../style/app_color.dart';
 import '../screens/auth/SignInScreen.dart';
 import '../screens/students_screen/class_manager.dart';
+import '../screens/students_screen/class_set_up_menu.dart';
 import '../screens/students_screen/edit_profile_screen.dart';
 import '../screens/students_screen/settings_screen.dart';
 
@@ -183,7 +184,16 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               ],
             ),
           ),
+          /*ListTile(
+            leading: const Icon(Icons.school),
+            title: const Text('S C H O O L  M E N U'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const SchoolSetup()));
+            },
+          ),*/
           _buildDrawerTile(Icons.account_box, 'B L A C K B O X', BlackBoxOnline()),
+          _buildDrawerTile(Icons.school, 'C L A S S  M E N U', ClassSetUpMenu()),
           _buildDrawerTile(Icons.palette, 'P R O F I L E', const EditProfileScreen()),
           _buildDrawerTile(Icons.bloodtype, 'C L A S S  M A N A G E R', ClassManagerPage()),
           _buildDrawerTile(Icons.note, 'N O T E S & T A S K S', NotesScreen()),

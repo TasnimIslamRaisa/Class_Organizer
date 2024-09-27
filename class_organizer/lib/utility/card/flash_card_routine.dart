@@ -92,7 +92,8 @@ class _FlashcardRoutineState extends State<FlashcardRoutine>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        scheduleItem.subCode??"",  // Use the appropriate property from ScheduleItem
+                        scheduleItem.subCode ?? "",
+                        // Use the appropriate property from ScheduleItem
                         style: const TextStyle(
                           color: AppColors.textColor,
                           fontSize: 16,
@@ -127,7 +128,9 @@ class _FlashcardRoutineState extends State<FlashcardRoutine>
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        scheduleItem.startTime??"",  // Use appropriate description or text field from ScheduleItem
+                        "${scheduleItem.startTime} - ${scheduleItem.endTime}",
+
+                        // Use appropriate description or text field from ScheduleItem
                         style: const TextStyle(
                           color: AppColors.textColor,
                           fontSize: 18,
