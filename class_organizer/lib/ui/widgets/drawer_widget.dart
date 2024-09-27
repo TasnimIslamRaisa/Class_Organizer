@@ -11,6 +11,7 @@ import '../../models/user.dart';
 import '../../preference/logout.dart';
 import '../../style/app_color.dart';
 import '../screens/auth/SignInScreen.dart';
+import '../screens/bus/bus_schedule.dart';
 import '../screens/students_screen/class_manager.dart';
 import '../screens/students_screen/edit_profile_screen.dart';
 import '../screens/students_screen/settings_screen.dart';
@@ -185,6 +186,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           ),
           _buildDrawerTile(Icons.account_box, 'B L A C K B O X', BlackBoxOnline()),
           _buildDrawerTile(Icons.palette, 'P R O F I L E', const EditProfileScreen()),
+          _buildDrawerTile(Icons.bus_alert_outlined, 'B U S ', const BusSchedule()),
           _buildDrawerTile(Icons.bloodtype, 'C L A S S  M A N A G E R', ClassManagerPage()),
           _buildDrawerTile(Icons.note, 'N O T E S & T A S K S', NotesScreen()),
           _buildDrawerTile(Icons.calendar_month_outlined, 'ACADEMIC - C A L E N D A R', AcademicCalender()),
