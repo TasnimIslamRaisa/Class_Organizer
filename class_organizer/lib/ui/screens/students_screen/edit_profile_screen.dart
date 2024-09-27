@@ -5,6 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../models/major.dart';
 import '../../../models/school.dart';
@@ -18,7 +19,8 @@ import '../../widgets/drawer_widget.dart';
 import '../../../utility/profile_app_bar.dart';
 import '../../widgets/background_widget.dart';
 import '../students_screen/settings_screen.dart';
-import 'class_manager.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:http/http.dart' as http;
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -99,6 +101,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     String? userDataString = prefs.getString('user_logged_in');
     String? imagePath = prefs.getString('profile_picture-${_user?.uniqueid!}');
 
+    await _loadUserImageByUniqueId(_user!.uniqueid!);
+
     if (userDataString != null) {
       Map<String, dynamic> userData = jsonDecode(userDataString);
       setState(() {
@@ -113,6 +117,41 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
+  Future<void> _loadUserImageByUniqueId(String uniqueId) async {
+    try {
+      // Construct the reference to the image in Firebase Storage using uniqueId
+      String filePath = 'profile_pictures/$uniqueId.jpg';
+      Reference storageRef = FirebaseStorage.instance.ref().child(filePath);
+
+      // Get the download URL for the image
+      String downloadUrl = await storageRef.getDownloadURL();
+
+      // Download the image from the download URL
+      final response = await http.get(Uri.parse(downloadUrl));
+      if (response.statusCode == 200) {
+        // Save the downloaded image to a temporary directory
+        final Directory tempDir = await getTemporaryDirectory();
+        final String tempPath = '${tempDir.path}/$uniqueId.jpg';
+
+        // Write the image data to the file
+        File file = File(tempPath);
+        await file.writeAsBytes(response.bodyBytes);
+
+        // Set the downloaded image as the _selectedImage
+        setState(() {
+          _selectedImage = file;
+        });
+
+        print('Image downloaded and set for user with uniqueId: $uniqueId');
+      } else {
+        print('Failed to download the image. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error while fetching the image for user with uniqueId: $uniqueId. Error: $e');
+    }
+  }
+
+
   Future<void> _saveUserData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -125,9 +164,34 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       'creditsCompleted': creditsController.text,
     };
 
+    // Save user data to shared preferences
     await prefs.setString('user_logged_in', jsonEncode(updatedUserData));
+
     if (_selectedImage != null) {
-      await prefs.setString('profile_picture-${_user?.uniqueid!}', _selectedImage!.path);
+      // Upload image to Firebase Storage
+      String fileName = 'profile_pictures/${_user?.uniqueid!}.jpg';
+      File file = File(_selectedImage!.path);
+
+      try {
+        // Create a reference to the location you want to upload to in Firebase Storage
+        Reference storageRef = FirebaseStorage.instance.ref().child(fileName);
+
+        // Upload the file
+        UploadTask uploadTask = storageRef.putFile(file);
+
+        // Wait for the upload to complete
+        TaskSnapshot snapshot = await uploadTask;
+
+        // Get the download URL
+        String downloadUrl = await snapshot.ref.getDownloadURL();
+
+        // Save the download URL to shared preferences
+        await prefs.setString('profile_picture-${_user?.uniqueid!}', downloadUrl);
+
+        print('Profile picture uploaded successfully: $downloadUrl');
+      } catch (e) {
+        print('Error uploading profile picture: $e');
+      }
     }
 
     // Show success dialog
@@ -147,6 +211,42 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
     });
   }
+
+
+  // Future<void> _saveUserData() async {
+  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
+  //
+  //   Map<String, dynamic> updatedUserData = {
+  //     'uname': nameController.text,
+  //     'university': universityController.text,
+  //     'department': selectedDepartment,
+  //     'semester': selectedSemester,
+  //     'cgpa': cgpaController.text,
+  //     'creditsCompleted': creditsController.text,
+  //   };
+  //
+  //   await prefs.setString('user_logged_in', jsonEncode(updatedUserData));
+  //   if (_selectedImage != null) {
+  //     await prefs.setString('profile_picture-${_user?.uniqueid!}', _selectedImage!.path);
+  //   }
+  //
+  //   // Show success dialog
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return const AlertDialog(
+  //         title: Center(child: Text("Successfully Updated")),
+  //       );
+  //     },
+  //   );
+  //
+  //   // Navigate to HomeScreen after a delay
+  //   Future.delayed(const Duration(seconds: 1), () {
+  //     Navigator.of(context).pushReplacement(
+  //       MaterialPageRoute(builder: (context) => const HomeScreen()),
+  //     );
+  //   });
+  // }
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
