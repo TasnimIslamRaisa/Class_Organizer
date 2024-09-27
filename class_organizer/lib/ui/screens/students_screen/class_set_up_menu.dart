@@ -1,3 +1,4 @@
+import 'package:class_organizer/ui/screens/bus/bus_schedule.dart';
 import 'package:class_organizer/admin/panel/admin_comopanion.dart';
 import 'package:class_organizer/admin/school/exam/exam_routine.dart';
 import 'package:class_organizer/admin/school/pages/courses.dart';
@@ -14,6 +15,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
 import '../../../utility/profile_app_bar_admin.dart';
+import '../../widgets/drawer_widget.dart';
 import 'campus_routine.dart';
 
 
@@ -34,6 +36,7 @@ class _ClassSetUpMenuState extends State<ClassSetUpMenu> {
         onActionPressed: (){},
         appBarbgColor: const Color(0xFF01579B),
       ),
+      drawer: const DrawerWidget(),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -188,11 +191,11 @@ class _ClassSetUpMenuState extends State<ClassSetUpMenu> {
   }
 
   void _navigateToPage(BuildContext context, String pageName) {
-    if(pageName=='programs'){
-      Navigator.push(context, MaterialPageRoute(builder: (context) => ProgramListPage()));
+    if(pageName=='bus'){
+      Navigator.push(context, MaterialPageRoute(builder: (context) => BusSchedule()));
     }else if(pageName=='schedules'){
-      //Navigator.push(context, MaterialPageRoute(builder: (context) => CampusRoutine()));
-      Get.off(CampusRoutine());
+      Navigator.push(context, MaterialPageRoute(builder: (context) => CampusRoutine()));
+      //Get.off(CampusRoutine());
     }else if(pageName=='sessions'){
       Navigator.push(context, MaterialPageRoute(builder: (context) => SessionListPage()));
     }else if(pageName=='rooms'){
@@ -200,8 +203,8 @@ class _ClassSetUpMenuState extends State<ClassSetUpMenu> {
     }else if(pageName=='courses'){
       Navigator.push(context, MaterialPageRoute(builder: (context) => CoursesListPage()));
     }else if(pageName=='routines'){
-      Get.off(ClassManagerScreen());
-      //Navigator.push(context, MaterialPageRoute(builder: (context) => RoutinesListPage()));
+      //Get.off(ClassManagerScreen());
+      Navigator.push(context, MaterialPageRoute(builder: (context) => ClassManagerScreen()));
     }else if(pageName=='faculty'){
       Navigator.push(context, MaterialPageRoute(builder: (context) => TeachersListPage()));
     }else if(pageName=='exams'){

@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -35,6 +37,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   String? selectedDepartment;
   String? selectedSemester;
   File? _selectedImage;
+  File? preImage;
   bool _showSaveButton = false;
 
   final _databaseRef = FirebaseDatabase.instance.ref();
@@ -108,6 +111,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         nameController.text = userData['uname'] ?? '';
         if (imagePath != null) {
           _selectedImage = File(imagePath);
+          preImage=_selectedImage;
         }
       });
     }
@@ -139,12 +143,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         );
       },
     );
-
     // Navigate to HomeScreen after a delay
     Future.delayed(const Duration(seconds: 1), () {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
+      Get.off(HomeScreen());
+    });
+  }
+  void cancleButton(){
+    setState(() {
+      _selectedImage = preImage;
+    });
+    Future.delayed(const Duration(seconds: 1), () {
+      Get.off(HomeScreen());
     });
   }
 
@@ -200,10 +209,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                           child: _selectedImage == null
                               ? const Icon(
-                                  Icons.person,
-                                  size: 80,
-                                  color: Colors.white,
-                                )
+                            Icons.person,
+                            size: 80,
+                            color: Colors.white,
+                          )
                               : null,
                         ),
                         Positioned(
@@ -238,9 +247,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   // Conditionally show the Save Button if an image is selected
                   if (_showSaveButton)
                     Center(
-                      child: ElevatedButton(
-                        onPressed: _saveUserData,
-                        child: const Text('Save Picture'),
+                      child: Row(
+                        children: [
+                          Flexible(
+                            child: ElevatedButton(
+                              onPressed: cancleButton,
+                              child: const Text('Cancel'),
+                            ),
+                          ),
+                          const SizedBox(width: 12,),
+                          Flexible(
+                            child: ElevatedButton(
+                              onPressed: _saveUserData,
+                              child: const Text('Save Picture'),
+                            ),),
+                        ],
                       ),
                     ),
                   const SizedBox(height: 8),

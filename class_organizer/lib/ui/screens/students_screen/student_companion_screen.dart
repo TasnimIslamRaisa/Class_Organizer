@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:class_organizer/ui/screens/students_screen/class_manager_screen.dart';
-import 'package:class_organizer/web/black_box_online.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -20,7 +18,6 @@ import '../../../preference/logout.dart';
 import '../../../style/app_color.dart';
 import '../../../utility/auto_function_caller.dart';
 import '../../../utility/card/flash_card_routine.dart';
-import '../../../web/black_box.dart';
 import '../../../web/black_box_online_e.dart';
 import '../../../web/internet_connectivity.dart';
 import '../controller/class_routine_controller.dart';
@@ -182,6 +179,7 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
       _currentIndex2 = index;
     });
   }
+
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -197,7 +195,7 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, String>> items = [
+    /*final List<Map<String, String>> items = [
       {
         'title': 'TODAY',
         'date': 'Sat, 31 August',
@@ -210,7 +208,7 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
         'icon': 'book',
         'text': 'CSE 412.1',
       },
-    ];
+    ];*/
 
     final brightness = Theme.of(context).brightness;
     final isLightMode = brightness == Brightness.light;
@@ -237,19 +235,6 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
                   )
                       : null,
                 ),
-                /*Container(
-                  width: 65,
-                  height: 65,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color:isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
-                  ),
-                  child: const Icon(
-                    Icons.person,
-                    color: Colors.white,
-                    size: 60,
-                  ),
-                ),*/
 
                 // Name and Details
                 Expanded(
@@ -324,7 +309,7 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
                   ),
                   Divider(
                     thickness: 2,
-                    color: Colors.grey,
+                    color: Colors.blueGrey,
                   ),
                   Expanded(
                     flex: 1,

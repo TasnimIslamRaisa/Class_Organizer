@@ -1,6 +1,7 @@
 import 'package:class_organizer/ui/screens/auth/SignInScreen.dart';
 import 'package:class_organizer/ui/screens/students_screen/campus_routine.dart';
 import 'package:class_organizer/ui/screens/students_screen/class_manager_screen.dart';
+import 'package:class_organizer/ui/screens/students_screen/class_set_up_menu.dart';
 import 'package:class_organizer/ui/screens/students_screen/edit_profile_screen.dart';
 import 'package:class_organizer/ui/screens/students_screen/academic_calender_screen.dart';
 import 'package:class_organizer/ui/screens/students_screen/settings_screen.dart';
@@ -25,12 +26,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: index == 0
           ? ProfileAppBar(
-          title:  'Student Companions',
-          actionIcon: Icons.more_vert,
-          onActionPressed: (){},
-          appBarbgColor: const Color(0xFF01579B),
+        title:  'Student Companions',
+        actionIcon: Icons.more_vert,
+        onActionPressed: (){},
+        appBarbgColor: const Color(0xFF01579B),
       )
-      : null,
+          : null,
       drawer: const DrawerWidget(),
       body: PageView(
         controller: _pageController,
@@ -45,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
           CampusRoutine(),
           AcademicCalender(),
           EditProfileScreen(),
+          ClassSetUpMenu(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -81,6 +83,10 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle),
             label: 'Profile',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.menu_book_outlined),
+            label: 'Menu',
           ),
         ],
       ),
