@@ -41,7 +41,7 @@ class ScheduleCards extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.redAccent,
+                    color: Colors.blueGrey,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -53,10 +53,11 @@ class ScheduleCards extends StatelessWidget {
                       ),
                       SizedBox(width: 4),
                       Text(
-                        scheduleItem.startTime??"",
+                        scheduleItem.startTime ?? "",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 14,
+                          fontSize: 15,
+                          //fontWeight: FontWeight.bold
                         ),
                       ),
                     ],
@@ -86,7 +87,7 @@ class ScheduleCards extends StatelessWidget {
 
             Divider(
               thickness: 1,
-              color: Colors.redAccent,
+              color: Colors.blueGrey,
             ),
             SizedBox(height: 8),
 
