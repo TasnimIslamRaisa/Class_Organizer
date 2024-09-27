@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import '../../models/school.dart';
+import '../../models/user.dart';
 import '../../preference/logout.dart';
 import '../../style/app_color.dart';
 import '../screens/auth/SignInScreen.dart';
@@ -26,6 +28,10 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   String? userEmail;
   File? _selectedImage;
   bool _showSaveButton = false;
+  User? _user, _user_data;
+  final _formKey = GlobalKey<FormState>();
+  String? sid;
+  School? school;
 
   @override
   void initState() {
@@ -48,13 +54,43 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
   Future<void> _saveProfilePicture(String path) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('profile_picture', path);
+    await prefs.setString('profile_picture-${_user?.uniqueid!}', path);
   }
 
   Future<void> _loadUserData() async {
+    Logout logout = Logout();
+    User? user = await logout.getUserDetails(key: 'user_data');
+
+
+    Map<String, dynamic>? userMap = await logout.getUser(key: 'user_logged_in');
+    Map<String, dynamic>? schoolMap = await logout.getSchool(key: 'school_data');
+
+
+    if (userMap != null) {
+      User user_data = User.fromMap(userMap);
+      setState(() {
+        _user_data = user_data;
+
+      });
+    } else {
+      print("User map is null");
+    }
+
+    if (schoolMap != null) {
+      School schoolData = School.fromMap(schoolMap);
+      setState(() {
+        _user = user;
+        school = schoolData;
+        sid = school?.sId;
+        print(schoolData.sId);
+      });
+    } else {
+      print("School data is null");
+    }
+
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userDataString = prefs.getString('user_logged_in');
-    String? imagePath = prefs.getString('profile_picture');
+    String? imagePath = prefs.getString('profile_picture-${_user?.uniqueid!}');
 
     if (userDataString != null) {
       Map<String, dynamic> userData = jsonDecode(userDataString);

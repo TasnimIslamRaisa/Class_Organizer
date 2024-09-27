@@ -97,7 +97,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userDataString = prefs.getString('user_logged_in');
-    String? imagePath = prefs.getString('profile_picture');
+    String? imagePath = prefs.getString('profile_picture-${_user?.uniqueid!}');
 
     if (userDataString != null) {
       Map<String, dynamic> userData = jsonDecode(userDataString);
@@ -127,7 +127,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     await prefs.setString('user_logged_in', jsonEncode(updatedUserData));
     if (_selectedImage != null) {
-      await prefs.setString('profile_picture', _selectedImage!.path);
+      await prefs.setString('profile_picture-${_user?.uniqueid!}', _selectedImage!.path);
     }
 
     // Show success dialog

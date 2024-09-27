@@ -125,7 +125,7 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userDataString = prefs.getString('user_logged_in');
-    String? imagePath = prefs.getString('profile_picture');
+    String? imagePath = prefs.getString('profile_picture-${_user?.uniqueid!}');
 
     if (userDataString != null) {
       Map<String, dynamic> userData = jsonDecode(userDataString);
