@@ -18,6 +18,7 @@ import '../../style/app_color.dart';
 import '../../ui/screens/auth/SignInScreen.dart';
 import '../../ui/screens/students_screen/edit_profile_screen.dart';
 import '../../ui/screens/students_screen/settings_screen.dart';
+import '../bus_schedule_screen.dart';
 
 class DrawerWidgetAdmin extends StatefulWidget {
   const DrawerWidgetAdmin({Key? key}) : super(key: key);
@@ -173,12 +174,11 @@ class _DrawerWidgetAdminState extends State<DrawerWidgetAdmin> {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.bloodtype),
-            title: const Text('School'),
+            leading: const Icon(Icons.school),
+            title: const Text('S C H O O L  M E N U'),
             onTap: () {
               Navigator.pop(context);
               Navigator.push(context, MaterialPageRoute(builder: (context) => const SchoolSetup()));
-
             },
           ),
           ListTile(
@@ -204,6 +204,7 @@ class _DrawerWidgetAdminState extends State<DrawerWidgetAdmin> {
             title: const Text('B U S - S C H E D U L E S'),
             onTap: () {
               Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => ShuttleScheduleApp()));
             },
           ),
           ListTile(

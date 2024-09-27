@@ -175,8 +175,8 @@ class AcademicCalender extends StatelessWidget {
                                       .textTheme
                                       .bodyLarge
                                       ?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.grey),
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey),
                                 ),
                               ],
                             ),
