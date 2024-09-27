@@ -3,7 +3,6 @@ import 'package:class_organizer/ui/screens/students_screen/class_manager_screen.
 import 'package:class_organizer/ui/screens/students_screen/edit_profile_screen.dart';
 import 'package:class_organizer/ui/screens/students_screen/academic_calender_screen.dart';
 import 'package:flutter/material.dart';
-
 import '../../utility/profile_app_bar_admin.dart';
 import '../widgets/drawer_widget_admin.dart';
 import 'admin_comopanion.dart';
@@ -23,12 +22,12 @@ class _AdminPanelState extends State<AdminPanel> {
     return Scaffold(
       appBar: index == 0
           ? ProfileAppBarAdmin(
-          title:  'Admin Companions',
-          actionIcon: Icons.more_vert,
-          onActionPressed: (){},
-          appBarbgColor: const Color(0xFF01579B),
+        title:  'Admin Companions',
+        actionIcon: Icons.more_vert,
+        onActionPressed: (){},
+        appBarbgColor: const Color(0xFF01579B),
       )
-      : null,
+          : null,
       drawer: const DrawerWidgetAdmin(),
       body: PageView(
         controller: _pageController,
