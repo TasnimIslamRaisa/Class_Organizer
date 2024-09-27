@@ -7,6 +7,7 @@ import 'package:class_organizer/admin/school/pages/routines.dart';
 import 'package:class_organizer/admin/school/pages/sessions.dart';
 import 'package:class_organizer/admin/school/pages/students.dart';
 import 'package:class_organizer/admin/school/pages/teachers.dart';
+import 'package:class_organizer/admin/bus/bus_schedule.dart';
 import 'package:flutter/material.dart';
 
 import '../../utility/profile_app_bar_admin.dart';
@@ -216,6 +217,8 @@ class _SchoolSetupState extends State<SchoolSetup> {
       Navigator.push(context, MaterialPageRoute(builder: (context) => TeachersListPage()));
     }else if(pageName=='exams'){
       Navigator.push(context, MaterialPageRoute(builder: (context) => ExamRoutine()));
+    }else if(pageName=='bus'){
+      Navigator.push(context, MaterialPageRoute(builder: (context) => BusSchedule()));
     }else{
 
     }
