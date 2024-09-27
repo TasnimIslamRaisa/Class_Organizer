@@ -41,7 +41,7 @@ class ScheduleCards extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.blueGrey,
+                    color: Colors.blue[800],
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -87,7 +87,7 @@ class ScheduleCards extends StatelessWidget {
 
             Divider(
               thickness: 1,
-              color: Colors.blueGrey,
+              color: Colors.blue[800],
             ),
             SizedBox(height: 8),
 
