@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:class_organizer/web/black_box_online.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -50,6 +51,8 @@ class _AdminComopanionState extends State<AdminComopanion> {
   String? sid;
   School? school;
   Teacher? teacher;
+  File? _selectedImage;
+  bool _showSaveButton = false;
 
   final AutoFunctionCaller _functionCaller = AutoFunctionCaller();
   PageController _pageController1 = PageController();
@@ -91,13 +94,16 @@ class _AdminComopanionState extends State<AdminComopanion> {
     Logout logout = Logout();
     User? user = await logout.getUserDetails(key: 'user_data');
 
+
     Map<String, dynamic>? userMap = await logout.getUser(key: 'user_logged_in');
     Map<String, dynamic>? schoolMap = await logout.getSchool(key: 'school_data');
+
 
     if (userMap != null) {
       User user_data = User.fromMap(userMap);
       setState(() {
         _user_data = user_data;
+
       });
     } else {
       print("User map is null");
@@ -117,6 +123,7 @@ class _AdminComopanionState extends State<AdminComopanion> {
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userDataString = prefs.getString('user_logged_in');
+    String? imagePath = prefs.getString('profile_picture-${_user?.uniqueid!}');
 
     if (userDataString != null) {
       Map<String, dynamic> userData = jsonDecode(userDataString);
@@ -124,6 +131,9 @@ class _AdminComopanionState extends State<AdminComopanion> {
         userName = userData['uname'];
         userPhone = userData['phone'];
         userEmail = userData['email'];
+        if (imagePath != null) {
+          _selectedImage = File(imagePath);
+        }
       });
     }
   }
@@ -202,19 +212,30 @@ class _AdminComopanionState extends State<AdminComopanion> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 // Icon
-                Container(
-                  width: 65,
-                  height: 65,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color:isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
-                  ),
-                  child: const Icon(
-                    Icons.person,
-                    color: Colors.white,
-                    size: 60,
-                  ),
+                CircleAvatar(
+                  radius: 40,
+                  backgroundImage: _selectedImage != null ? FileImage(_selectedImage!) : null,
+                  child: _selectedImage == null
+                      ? Icon(
+                    Icons.person_pin_circle_sharp,
+                    size: 65,
+                    color: isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
+                  )
+                      : null,
                 ),
+                // Container(
+                //   width: 65,
+                //   height: 65,
+                //   decoration: BoxDecoration(
+                //     shape: BoxShape.circle,
+                //     color:isLightMode ? Colors.blueGrey[100] : Colors.blueGrey[600],
+                //   ),
+                //   child: const Icon(
+                //     Icons.person,
+                //     color: Colors.white,
+                //     size: 60,
+                //   ),
+                // ),
 
                 // Name and Details
                 Expanded(

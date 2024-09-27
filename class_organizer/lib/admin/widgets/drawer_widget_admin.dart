@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:class_organizer/admin/school/pages/routines.dart';
 import 'package:class_organizer/admin/school/school_setup.dart';
 import 'package:class_organizer/ui/screens/students_screen/academic_calender_screen.dart';
@@ -8,6 +10,9 @@ import 'package:class_organizer/web/black_box_online.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import '../../models/school.dart';
+import '../../models/teacher.dart';
+import '../../models/user.dart';
 import '../../preference/logout.dart';
 import '../../style/app_color.dart';
 import '../../ui/screens/auth/SignInScreen.dart';
@@ -25,6 +30,13 @@ class _DrawerWidgetAdminState extends State<DrawerWidgetAdmin> {
   String? userName;
   String? userPhone;
   String? userEmail;
+  User? _user, _user_data;
+  final _formKey = GlobalKey<FormState>();
+  String? sid;
+  School? school;
+  Teacher? teacher;
+  File? _selectedImage;
+  bool _showSaveButton = false;
 
   @override
   void initState() {
@@ -33,8 +45,39 @@ class _DrawerWidgetAdminState extends State<DrawerWidgetAdmin> {
   }
 
   Future<void> _loadUserData() async {
+    Logout logout = Logout();
+    User? user = await logout.getUserDetails(key: 'user_data');
+
+
+    Map<String, dynamic>? userMap = await logout.getUser(key: 'user_logged_in');
+    Map<String, dynamic>? schoolMap = await logout.getSchool(key: 'school_data');
+
+
+    if (userMap != null) {
+      User user_data = User.fromMap(userMap);
+      setState(() {
+        _user_data = user_data;
+
+      });
+    } else {
+      print("User map is null");
+    }
+
+    if (schoolMap != null) {
+      School schoolData = School.fromMap(schoolMap);
+      setState(() {
+        _user = user;
+        school = schoolData;
+        sid = school?.sId;
+        print(schoolData.sId);
+      });
+    } else {
+      print("School data is null");
+    }
+
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userDataString = prefs.getString('user_logged_in');
+    String? imagePath = prefs.getString('profile_picture-${_user?.uniqueid!}');
 
     if (userDataString != null) {
       Map<String, dynamic> userData = jsonDecode(userDataString);
@@ -42,6 +85,9 @@ class _DrawerWidgetAdminState extends State<DrawerWidgetAdmin> {
         userName = userData['uname'];
         userPhone = userData['phone'];
         userEmail = userData['email'];
+        if (imagePath != null) {
+          _selectedImage = File(imagePath);
+        }
       });
     }
   }

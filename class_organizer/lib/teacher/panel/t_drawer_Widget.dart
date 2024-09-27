@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:class_organizer/admin/school/pages/departments.dart';
 import 'package:class_organizer/admin/school/pages/routines.dart';
 import 'package:class_organizer/admin/school/pages/sessions.dart';
@@ -12,6 +13,8 @@ import 'package:class_organizer/ui/screens/students_screen/events_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../models/school.dart';
+import '../../models/teacher.dart';
 import '../../models/user.dart';
 import '../../preference/logout.dart';
 import '../../test/test_v1.dart';
@@ -32,8 +35,13 @@ class _DrawerWidgetState extends State<t_DrawerWidget> {
   String? _userPhone = '+008 1800-445566';
   String? _userEmail = 'r@gmail.com';
 
-  User? _user;
-  User? _user_data;
+  User? _user, _user_data;
+  final _formKey = GlobalKey<FormState>();
+  String? sid;
+  School? school;
+  Teacher? teacher;
+  File? _selectedImage;
+  bool _showSaveButton = false;
 
   @override
   void initState() {
@@ -59,12 +67,49 @@ class _DrawerWidgetState extends State<t_DrawerWidget> {
   Future<void> _loadUserData() async {
     Logout logout = Logout();
     User? user = await logout.getUserDetails(key: 'user_data');
+
+
     Map<String, dynamic>? userMap = await logout.getUser(key: 'user_logged_in');
-    User user_data = User.fromMap(userMap!);
-    setState(() {
-      _user = user;
-      _user_data = user_data;
-    });
+    Map<String, dynamic>? schoolMap = await logout.getSchool(key: 'school_data');
+
+
+    if (userMap != null) {
+      User user_data = User.fromMap(userMap);
+      setState(() {
+        _user_data = user_data;
+
+      });
+    } else {
+      print("User map is null");
+    }
+
+    if (schoolMap != null) {
+      School schoolData = School.fromMap(schoolMap);
+      setState(() {
+        _user = user;
+        school = schoolData;
+        sid = school?.sId;
+        print(schoolData.sId);
+      });
+    } else {
+      print("School data is null");
+    }
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userDataString = prefs.getString('user_logged_in');
+    String? imagePath = prefs.getString('profile_picture-${_user?.uniqueid!}');
+
+    if (userDataString != null) {
+      Map<String, dynamic> userData = jsonDecode(userDataString);
+      setState(() {
+        _userName = userData['uname'];
+        _userPhone = userData['phone'];
+        _userEmail = userData['email'];
+        if (imagePath != null) {
+          _selectedImage = File(imagePath);
+        }
+      });
+    }
   }
 
   @override
