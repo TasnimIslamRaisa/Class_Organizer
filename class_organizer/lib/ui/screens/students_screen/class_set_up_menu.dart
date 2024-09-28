@@ -15,6 +15,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
 import '../../../utility/profile_app_bar_admin.dart';
+import '../../../utility/scanner_code.dart';
 import '../../widgets/drawer_widget.dart';
 import 'campus_routine.dart';
 
@@ -196,8 +197,8 @@ class _ClassSetUpMenuState extends State<ClassSetUpMenu> {
     }else if(pageName=='schedules'){
       Navigator.push(context, MaterialPageRoute(builder: (context) => CampusRoutine()));
       //Get.off(CampusRoutine());
-    }else if(pageName=='sessions'){
-      Navigator.push(context, MaterialPageRoute(builder: (context) => SessionListPage()));
+    }else if(pageName=='scanner'){
+      Navigator.push(context, MaterialPageRoute(builder: (context) => ScannerCode()));
     }else if(pageName=='rooms'){
       Navigator.push(context, MaterialPageRoute(builder: (context) => RoomListPage()));
     }else if(pageName=='courses'){
