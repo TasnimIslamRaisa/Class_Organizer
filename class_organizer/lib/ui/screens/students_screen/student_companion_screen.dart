@@ -79,7 +79,7 @@ class _StudentCompanionScreenState extends State<StudentCompanionScreen> {
 
   void _startAutomaticUpdates() {
     _functionCaller.startTimer(
-      interval: Duration(seconds: 10),
+      interval: Duration(seconds: 2),
       functionToCall: getSchedules,
     );
   }
